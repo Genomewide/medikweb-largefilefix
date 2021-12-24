@@ -1,0 +1,38 @@
+{
+  "name": "medikweb",
+  "version": "1.0.0",
+  "description": "Interface for medikanren",
+  "main": "index.js",
+  "scripts": {
+    "start": "node server/index.js",
+    "dev": "nodemon server/index.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Genomewide/NEVM-test.git"
+  },
+  "author": "acrouse",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/Genomewide/NEVM-test/issues"
+  },
+  "homepage": "https://github.com/Genomewide/NEVM-test#readme",
+  "dependencies": {
+    "axios": "^0.21.1",
+    "body-parser": "^1.19.0",
+    "cors": "^2.8.5",
+    "d3": "^7.0.1",
+    "express": "^4.17.1",
+    "express-list-endpoints": "^5.0.0",
+    "fast-xml-parser": "^3.18.0",
+    "got": "^11.8.1",
+    "mongodb": "^3.6.3",
+    "mongoose": "^5.11.10",
+    "vue-d2b": "^2.0.4",
+    "vue-d3-sunburst": "^1.9.1"
+  },
+  "devDependencies": {
+    "@vue/cli-plugin-router": "^4.5.10",
+    "nodemon": "^2.0.6"
+  }
+}
