@@ -1,5 +1,5 @@
 <template>
-  <b-container fluid style="background:#2E72BD; border-radius: 25px;">
+  <b-container fluid style="background: #2e72bd; border-radius: 25px">
     <b-row class="text-center" align-v="center">
       <!-- {{conceptData}} -->
       <b-col cols="1">
@@ -22,7 +22,12 @@
           align-v="center"
           v-for="(result, index) of conceptData.children"
           :key="index"
-          style="border: #FFFFF0; background: #4192E1; border-radius: 25px; padding: 10px"
+          style="
+            border: #fffff0;
+            background: #4192e1;
+            border-radius: 25px;
+            padding: 10px;
+          "
         >
           <b-col cols="1">
             <div
@@ -44,91 +49,86 @@
                   {{ res.name }}
                  </div>  -->
               <div class="text-left" style="width: 100%">
-                <b-card
-               
-                  style="margin: 5px; background: #5AB0F8; color: #fff;"
-                >
-                  <b-card-text >
+                <b-card style="margin: 5px; background: #5ab0f8; color: #fff">
+                  <b-card-text>
                     <h4>
                       {{ res.name }} (
                       {{ res.children.length.toString() }}
-                    )
+                      )
+
+                      <b-button v-b-toggle.table-collapse
+                        >Toggle Collapse</b-button
+                      >
                     </h4>
-                    
                   </b-card-text>
                   <!-- <div v-if="false"> -->
-                  <div >
+                  <div>
+                    <b-collapse id="table-collapse">
                     <b-card-text>
+                      <b-form style="margin-top: 20px; margin-bottom: 20px">
+                        <b-form-group
+                          label="Filter"
+                          label-for="filter-input"
+                          label-cols-sm="1"
+                          label-align-sm="left"
+                          label-size="sm"
+                          class="mb-0"
+                        >
+                          <b-input-group size="sm">
+                            <b-form-input
+                              id="filter-input"
+                              v-model="filter"
+                              type="search"
+                              placeholder="Type to Search"
+                            ></b-form-input>
 
-<b-form style="margin-top: 20px; margin-bottom: 20px">
-                    <b-form-group
-                      label="Filter"
-                      label-for="filter-input"
-                      label-cols-sm="1"
-                      label-align-sm="left"
-                      label-size="sm"
-                      class="mb-0"
-                    >
-                      <b-input-group size="sm">
-                        <b-form-input
-                          id="filter-input"
-                          v-model="filter"
-                          type="search"
-                          placeholder="Type to Search"
-                        ></b-form-input>
+                            <b-input-group-append>
+                              <b-button :disabled="!filter" @click="filter = ''"
+                                >Clear</b-button
+                              >
+                            </b-input-group-append>
+                          </b-input-group>
+                        </b-form-group>
+                      </b-form>
+                      <!-- </b-col> -->
+                      <!-- </b-row> -->
 
-                        <b-input-group-append>
-                          <b-button :disabled="!filter" @click="filter = ''"
-                            >Clear</b-button
-                          >
-                        </b-input-group-append>
-                      </b-input-group>
-                    </b-form-group>
-                  </b-form>
-                  <!-- </b-col> -->
-                  <!-- </b-row> -->
-             
+                      <b-pagination
+                        style="padding-bottom: 20px"
+                        v-model="currentPage"
+                        :total-rows="res.children.length"
+                        :per-page="10"
+                        align="fill"
+                        size="sm"
+                        class="my-0"
+                      ></b-pagination>
 
-              <b-pagination
-                style="padding-bottom: 20px"
-                v-model="currentPage"
-                :total-rows="res.children.length"
-                :per-page="10"
-                align="fill"
-                size="sm"
-                class="my-0"
-              ></b-pagination>
-
-                <b-table
-                  bordered
-                  striped
-                  hover
-                  
-                  ref="selectableTable"
-                  responsive="true"
-                  table-layout:
-                  fixed
-                  :current-page="currentPage"
-                  :per-page="10"
-                  :fields="resultFields"
-                  :items="res.children"
-                  :filter="filter"
-                  :filter-include-fields="[]"
-                  @filtered="onFiltered"
-                >
-                  <template #cell(object)="data">
-                    <!-- <div class="fade" style="background: linear-gradient(to right, white, transparent 90%);"> -->
-                    <span v-b-tooltip.hover :title=data.item.objectName>{{data.item.objectName}}</span>
-                   
-                  </template>
-                    <template v-slot:cell()="data">
-        <span v-b-tooltip.hover :title=data.value>{{ data.value}}</span>
-      </template>
-                </b-table>
-
-
+                      <b-table
+                        bordered
+                        striped
+                        hover
+                        ref="selectableTable"
+                        responsive="true"
+                        table-layout:
+                        fixed
+                        :current-page="currentPage"
+                        :per-page="10"
+                        :fields="resultFields"
+                        :items="res.children"
+                        :filter="filter"
+                        :filter-include-fields="[]"
+                        @filtered="onFiltered"
+                      >
+                        <template #cell(object)="data">
+                          <!-- <div class="fade" style="background: linear-gradient(to right, white, transparent 90%);"> -->
+                          <span>{{ data.item.objectName }}</span>
+                        </template>
+                        <template v-slot:cell()="data">
+                          <span>{{ data.value }}</span>
+                        </template>
+                      </b-table>
                     </b-card-text>
-
+                    </b-collapse>
                   </div>
                 </b-card>
               </div>
@@ -143,7 +143,6 @@
   
 
 <script>
-
 // #2E72BD #4192E1 #5AB0F8 #93CEFA #C3E5FC
 
 export default {
@@ -152,8 +151,8 @@ export default {
   // },
   props: ["conceptData"],
   mounted: function () {
-  console.log("this.conceptData")
-  console.log(this.conceptData)
+    console.log("this.conceptData");
+    console.log(this.conceptData);
   },
   data() {
     return {
@@ -161,8 +160,8 @@ export default {
       children: [],
       filter: null,
       currentPage: 1,
-      resultFields:[
-                {
+      resultFields: [
+        {
           key: "object",
           label: "object",
           thStyle: { "max-width": "50px" },
@@ -175,10 +174,9 @@ export default {
         {
           key: "subject",
           label: "subject",
-           thStyle: { "max-width": "50px" },
-
+          thStyle: { "max-width": "50px" },
         },
-      ]
+      ],
     };
   },
   methods: {
@@ -187,7 +185,7 @@ export default {
       this.totalRows = filteredItems.length;
       this.currentPage = 1;
     },
-  }
+  },
 };
 </script>
 
