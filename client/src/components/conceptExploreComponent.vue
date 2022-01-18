@@ -1,5 +1,136 @@
 <template>
+
   <b-container fluid style="background: #2e72bd; border-radius: 25px">
+        <div>
+    <b-row class="text-center" align-v="center">
+      <b-col >
+        <div
+          style="
+            text-transform: uppercase;
+            font-size: 26px;
+            font-weight: bold;
+          "
+        >
+          {{ conceptData.name }} 
+        </div>
+      </b-col>
+    </b-row>
+    <b-row>
+        <b-col
+          class="text-center predicate"
+          align-v="center"
+          v-for="(result, index) of conceptData.children"
+          :key="index"
+          style="
+            border: #fffff0;
+            background: #4192e1;
+            border-radius: 25px;
+            padding: 10px;
+          "
+        >
+        <b-row>        
+          <b-col>
+            <div
+              style="
+                text-transform: uppercase;
+                font-size: 26px;
+                font-weight: bold;
+                width: 100%
+              "
+            >
+              {{ result.name }} 
+            </div>
+      
+            <!-- BREAK OUT INTO GROUPS WITH RESULTS IN TABLES -->
+            <b-row v-for="(res, index) of result.children" :key="index">
+              <div class="text-left" style="width: 100%">
+                <b-card style="margin: 5px; background: #5ab0f8; color: #fff width: 100%">
+                  <b-card-text>
+                    <h4>
+                      {{ res.name }}  (
+                      {{ res.children.length.toString() }}
+                      )
+
+                      <b-button v-b-toggle="'table-collapse' + index + result.name"
+                        >Toggle Collapse</b-button
+                      >
+                    </h4>
+                  </b-card-text>
+                  <div>
+                    <b-collapse :id="'table-collapse' + index + result.name">
+                    <b-card-text>
+                      <b-form style="margin-top: 20px; margin-bottom: 20px">
+                        <b-form-group
+                          label="Filter"
+                          label-for="filter-input"
+                          label-cols-sm="1"
+                          label-align-sm="left"
+                          label-size="sm"
+                          class="mb-0"
+                        >
+                          <b-input-group size="sm">
+                            <b-form-input
+                              id="filter-input"
+                              v-model="filter"
+                              type="search"
+                              placeholder="Type to Search"
+                            ></b-form-input>
+
+                            <b-input-group-append>
+                              <b-button :disabled="!filter" @click="filter = ''"
+                                >Clear</b-button
+                              >
+                            </b-input-group-append>
+                          </b-input-group>
+                        </b-form-group>
+                      </b-form>
+                      <b-pagination
+                        style="padding-bottom: 20px"
+                        v-model="currentPage"
+                        :total-rows="res.children.length"
+                        :per-page="10"
+                        align="fill"
+                        size="sm"
+                        class="my-0"
+                      ></b-pagination>
+
+                      <b-table
+                        bordered
+                        striped
+                        hover
+                        ref="selectableTable"
+                        responsive="true"
+                        table-layout:
+                        fixed
+                        :current-page="currentPage"
+                        :per-page="10"
+                        :fields="resultFields"
+                        :items="res.children"
+                        :filter="filter"
+                        :filter-include-fields="[]"
+                        @filtered="onFiltered"
+                      >
+
+                        <template #cell(object)="data">
+                          <span>{{ data.item.object }}</span>
+                          <span>{{ data.item.objectName }}</span>
+                        </template>
+                        <template v-slot:cell()="data">
+                          <span>{{ data.value }}</span>
+                        </template>
+                      </b-table>
+                    </b-card-text>
+                    </b-collapse>
+                  </div>
+                </b-card>
+              </div>
+            </b-row>
+          </b-col>
+          </b-row>
+        </b-col>
+    </b-row>
+    </div>
+    <div>
     <b-row class="text-center" align-v="center">
       <!-- {{conceptData}} -->
       <b-col cols="1">
@@ -40,10 +171,11 @@
                 left: -40px;
               "
             >
-              {{ result.name }}
+              {{ result.name }} 
             </div>
           </b-col>
           <b-col>
+            <!-- BREAK OUT INTO GROUPS WITH RESULTS IN TABLES -->
             <b-row v-for="(res, index) of result.children" :key="index">
               <!-- <div class="names" >
                   {{ res.name }}
@@ -137,6 +269,7 @@
         </b-row>
       </b-col>
     </b-row>
+    </div>
   </b-container>
 </template>
     

@@ -1,5 +1,40 @@
 <template>
-  <div class="treeview" >
+
+  <div>
+    <svg >
+  <defs>
+    <marker id="m-end" markerWidth="10" markerHeight="10" refX="9" refY="3" orient="auto" markerUnits="strokeWidth" >
+      <path d="M0,0 L0,6 L9,3 z"></path>
+    </marker>
+        <marker id="m-start" markerWidth="6" markerHeight="6" refX="-4" refY="3" orient="auto" markerUnits="strokeWidth" >
+      <rect width="3" height="6"></rect>
+    </marker>
+  </defs>
+</svg>
+
+    
+    <d3-network ref='net' :net-nodes="nodes" :net-links="links" :options="options"  :link-cb="lcb"/>
+
+  </div>
+      <!-- <div class="title">
+    <h1> <a href="https://github.com/emiliorizzo/vue-d3-network">vue-d3-network</a> </h1> 
+    <ul class="menu">
+      <li>
+        <label> Node size  </label>
+        <input type="range" min="1" max="100" v-model='nodeSize' /> {{ options.nodeSize }}
+      </li>
+      <li>
+        <label>Render as  </label>
+      <input type="radio" :value='false' v-model='canvas' />
+      <label>SVG</label>
+      <input type="radio" :value='true' v-model='canvas' />
+      <label>Canvas</label>
+      </li>  
+    </ul>
+    </div>
+    <d3-network ref='net' :net-nodes="nodes" :net-links="links" :options="options" /> 
+  </div>-->
+    <!-- TEST -->
     <!-- <svg>
   <rect x="120" y="100" width="100" height="100" rx="15" />
 
@@ -7,9 +42,8 @@
 </svg> -->
     <!-- <hierarchical-edge-bundling height="100%" identifier="id" :data="tree" :links="links" node-text="name"/> -->
     
-    <tree :data="treeData" node-text="name" layoutType="circular" type="cluster" :key="treeKey">
+    <!-- <tree :data="treeData" node-text="name" layoutType="circular" type="cluster" :key="treeKey">
       <template #node="{ data, node: { depth }, isRetracted }">
-        <!-- <template #node="{data, node: {depth}, radius, isRetracted}"> -->
         <template v-if="data.children && data.children.length">
           <path :fill="isRetracted ? 'red' : 'blue'" d="M190.5..">
             <title>{{ data.text }} {{ depth }}</title>
@@ -22,121 +56,127 @@
         </template>
       </template>
       </tree>
-      {{treeData}}
-  </div>
+      {{treeData}} -->
+  <!-- </div> -->
 </template>
     
   
 
 <script>
-import { tree } from "vued3tree";
+import D3Network from "vue-d3-network";
 
 export default {
   components: {
-    tree,
+    D3Network,
   },
-  props: ["treeData"],
-  mounted: function () {
-  this.treeDataGraphed = this.treeData;
-  },
-  data() {
+  // props: ["treeData"],
+  // mounted: function () {
+  // this.treeDataGraphed = this.treeData;
+  // },
+   data () {
     return {
-      treeDataGraphed: {
-        name: "test",
-        children: [
-          {
-            name: "biolink:GeneProduct",
-            children: [
-              {
-                name: "C-Jun-amino-terminal kinase-interacting protein 3 (human)",
-                value: 83,
-              },
-            ],
-          },
-          {
-            name: "biolink:Gene",
-            children: [
-              {
-                name: "HGNC:6884",
-                value: 83,
-              },
-              {
-                name: "MAPK8IP3",
-                value: 83,
-              },
-            ],
-          },
-          {
-            name: "biolink:NamedThing",
-            children: [
-              {
-                name: "PANTHER:PTHR13886",
-                value: 83,
-              },
-            ],
-          },
-          {
-            name: "biolink:SequenceVariant",
-            children: [
-              {
-                name: "dbSNP:rs1567128142",
-                value: 83,
-              },
-              {
-                name: "dbSNP:rs770703007",
-                value: 83,
-              },
-              {
-                name: "dbSNP:rs1567198751",
-                value: 83,
-              },
-              {
-                name: "dbSNP:rs1567203083",
-                value: 83,
-              },
-              {
-                name: "dbSNP:rs1567214097",
-                value: 83,
-              },
-            ],
-          },
-          {
-            name: "biolink:NamedThing|biolink:GenomicEntity",
-            children: [
-              {
-                name: "chr16p13.3 (Human)",
-                value: 83,
-              },
-            ],
-          },
-          {
-            name: "biolink:Publication|biolink:InformationContentEntity|biolink:NamedThing",
-            children: [
-              {
-                name: "PMID:10523642",
-                value: 83,
-              },
-              {
-                name: "PMID:10629060",
-                value: 83,
-              },
-            ],
-          },
-        ],
-      },
-    };
+       nodes: [
+        { id: 1, name: 'my awesome node 1'},
+        { id: 2, name: 'my node 2'},
+        { id: 3, name:'orange node', _color: 'orange' },
+        { id: 4, name:'blue node',_color: '#00aaff'},
+        { id: 5 },
+        { id: 6 },
+        { id: 7 },
+        { id: 8 },
+        { id: 9 },
+        { id: 10 },
+        { id: 11 },
+        { id: 12 },
+        { id: 13 },
+        { id: 14 },
+      ],
+      links: [
+        { sid: 1, tid: 2 },
+        { sid: 2, tid: 8 },
+        { sid: 4, tid: 3 },
+        { sid: 4, tid: 5 },
+        { sid: 4, tid: 9 },
+        { sid: 5, tid: 6 },
+        { sid: 7, tid: 8 },
+        { sid: 5, tid: 8 },
+        { sid: 3, tid: 8 },
+        { sid: 7, tid: 9 },
+        { sid: 3, tid: 9 },
+        { sid: 10, tid: 6 },
+        { sid: 11, tid: 6 },
+        { sid: 12, tid: 6 },
+        { sid: 13, tid: 6 },
+        { sid: 14, tid: 6 }
+        
+      ],
+      nodeSize:10,
+      canvas:false
+
+    }
   },
+  computed:{
+    options(){
+      return{
+        force: 3000,
+        size:{ w:600, h:600},
+        nodeSize: this.nodeSize,
+        nodeLabels: true,
+        canvas: this.canvas,
+        linkWidth:2,
+        strLinks: true
+      }
+    }
+  },
+  methods:{
+    lcb (link) {
+      link._svgAttrs = { 'marker-end': 'url(#m-end)',
+                       'marker-start': 'url(#m-start)'}
+      return link
+    }
+  }
 };
 //...
 </script>
 
-<style>
-.viewport {
-  width: 100%;
-  height: 500px;
+<style scoped>
+
+@import '/../node_modules/vue-d3-network/dist/vue-d3-network.css';
+@import url('https://fonts.googleapis.com/css?family=PT+Sans');
+
+body{
+  font-family: 'PT Sans', sans-serif;
+  background-color: #eee;
 }
-.treeview {
-  width: 100%;
-  height: 500px;
+.title{
+  position:absolute;
+  text-align: center;
+  left: 2em;
 }
+h1,a{
+  color: #1aad8d;
+  text-decoration: none;
+}
+
+ul.menu {
+  list-style: none;
+  position: absolute;
+  z-index: 100;
+  min-width: 20em;
+  text-align: left;
+}
+ul.menu li{
+  margin-top: 1em;
+  position: relative;
+}
+.node {
+  color: #1aad8d;
+}
+.greenNode{
+  color: #1aad8d;
+}
+#m-end path, #m-start{
+  fill: rgba(18, 120, 98, 0.8);
+}
+
 </style>

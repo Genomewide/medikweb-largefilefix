@@ -314,7 +314,7 @@
               </div>
           </b-tab>
           <b-tab title="Diagram">
-<conceptExploreComponent :conceptData="testjson" />
+<conceptExploreComponent :conceptData="tree" />
  <!-- {{testjson}} -->
           </b-tab>
         </b-tabs>
@@ -511,6 +511,7 @@ export default {
       // alert(JSON.stringify(this.form))
     },
     async getAllEdges (){
+      // this.tree = testjson
 
       let queryForward = {"message": {"query_graph": {"nodes": {"n1": {},"n2": {"id": "HGNC:6884"}},"edges": {"e1": {"subject": "n1","object": "n2"}}}}}
       let queryBackward = {"message": {"query_graph": {"nodes": {"n1": {},"n2": {"id": "HGNC:6884"}},"edges": {"e1": {"subject": "n2","object": "n1"}}}}}

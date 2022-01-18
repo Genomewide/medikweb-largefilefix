@@ -22,6 +22,7 @@
     "jquery": "^3.5.1",
     "popper.js": "^1.16.1",
     "vue": "^2.6.11",
+    "vue-d3-network": "^0.1.28",
     "vue-router": "^3.4.9",
     "vued3tree": "^5.1.0",
     "vuex": "^3.6.2"
