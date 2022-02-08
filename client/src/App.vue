@@ -52,6 +52,7 @@
     <b-nav-item ><router-link to="/twohop">Two Hop G2G2D</router-link></b-nav-item>
     <b-nav-item ><router-link to="/conceptExplore">Concepts Explorer</router-link></b-nav-item>
     <b-nav-item ><router-link to="/apiexplorer">Api Format Tester</router-link></b-nav-item>
+    <b-nav-item ><router-link to="/arsexplorer">ARS Format Tester</router-link></b-nav-item>
     <b-nav-item ><router-link to="/geneToDrugnext">geneToDrugnext</router-link></b-nav-item>
     <b-nav-item ><router-link to="/starburst">starburst</router-link></b-nav-item>
     <b-nav-item ><router-link to="/svgtest">svgtest</router-link></b-nav-item>

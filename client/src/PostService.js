@@ -255,6 +255,39 @@ class PostService {
     });
   }
 
+  static query_ars() {
+    // console.log("started query_raw");
+    // console.log(concepts)
+    // concepts = formData
+    let arsurl = "https://ars.transltr.io/ars/api/submit"
+    // let query = '{"message": {"query_graph": {"nodes": {"n1": {},"n2": {"id": "HGNC:6884"}},"edges": {"e1": {"subject": "n1","object": "n2"}}}}}'
+    // let query_example = ' {"message": {"query_graph": {"edges": {"e01": {"subject": "n0","predicate": "biolink:treats","object": "n1"}},"nodes": {"n0": {"category": "biolink:Drug","id": "DRUGBANK:DB00394"},"n1": {"category": "biolink:Disease"}}}}}"'
+    let query_example = '{"message": {"query_graph": {"edges": {"e01": {"subject": "n0","predicate": "biolink:treats","object": "n1"}},"nodes": {"n0": {"category": "biolink:Drug","id": "DRUGBANK:DB00394"},"n1": {"category": "biolink:Disease"}}}}}'
+    return new Promise(async (resolve, reject) => { // eslint-disable-line
+      
+      try {
+        // terms.array.forEach(element => {
+          console.log("query_example = ", query_example)
+          let query = JSON.parse(query_example)
+
+          console.log("query = ", query)
+          // let query = JSON.parse(query_example)
+        const res = await axios.post(arsurl, 
+          query
+          // name: "test text",
+          // email:"sean_bean@gameofthron.es",
+          // password:"$2b$12$UREFwsRUoyF0CRqGNK0LzO0HM/jLhgUCNNIJ9RJAqMUQ74crlJ1Vu"
+        );
+        const data = res.data;
+        console.log("ARS axios for Postservices done")
+        console.log(data)
+        resolve(data);
+      } catch (err) {
+        reject(err);
+      }
+    });
+  }
+
   static mongo_postChebi(drugs) {
     return new Promise(async (resolve, reject) => {// eslint-disable-line
       // eslint-disable-line

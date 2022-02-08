@@ -4,6 +4,7 @@ import Router from 'vue-router'
 
 import home from './components/geneToDrug.vue';
 import apiexplorer from './components/apiexplorer.vue';
+import arsexplorer from './components/arsexplorer.vue';
 import conceptExplore from './components/conceptExplore.vue';
 import geneToDrug from './components/geneToDrug.vue';
 import geneToDrugnext from './components/geneToDrugnext.vue';
@@ -16,7 +17,7 @@ import geneAllSynToDrugs from './components/geneAllSynToDrugs.vue';
 // client/src/components/conceptExplorePlus.vue geneAllSynToDrugs
 
 Vue.use(Router)
-
+// arsexplorer
 // export function createRouter () {
 //   return new Router({
   export default new Router({
@@ -32,6 +33,11 @@ Vue.use(Router)
         name: 'home', 
         component: home 
       },
+      { 
+        path: '/arsexplorer', 
+        name: 'arsexplorer', 
+        component: arsexplorer 
+      },      
       { 
         path: '/apiexplorer', 
         name: 'apiexplorer', 

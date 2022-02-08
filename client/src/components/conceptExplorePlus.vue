@@ -525,6 +525,7 @@ export default {
         let allResults = []
         // let allResultsForward = []
         // let allResultsBackward = []
+        
         for (let i = 0; i < this.allSynonyms.length; i++) {
           const synonym = this.allSynonyms[i];
           console.log("SYNONYM TO GET DRUG RESULTS = ", synonym)
