@@ -1,6 +1,6 @@
 <template>
   <div class="container" style="margin-bottom: 100px">
-    <h1 class="text-center">MEDIK GENE TO GENE TO DRUG QUERY NEXT</h1>
+    <h1 class="text-center">ARS GENE TO GENE TO DRUG QUERY NEXT</h1>
 
     <div style="margin-top: 20px">
       <b-modal
@@ -51,12 +51,12 @@
                     v-on:click="testSection"
                     >testSection
                   </b-button>
-
+                  
                   <b-button
                     style="margin-left: 20px"
                     variant="primary"
-                    v-on:click="tryARAX"
-                    >tryARAX
+                    v-on:click="tryARS"
+                    >tryARS
                   </b-button>
                   <b-form-checkbox
                     style="margin-left: 20px"
@@ -92,6 +92,13 @@
                   <p text-muted>Enter the HGNC ID in the format shown</p>
                 </b-form>
               </b-form-group>
+              Example: {{ARSrequestID}} 
+                               <b-button
+                    style="margin-left: 20px"
+                    variant="primary"
+                    v-on:click="ARScheckResults"
+                    >ARScheckResults
+                  </b-button>
             </div>
           </b-form>
         </b-col>
@@ -122,51 +129,44 @@
 
       <b-container style="margin-top: 20px" fluid>
         <b-row>
-          <b-card header="featured" header-tag="header" :key="componentKey">
-            <template #header>
-              <h6 class="mb-0">Test ARAX:</h6>
-              <!-- concept_search -->
-            </template>
-            <!-- <h4 class="mb-0">Symbol: {{ concept_search }}</h4> -->
+                          <b-card
+                  header="featured"
+                  header-tag="header"
+                  :key="componentKey"
+                >
+                  <template #header>
+                    <h6 class="mb-0">Current result count:</h6>
+                    <!-- concept_search -->
+                  </template>
+                  <!-- <h4 class="mb-0">Symbol: {{ concept_search }}</h4> -->
 
-            <br />
-            <b-table
-              bordered
-              striped
-              hover
-              ref="timepersteptable"
-              table-layout:
-              fixed
-              :items="araxResultTable"
-              :fields="fields"
-            >
-              <template #cell(publications)="data">
-                {{ data }}
-                <!-- <div v-if="data.item.pubLength > 0">
-                    <b-button
-                      size="sm"
-                      @click="data.toggleDetails"
-                      class="mr-2"
-                    >
-                      Pubs =
-                      <b-badge variant="light">{{
-                        data.item.pubLength
-                      }}</b-badge>
-                    </b-button>
-                  </div> -->
-              </template>
-            </b-table>
-            <!-- <b-card-text v-for="syn in synonymsArray" :key="syn.id">
+                  <br />
+                <b-table
+                  bordered
+                  striped
+                  hover
+                  ref="timepersteptable"
+                  table-layout:
+                  fixed
+                  :fields="fields"
+                  :items="resultSetIDs"
+                >
+
+                </b-table>
+                  <!-- <b-card-text v-for="syn in synonymsArray" :key="syn.id">
                     <b>{{ syn.identifier }}: &nbsp;</b>{{ syn.name }} &nbsp;
                     (Hits = {{ syn.hitCount }})
                   </b-card-text> -->
-            <!-- {{synonymsArray}} -->
-          </b-card>
+                  <!-- {{synonymsArray}} -->
+                </b-card>
         </b-row>
         <b-row>
           <b-col>
             <div>
               <b-card-group deck>
+
+
+
                 <b-card
                   header="featured"
                   header-tag="header"
@@ -274,7 +274,7 @@
 
               <!-- <b-card-sub-title  v-for="(predicate, index) in resultWithDrugs.predicates" :key="index" >Predicate: {{predicate}} </b-card-sub-title> -->
               <b-card-text>
-                {{ currentDrug }}
+                {{currentDrug}}
                 <!-- <b-table
                   bordered
                   striped
@@ -291,47 +291,32 @@
             <!-- <b-col> </b-col> -->
           </b-row>
         </b-container>
-        <b-container :key="componentKey">
+                <b-container :key="componentKey">
           <b-row
             style="margin-top: 20px; width: 100%"
             v-for="gene in geneIDList"
             :key="gene.id"
           >
-            <b-card
-              style="margin-top: 20px; width: 100%"
-              :key="gene.id + componentKey"
-            >
+            <b-card style="margin-top: 20px; width: 100%" :key=" gene.id + componentKey">
               <template #header>
-                <h4 class="mb-0">{{ progressObject[gene].groupName }}</h4>
-                (all drugs with any predicate:
-                {{ progressObject[gene].chemCountTotal }})
+                <h4 class="mb-0">{{ progressObject[gene].groupName }}</h4> (all drugs with any predicate: {{progressObject[gene].chemCountTotal}})
+
               </template>
+             
 
               <b-card-text>
-                Drugs with clear predicate ({{
-                  progressObject[gene].chemCount
-                }})
-                <div>
-                  <h5>Getting and filtering synonyms:</h5>
-                  <b-progress
-                    :value="progressObject[gene].synCurrentCount"
-                    :max="progressObject[gene].chemCount"
-                    show-progress
-                    animated
-                  ></b-progress>
-                  {{ progressObject[gene] }}
-                </div>
-                <div>
-                  <h5>Checking FDA status:</h5>
-                  <b-progress
-                    :value="progressObject[gene].FDACurrentCount"
-                    :max="progressObject[gene].chemCount"
-                    show-progress
-                    animated
-                  ></b-progress>
-                  {{ progressObject[gene] }}
-                </div>
-              </b-card-text>
+        Drugs with clear predicate ({{progressObject[gene].chemCount}})
+        <div>
+          <h5>Getting and filtering synonyms: </h5>
+              <b-progress :value="progressObject[gene].synCurrentCount" :max="progressObject[gene].chemCount" show-progress animated></b-progress>
+                {{progressObject[gene]}}
+        </div>        
+        <div>
+          <h5>Checking FDA status: </h5>
+              <b-progress :value="progressObject[gene].FDACurrentCount" :max="progressObject[gene].chemCount" show-progress animated></b-progress>
+                {{progressObject[gene]}}
+        </div>
+      </b-card-text> 
               <b-card-body> </b-card-body>
             </b-card>
             <!-- <b-col> </b-col> -->
@@ -346,16 +331,17 @@
 import PostService from "../PostService";
 import PubCleanService from "../PubCleanService";
 import TrapiResultClean from "../TrapiResultClean";
+import ARSService from "../ARSService";
 import ARAXService from "../ARAXService";
 // import svgtest from "./svgtest.vue"
-import importResultWithDrugs from "/Users/andycrouse/Downloads/HGNC_68842hopJSON.json";
+// import importResultWithDrugs from "/Users/andycrouse/Downloads/resultWithDrugsWithFDA.json"
 import synonymService from "../synonymService";
 // import twohopdata from "../../../datafiles/twohopggd.json"
+
 
 var parser = require("fast-xml-parser");
 import axios from "axios";
 import * as d3 from "d3";
-// import { off } from 'process';
 
 // import {
 //   breadcrumbTrail,
@@ -409,6 +395,81 @@ export default {
       // 5173 HRAS
 
       // KEEP THIS AS TEMPLATE FOR QUERIES
+      query: {
+  "message": {
+      "query_graph": {
+          "edges": {
+              "e00": {
+                  "constraints": [],
+                  "object": "gene1",
+                  "predicates": [
+                      "biolink:decreases_degradation_of",
+                      "biolink:increases_activity_of",
+                      "biolink:increases_expression_of",
+                      "biolink:increases_stability_of",
+                      "biolink:increases_synthesis_of",
+                      "biolink:activator",
+                      "biolink:agonist",
+                      "biolink:inducer",
+                      "biolink:inverse_agonist",
+                      "biolink:partial_agonist",
+                      "biolink:positive_allosteric_modulator",
+                      "biolink:stimulates",
+                      "biolink:stimulator",
+                      "biolink:positively_regulates",
+                              "biolink:regulates",
+        "biolink:negatively_regulates",
+        "biolink:positively_regulates",
+        "biolink:entity_positively_regulates_entity",
+        "biolink:entity_negatively_regulates_entity",
+        "biolink:entity_regulates_entity",
+        "biolink:correlated_with",
+        "biolink:affects"
+
+                  ],
+                  "subject": "gene0"
+              }
+ 
+          },
+          "nodes": {
+      
+              "gene0": {
+                  "categories": [
+                      "biolink:Protein",
+                      "biolink:Gene"
+                  ],
+                  "constraints": [],
+                  "ids": [
+      "HGNC:6884",
+        "NCBIGene:23162",
+        "UMLS:C1417026",
+        "RGD:1563691",
+        "NCBIGene:302983",
+        "MGI:1353598",
+        "NCBIGene:30957",
+        "PR:Q9UPT6",
+        "UniProtKB:Q9UPT6",
+        "PR:000010162",
+        "NCBIGene:176349", "UMLS:C1432412", "wb:WBGene00006755", "WormBase:WBGene00006755",
+        "MESH:C581624", "UMLS:C3657327", "RGD:1563691", "MESH:C554781", "UMLS:C2974800"
+                  ],
+                  "is_set": false
+              },
+              "gene1": {
+                "categories": [
+                    "biolink:Protein",
+                    "biolink:Gene"
+                ],
+                "constraints": [],
+          
+                "is_set": false
+            }
+          }
+      }
+  },
+  "submitter": "UI Team ABC",
+  "stream_progress": true
+},
       queryjson: {
         message: {
           query_graph: {
@@ -585,15 +646,36 @@ export default {
       ],
       badChemResults: ["UMLS:C0066772"],
       rawresultstosave: null,
-      query: {
-        message: {
-          query_graph: {
-            nodes: { n1: { category: "gene" }, n2: { id: "UMLS:C1425544" } },
-            edges: { e0: { subject: "n1", object: "n2" } },
-          },
+
+      fields: [
+        {
+          key: "agent",
+          label: "Name",
+          sortable: true,
+          tdClass: "colwidth",
         },
-      },
-      nodelist: [],
+        {
+          key: "code",
+          label: "Code",
+        },
+        {
+          key: "status",
+          label: "Status",
+        },
+        {
+          key: "id",
+          label: "ID",
+        },
+        {
+          key: "resultCount",
+          label: "Result Count",
+          sortable: true,
+          tdClass: "colwidth",
+        }
+   
+      ],
+      predicateAll:[],
+            nodelist: [],
       filteredResultsmore: [],
       synonymsArray: [],
       synCountHits: [],
@@ -614,6 +696,8 @@ export default {
       geneTableToSave: [],
       chemTableToSave: [],
       hgncAll: [
+     
+      
         "HGNC:10596",
         "HGNC:15573",
         "HGNC:25566",
@@ -631,40 +715,13 @@ export default {
       geneIDList: [],
       currentDrug: "test",
       araxResultTable: [],
-      fields: [
-        {
-          key: "nodeDrugName",
-          label: "Drug",
-          sortable: true,
-          tdClass: "colwidth",
-        },
-        {
-          key: "edgeOne",
-          label: "dg_pred",
-          sortable: true,
-          tdClass: "colwidth",
-        },
-        {
-          key: "nodeGeneName",
-          label: "Gene",
-          sortable: true,
-          tdClass: "colwidth",
-        },
-        {
-          key: "edgeTwo",
-          label: "gg_pred",
-          sortable: true,
-          tdClass: "db_colwidth",
-        },
-        {
-          key: "nodeTarget",
-          label: "Target",
-          sortable: true,
-          tdClass: "db_colwidth",
-        },
-      ],
-      predicateAll: [],
-      // nodeGeneName
+      ARSrequestID: "f92c8a10-551f-4086-a036-6f6e3162eb42",
+      resultSetIDs: [],
+      ARSResultStatus: {},
+      ARSJobId: "bc32c185-6a97-4aff-b467-aa2fac22e275",
+      // 0c2bff46-f20a-4761-859b-50b4d0b0ce83  Object from aragorn
+
+// nodeGeneName
       //FAILED "HGNC:2348", "HGNC:13723", "HGNC:2514", "HGNC:2961", "HGNC:3373", reasoner_id
     };
   },
@@ -676,315 +733,150 @@ export default {
     openPubmed: function (pmid) {
       window.open("https://pubmed.ncbi.nlm.nih.gov/" + pmid, "_blank");
     },
-     waitforme(milisec) {
-        return new Promise(resolve => {
-          setTimeout(() => { resolve('') }, milisec);
-      })
+    async tryARS() {
+
+    // SET QUERY WITH SEARCH TERM
+    // this.query.message.query_graph.nodes.n00.ids = [this.concept_search]
+
+    // GET GENES REGULATING TARGET
+      console.log("------ ARSService REQUEST STARTED")
+      // console.log(ARSService)
+      let ARSRequest = await ARSService.ARSQuery(this.query)
+      console.log("ARSRequest")
+      console.log(ARSRequest)
+      // ARSStatus
+      let ARSrequestID = ARSRequest.pk
+      this.ARSrequestID = ARSrequestID
+      this.ARScheckResults()
+
     },
-    async testSection() {
-      this.startTime = new Date()
-      console.log(importResultWithDrugs);
-      let chemTableForDownload = []
 
-      // CREATE EMMITTERS FOR LOOP THROUGH PUBMEDS
-      const EventEmitter = require("events");
-      class Emitter extends EventEmitter {}
-      const eventEmitter = new Emitter();
+    async ARScheckResults () {
+      // let ARSStatus = await ARSService.ARSStatus(this.ARSrequestID)
+      console.log("##### ##### ##### ##### ##### ##### ##### ")
+      console.log("##### ARSStatus checked by rerunning")
+      // console.log(ARSStatus)
+      this.resultSetIDs = []
 
+      ARSService.ARSStatus(this.ARSrequestID)
+      .then(async (ARSStatus) => {
+        console.log("ARSStatus")
+        console.log(ARSStatus)
+        let resultList  = ARSStatus.children
 
-      try{
-        // GENE LOOP
-        
-        for (let i = 0; i < importResultWithDrugs.length; i++) {
-            // for (let i = 0; i < 2; i++) {
-            console.log("##### GENE INDEX = ", i)
-            const geneData = importResultWithDrugs[i];
-            let chemResults = geneData.chemResults
-            if(chemResults.length > 0){
-              // CHEM LOOP 
-            for (let n = 0; n < chemResults.length; n++) {
-              // for (let n = 0; n < 5 || n < chemResults.length; n++) {
-
-                console.log("------- CHEM INDEX = ", n)
-                console.log(new Date())
-                const chem = chemResults[n];
-                // console.log("chem = ", chem)
-                let edgeInfo = {}
-                edgeInfo.object = chem.object
-                edgeInfo.objectAraxid = chem.objectAraxid
-                edgeInfo.objectChemFDA = chem.objectChemFDA
-                edgeInfo.objectName = chem.objectName
-                edgeInfo.subject = chem.subject
-                edgeInfo.subjectName = chem.subjectName
-                edgeInfo.objectSRINormid = chem.objectSRINormid
-                          
-                // console.log("geneData")
-                // console.log(geneData)
-                let pubs = chem.edgepublications
-                console.log("pubs to check what is being sent to pubclean")
-                // console.log(pubs)
-                console.log(pubs != null)
-
-                if(pubs != null && pubs != [null]){
-                  if(pubs.length > 0){
-                    console.log("@@@@@@@@@ eventEmitter.eventNames()")
-                    console.log(eventEmitter.eventNames())
-                  console.log("RESULT TABLE LENGTH = ", chemTableForDownload.length)
-                  let emmiterCheck = eventEmitter.eventNames()
-                  if(emmiterCheck.indexOf('event')> -1){
-                    eventEmitter.removeAllListeners(['event'])
-                  }
-                  let x = 0
-                  let length = pubs.length
-
-                  eventEmitter.on("event", async () => {
-                 
-                    console.log("event emitted!");
-
-                    if (x < length) {
-
-                       const pub = pubs[x];
-                        edgeInfo.link =  "https://pubmed.ncbi.nlm.nih.gov/" + pub
-                        edgeInfo.geneIndex = i
-                        edgeInfo.chemIndex = n
-                        edgeInfo.pubIndex = x
-
-                        chemTableForDownload.push(edgeInfo)
-                        // await this.waitforme(40)
-                        console.log(edgeInfo)                      
-
-                      x++;
-
-                      eventEmitter.emit("event");
-                    }
-                  });
-
-                  eventEmitter.emit("event");
+        for (let i = 0; i < resultList.length; i++) {
+          console.log("----- ----- ----- ----- -----")
 
 
+          const resInfo = resultList[i];
+          console.log(resInfo.actor.agent)
+          console.log(resInfo.code)
+          console.log(resInfo.status)        
+          let result = await ARSService.ARSStatus(resInfo.message)
 
+          let agent = resInfo.actor.agent
+          this.ARSResultStatus[agent] = {}
+          this.ARSResultStatus[agent]["agent"] = agent
+          this.ARSResultStatus[agent]["code"] = resInfo.code
+          this.ARSResultStatus[agent]["status"] = resInfo.status
+          this.ARSResultStatus[agent]["id"] = resInfo.message
+          this.ARSResultStatus[agent]["resultCount"] = null
+          this.ARSResultStatus[agent]["results"] = result
 
+          // CHECK IF THERE IS A KNOWLEDGE GRAPH
+          console.log(Object.prototype.hasOwnProperty.call(result, "message"))
+          if(Object.prototype.hasOwnProperty.call(result, "message")){
+            console.log("Has Knowledge Graph = ", (Object.prototype.hasOwnProperty.call(result.message, "knowledge_graph")))
+          }else {
+            console.log("Has Knowledge Graph = ", false)
+          }
 
+          // SHOW RESULTS
+          console.log(result)  
 
-
-
-                    // for (let x = 0; x < pubs.length; x++) {
-                    //   (function(x) {
-                    //     const pub = pubs[x];
-                    //     edgeInfo.link =  "https://pubmed.ncbi.nlm.nih.gov/" + pub
-                    //     edgeInfo.geneIndex = i
-                    //     edgeInfo.chemIndex = n
-                    //     edgeInfo.pubIndex = x
-
-                    //     chemTableForDownload.push(edgeInfo)
-                    //     // await this.waitforme(40)
-                    //     console.log(edgeInfo)
-                    //   })(i) 
-
-                    //   // chemTableForDownload = [...chemTableForDownload, ...chemPubTableArr]
-                      
-                    // }
-
-
-
-
-
-
-
-
-
-                    // await new Promise(resolve => setTimeout(resolve, 1000))
-                    // await this.waitforme(400)
-                    // let pubsJoined = pubs.join()
-                    // let pubinfo = await this.getPubmed(pubsJoined)
-                    // console.log("pubinfo")
-                    // console.log(pubinfo)
-                    // console.log(pubsJoined)
-                    // if(pubs != null && pubs != [null]){
-                    //   let chemPubTableArr = await PubCleanService.createPubReviewTable(pubinfo, edgeInfo)
-                    //   console.log(chemPubTableArr)
-                    //   chemTableForDownload = [...chemTableForDownload, ...chemPubTableArr]
-                    //   console.log("######$$$$$$$$    %%%%%%%%")
-                    //   console.log("chemTableForDownload")
-                    //   console.log(chemTableForDownload)
-                    // }
-
-                  }  
-                }
-      
+          // IF THERE ARE  RESULTS SEND THEM TO BE CLEANED
+          if(Object.prototype.hasOwnProperty.call(result, "message")){
+            console.log("FOUND MESSAGE")
+            if(Object.prototype.hasOwnProperty.call(result.message, "knowledge_graph")){
+              console.log("FOUND KNOWLEDGE GRAPH")
+              // if(result.message.results.length > 0){
+                // console.log("HAS MORE THAN 0 RESULTS")
+                this.ARSResultStatus[agent].resultCount = result.message.results.length
                 
-                if(i == importResultWithDrugs.length - 1 && n == chemResults.length -1){
-                  console.log("FINISHED CHEM GENE")
-                  this.saveThisFile(chemTableForDownload, "CHEM GENE");
-                }
-              }
+                let resultObj = {"agent": resInfo.actor.agent,"status": resInfo.status, "code": resInfo.code, "id": resInfo.message, "resultCount":  result.message.results.length}
+                this.resultSetIDs.push(resultObj)
+                // let cleanedResults = await TrapiResultClean.TrapiResultClean(result)
+                // console.log("cleanedResults")
+                // console.log(cleanedResults)
+              // }
+            }
+          }
+
+          
+        // NOTE WHEN FINISHED
+          if(i == resultList.length - 1){
+            console.log("FINISHED GETTING ALL THE RESULTS")
+            return
+          }    
+        }
+
+      })
+      .then(async () => {
+
+        let keys = Object.keys(this.ARSResultStatus)
+        console.log(this.ARSResultStatus)
+        this.resultSetIDs = []
+        console.log(keys)
+        for (let i = 0; i < keys.length; i++) {
+          const id = keys[i];
+          console.log("id")
+          console.log(id)
+          this.resultSetIDs.push(this.ARSResultStatus[id])
+          console.log("this.ARSResultStatus[id]")
+          console.log(this.ARSResultStatus[id])
+          
+          if(Object.prototype.hasOwnProperty.call(this.ARSResultStatus[id].results, "message")){
+            if(Object.prototype.hasOwnProperty.call(this.ARSResultStatus[id].results.message, "knowledge_graph")){
+              console.log("CLEANING RESULTS")
+              let cleanedResults = await TrapiResultClean.TrapiResultClean(this.ARSResultStatus[id].results)
+              console.log(cleanedResults)
+
             }
 
-
-            
-          }
-      } catch (err){
-        console.error(err)
-        console.log("WRITING FILE FOR WHAT WE HAAVE SO FAR")
-        this.saveThisFile(chemTableForDownload, "CHEM GENE");
-      }
- 
-
-
-    },
-
-   async getPubmed(pubs) {
-      return new Promise(async (resolve, reject) => { // eslint-disable-line
-
-      console.log("***** START getPubmed");
-      // console.log("index = ",);
-      console.log(pubs);
-
-        try {
-          let pubmedurl =
-            "https://eutils.ncbi.nlm.nih.gov/entrez/eutils/efetch.fcgi?db=pubmed&id=" +
-            pubs +
-            "&rettype=json";
-          // let pubmedurl =
-          // "https://eutils.ncbi.nlm.nih.gov/entrez/eutils/efetch.fcgi?db=pubmed&id=30945334&rettype=json";
-          // "https://eutils.ncbi.nlm.nih.gov/entrez/eutils/efetch.fcgi?db=pubmed&id=30945334,30612693&rettype=json";
-
-          console.log("url = ", pubmedurl);
-          const res = await axios.get(pubmedurl);
-
-          const xmlData = res.data;
-
-          var pmjson = parser.parse(xmlData);
-
-          let pub = [];
-          if (Array.isArray(pmjson.PubmedArticleSet.PubmedArticle)) {
-            pub = pmjson.PubmedArticleSet.PubmedArticle;
-          } else {
-            pub.push(pmjson.PubmedArticleSet.PubmedArticle);
           }
 
-          // console.log(pmjson.PubmedArticleSet)
-          // console.log(Array.isArray(pmjson.PubmedArticleSet.PubmedArticle));
 
 
-          let pubData = await PubCleanService.cleanPubmed(pub);
-          console.log("pubData processsed");
 
-          console.log("***** END getPubmed");
-          if(pubData != null){
-            resolve(pubData)
-          } else {
-            resolve([])
-          }
-          
 
-          this.groupedTableKey += 1;
-        } catch (err) {
-          console.error(err);
-          this.stopTime = new Date()
-          reject(err)
-        }
+          // if( this.ARSResultStatus[id].agent == "ara-aragorn"){
+          //   console.log("TESTING INFO FROM ARAGORM")
+          //   // console.log(this.ARSResultStatus[id].message.knowledge_graph.edges["0c2bff46-f20a-4761-859b-50b4d0b0ce83"])
+          //   let test = this.ARSResultStatus[id].results.message.knowledge_graph.edges["0c2bff46-f20a-4761-859b-50b4d0b0ce83"]
+          //   console.log(JSON.stringify(test))
+          //   console.log(this.ARSResultStatus[id].results.message.knowledge_graph.edges["0c2bff46-f20a-4761-859b-50b4d0b0ce83"])
+          //   // console.log(this.ARSResultStatus[id].message.knowledge_graph)
           // }
-        
-      })
+          
+        }
+      })    
+
+
     },
+    async testSection () {
+      console.log("search term = ", this.concept_search)
+      let ARAXsyn = await  ARAXService.getARAXSynonyms(this.concept_search)
+      console.log("ARAXsyn")
+      console.log(ARAXsyn)
 
-    async testSave(jsonObject) {
-      console.log("testSave - testing");
-      const text = JSON.stringify(jsonObject);
-
-      let filename = this.concept_search + "2hopJSON.json";
-      let element = document.createElement("a");
-      element.setAttribute(
-        "href",
-        "data:application/json;charset=utf-8," + encodeURIComponent(text)
-      );
-      element.setAttribute("download", filename);
-
-      element.style.display = "none";
-      document.body.appendChild(element);
-
-      element.click();
-      document.body.removeChild(element);
     },
-    async tryARAX() {
-      // console.log("twohopdata")
-      // console.log(twohopdata)
-      // GET GENES REGULATING TARGET
-      //   let araxResults = await ARAXService.araxQuery_gg(this.concept_search)
-      //   let context = '"context": "https://raw.githubusercontent'
-      //   let index = araxResults.indexOf(context) - 1
-      //   // console.log("index")
-      //   // console.log(index)
-      //   // console.log(araxResults.substring(index))
-      //   // console.log(JSON.parse( araxResults.substring(index)))
-      //   let araxJson = JSON.parse(araxResults.substring(index))
-      //   // console.log(araxJson)
-      //   console.log("araxJson.message.knowledge_graph.edges")
-      //   console.log(araxJson.message.knowledge_graph.edges)
-      //   console.log("araxJson.message.knowledge_graph.nodes")
-      //   console.log(araxJson.message.knowledge_graph.nodes)
-      //   let nodes = araxJson.message.knowledge_graph.nodes
-      //   // console.log(JSON.parse(araxResults) )
-      //   // console.log(araxResults)
-      //   console.log("araxJson.message.results")
-      //   console.log(araxJson.message.results)
-      //   let results = araxJson.message.results
-      //   // essence
-      //   // let resultsGrouped = await TrapiResultClean.TrapiResultGroup(results, "essence")
-      //   // console.log("resultsGrouped = ", resultsGrouped)
-      // // GET GENES REGULATING TARGET
-      //   let genes = Object.keys(nodes)
-      //   console.log("genes = ", genes)
-      //   let araxResults_dg = await ARAXService.araxQuery_dg(genes)
-      //   index = araxResults.indexOf(context) - 1
-      //   araxJson_dg = JSON.parse(araxResults_dg.substring(index))
-      //   let nodes_dg = araxJson_dg.message.knowledge_graph.nodes
-      //   console.log("nodes_dg")
-      //   console.log(nodes_dg)
-      // for (let i = 0; i < results.length; i++) {
-      //   const result = results[i];
-      //   let row = {}
-      //   // let predicates = []
-      //   console.log("result = ", result)
-      //   row.nodeDrug = result.node_bindings.n00[0].id
-      //   row.nodeGene = result.node_bindings.n02[0].id
-      //   row.nodeTarget = result.node_bindings.n01[0].id
-      //   row.nodeDrugName = nodes[row.nodeDrug].name
-      //   row.nodeGeneName = nodes[row.nodeGene].name
-      //   row.reasoner_id = result.reasoner_id
-      //   row.key = this.componentKey
-      //   let e00 = result.edge_bindings.e00
-      //   let e01 = result.edge_bindings.e01
-      //   // console.log("nodeDrugName = ", nodeDrugName)
-      //   // row.edgeOnetest = e00.map(edge => edge.id.split("biolink")[1])
-      //   // console.log("row.edgeOnetest = ", row.edgeOnetest)
-      //   row.edgeOne = e00.map(edge => edge.id.split("biolink:")[1].split("-")[0])
-      //   row.edgeTwo = e01.map(edge => edge.id.split("biolink:")[1].split("-")[0])
-      //   // row.edgeTwo = result
-      //   // console.log("nodes[row.nodeDrug] = ", nodes[row.nodeDrug])
-      //   this.araxResultTable.push(row)
-      //   this.componentKey++
-      //   if(i == results.length - 1){
-      //     let groupedGroupID = await TrapiResultClean.TrapiResultGroup(this.araxResultTable, "nodeDrugName")
-      //     console.log("groupedGroupID = ", groupedGroupID)
-      //   }
-      //   // groupedGroupID = await TrapiResultClean.TrapiResultGroup
-      // }
-    },
-    // async testSection () {
-    //   console.log("search term = ", this.concept_search)
-    //   let ARAXsyn = await  ARAXService.getARAXSynonyms(this.concept_search)
-    //   console.log("ARAXsyn")
-    //   console.log(ARAXsyn)
-
-    // },
     async eventLoop() {
       // concept_search
 
-      this.progressTable = [];
-      this.progressObject = {};
-      this.geneIDList = [];
+      
+      this.progressTable = []
+      this.progressObject= {}
+      this.geneIDList = []
       let length = this.hgncAll.length;
       let i = 0;
 
@@ -992,9 +884,10 @@ export default {
       class Emitter extends EventEmitter {}
       const eventEmitter = new Emitter();
       eventEmitter.on("event", async () => {
-        this.progressTable = [];
-        this.progressObject = {};
-        this.geneIDList = [];
+
+     this.progressTable = []
+      this.progressObject= {}
+      this.geneIDList = []
         console.log("event emitted!");
         console.log(this.hgncAll[i]);
 
@@ -1023,7 +916,7 @@ export default {
       this.synonymsArray = [];
 
       return new Promise(async (resolve, reject) => { // eslint-disable-line
-        // eslint-disable-line
+        
 
         let syns = await synonymService.allSynonyms(this.concept_search);
         console.log("syns");
@@ -1035,19 +928,15 @@ export default {
       });
     },
     async getAllSynToDrugs() {
-      this.progressObject = {};
+      this.progressObject= {}
       this.timeArray = [];
-      let time = {
-        step: "start get synonyms",
-        time: new Date(),
-        gene: this.concept_search,
-      };
+      let time = { step: "start get synonyms", time: new Date(), gene: this.concept_search };
       this.timeArray.push(time);
       this.componentKey = this.componentKey + 1;
 
       try {
         return new Promise(async (resolve, reject) => { // eslint-disable-line
-          // eslint-disable-line
+          
 
           synonymService
             .allSynonyms(this.concept_search)
@@ -1184,6 +1073,7 @@ export default {
               }
             })
 
+
             .then(async (results) => {
               // ##############################
               // GET SYNONYMS SO RESULTS THAT ARE THE SAME CAN BE COMBINED
@@ -1213,7 +1103,7 @@ export default {
                   // console.log("object = ",object)
                   let synData = results[i].objectSynonyms[object];
                   results[i].chemSearchSynArray = [];
-                  if (synData != null) {
+                  // if (synData != null) {
                     if (
                       Object.prototype.hasOwnProperty.call(synData, "nodes")
                     ) {
@@ -1294,7 +1184,7 @@ export default {
                         }
                       }
                     }
-                  }
+                  // }
 
                   if (i == results.length - 1) {
                     return results;
@@ -1657,20 +1547,19 @@ export default {
               // console.log(resultsArray);
               for (let i = 0; i < resultsArray.length; i++) {
                 let gene = resultsArray[i];
-                this.geneIDList.push(gene.id);
-                this.progressObject[gene.id] = {};
-                this.progressObject[gene.id].id = gene.id;
-                this.progressObject[gene.id].groupName = gene.groupName;
-                this.progressObject[gene.id].chemCount = gene.chemCount;
-                this.progressObject[gene.id].chemCountTotal =
-                  gene.chemCountTotal;
-                this.progressObject[gene.id].FDACurrentCount = 0;
-                this.progressObject[gene.id].synCurrentCount = 0;
-                if (i == resultsArray.length - 1) {
+                this.geneIDList.push(gene.id)
+                this.progressObject[gene.id] = {}
+                this.progressObject[gene.id].id = gene.id
+                this.progressObject[gene.id].groupName = gene.groupName
+                this.progressObject[gene.id].chemCount = gene.chemCount
+                this.progressObject[gene.id].chemCountTotal = gene.chemCountTotal
+                this.progressObject[gene.id].FDACurrentCount = 0  
+                this.progressObject[gene.id].synCurrentCount = 0  
+                if(i == resultsArray.length -1){
                   // console.log("this.progressObject")
                   // console.log(this.progressObject)
-                  return resultsArray;
-                }
+                  return resultsArray
+                }             
               }
               // this.progressTable = resultsArray.map(gene => ({id: gene.id,  groupName:gene.groupName , chemCount: gene.chemCount, chemCountTotal : gene.chemCountTotal, currentCount: 0}))
               // console.log("this.progressTable")
@@ -1745,7 +1634,7 @@ export default {
                 }
                 if (i == resultWithDrugs.length - 1) {
                   console.log("ABOUT TO SAVE FILE");
-                  this.testSave(this.geneTableToSave, "GENE GENE");
+
                   // console.log(resultWithDrugs);
                   this.saveThisFile(this.geneTableToSave, "GENE GENE");
                   // console.log("this.geneTableToSave");
@@ -1827,98 +1716,88 @@ export default {
                 // console.log("dgObject.chemResults");
                 // console.log(dgObject.chemResults);
                 // if(dgObject.chemResults.length > 0){
-                // ##############################
-                // START - GET START TIME TO SEE WHAT AVERAGE TIME PER DRUG IS
-                // ##############################
+              // ##############################
+              // START - GET START TIME TO SEE WHAT AVERAGE TIME PER DRUG IS
+              // ##############################                
                 this.progressObject[dgObject.id].drugStartTime = new Date();
 
-                // ##############################
-                // START - GO THROUGH EACH DRUG
-                // ##############################
+              // ##############################
+              // START - GO THROUGH EACH DRUG
+              // ##############################              
                 for (let n = 0; n < dgObject.chemResults.length; n++) {
                   p++;
 
-                  try {
-                    if (p % 10 == 0) {
-                      console.log("p chems have been proces = ", p);
-                    }
-                    resultWithDrugs[i].chemResults[n].objectChemblArray = [];
-                    resultWithDrugs[i].chemResults[n].objectChemSynArray = [];
-                    // for (let n = 0; n < 1; n++) {
-                    const chemData = dgObject.chemResults[n];
-                    this.currentDrug = chemData.objectName;
-                    // ##############################
-                    // ADJUST COUNTER FOR FINDING CHEM SYNONYMS
-                    // ##############################
+                   try {
+                  if (p % 10 == 0) {
+                    console.log("p chems have been proces = ", p);
+                  }
+                  resultWithDrugs[i].chemResults[n].objectChemblArray = [];
+                  resultWithDrugs[i].chemResults[n].objectChemSynArray = [];
+                  // for (let n = 0; n < 1; n++) {
+                  const chemData = dgObject.chemResults[n];
+                  this.currentDrug = chemData.objectName
+                  // ##############################
+                  // ADJUST COUNTER FOR FINDING CHEM SYNONYMS
+                  // ##############################
 
-                    this.progressObject[dgObject.id].synCurrentCount = n + 1;
-                    this.componentKey = this.componentKey + 1;
+                  this.progressObject[dgObject.id].synCurrentCount = n + 1
+                  this.componentKey = this.componentKey + 1;
 
-                    // ##############################
-                    // END - ADJUST COUNTER FOR FINDING CHEM SYNONYMS
-                    // ##############################
+                  // ##############################
+                  // END - ADJUST COUNTER FOR FINDING CHEM SYNONYMS
+                  // ##############################
 
-                    // console.log(dgObject)
-                    // console.log(chemData)
-                    // console.log("chemData.object")
-                    // console.log(chemData.object)
-                    if (this.badChemResults.indexOf(chemData.object) == -1) {
-                      let startchemsyn = new Date();
-                      let synonymData = await synonymService.chemSynonyms(
-                        chemData.object
+                  // console.log(dgObject) 
+                  // console.log(chemData)
+                  // console.log("chemData.object")
+                  // console.log(chemData.object)
+                  if(this.badChemResults.indexOf(chemData.object) == -1){
+                    let startchemsyn = new Date()
+                    let synonymData = await synonymService.chemSynonyms(
+                      chemData.object
+                    );
+                    let endchemsyn = new Date()
+                    // console.log("synonymData = ", synonymData);
+                    console.log("synonymData = ");
+                    console.log("chem turnaround syn time (sec)= ", (endchemsyn - startchemsyn)/1000 );
+
+                    if (synonymData[chemData.object] != null) {
+                      resultWithDrugs[i].chemResults[n].objectChemSynArray =
+                        synonymData[chemData.object].nodes;
+                      let chemblArray = synonymData[chemData.object].nodes.filter(
+                        (node) => node.identifier.includes("CHEMBL")
                       );
-                      let endchemsyn = new Date();
-                      // console.log("synonymData = ", synonymData);
-                      console.log("synonymData = ");
-                      console.log(
-                        "chem turnaround syn time (sec)= ",
-                        (endchemsyn - startchemsyn) / 1000
-                      );
-
-                      if (synonymData[chemData.object] != null) {
-                        resultWithDrugs[i].chemResults[n].objectChemSynArray =
-                          synonymData[chemData.object].nodes;
-                        let chemblArray = synonymData[
-                          chemData.object
-                        ].nodes.filter((node) =>
-                          node.identifier.includes("CHEMBL")
-                        );
-                        resultWithDrugs[i].chemResults[n].objectChemblArray =
-                          chemblArray;
-                        resultWithDrugs[i].chemResults[n].objectAraxid =
-                          synonymData[chemData.object].id.identifier;
-                        if (
-                          synonymData[chemData.object].id
-                            .SRI_normalizer_curie == null
-                        ) {
-                          resultWithDrugs[i].chemResults[n].objectSRINormid =
-                            chemData.object;
-                        } else {
-                          resultWithDrugs[i].chemResults[n].objectSRINormid =
-                            synonymData[
-                              chemData.object
-                            ].id.SRI_normalizer_curie;
-                        }
+                      resultWithDrugs[i].chemResults[n].objectChemblArray =
+                        chemblArray;
+                      resultWithDrugs[i].chemResults[n].objectAraxid =
+                        synonymData[chemData.object].id.identifier;
+                      if (
+                        synonymData[chemData.object].id.SRI_normalizer_curie ==
+                        null
+                      ) {
+                        resultWithDrugs[i].chemResults[n].objectSRINormid =
+                          chemData.object;
+                      } else {
+                        resultWithDrugs[i].chemResults[n].objectSRINormid =
+                          synonymData[chemData.object].id.SRI_normalizer_curie;
                       }
                     }
+                  }
 
-                    // if(n == 10){
-                    //   n = dgObject.chemResults.length
-                    // }
-                    if (n == dgObject.chemResults.length - 1) {
-                      // console.log(
-                      //   "done with chembl array = ",
-                      //   resultWithDrugs[i].chemResults[n]
-                      // );
-                      this.progressObject[dgObject.id].drugStopTime =
-                        new Date();
-                      this.progressObject[dgObject.id].drugTotalTime =
-                        (this.progressObject[dgObject.id].drugStOPTime -
-                          this.progressObject[dgObject.id].drugStopTime) /
-                        1000;
-                    }
-                  } catch (err) {
-                    console.error(err);
+                  // if(n == 10){
+                  //   n = dgObject.chemResults.length
+                  // }
+                  if (n == dgObject.chemResults.length - 1) {
+                    // console.log(
+                    //   "done with chembl array = ",
+                    //   resultWithDrugs[i].chemResults[n]
+                    // );
+                    this.progressObject[dgObject.id].drugStopTime = new Date();
+                    this.progressObject[dgObject.id].drugTotalTime = (this.progressObject[dgObject.id].drugStOPTime - this.progressObject[dgObject.id].drugStopTime) /1000
+                  }
+                  }
+                  catch (err){
+                    console.error(err)
                     this.timeArray.push({
                       step: "error - GET CHEM SYNONYMS SO WE CAN GET FDA APPROVAL AND GROUP THEM USING UNIFIED ARAX ID - SRI_normalizer_curie",
                       time: new Date(),
@@ -1930,6 +1809,7 @@ export default {
                       // );
                     }
                   }
+                  
                 }
                 // }
 
@@ -1971,32 +1851,35 @@ export default {
               for (let i = 0; i < resultWithDrugs.length; i++) {
                 // console.log("@@@@@@@@@@@ gene count = ", i);
 
+
                 const gene = resultWithDrugs[i];
 
                 let chems = gene.chemResults;
                 // console.log("chems = ", chems);
                 for (let n = 0; n < chems.length; n++) {
-                  // ##############################
-                  // GET CALCULATING PROGRESS
-                  // ##############################
 
-                  try {
-                    let geneID = gene.id;
-                    this.progressObject[geneID].FDACurrentCount = n + 1;
-                    // console.log("## CALC PROGRESS ##")
+              // ##############################
+              // GET CALCULATING PROGRESS 
+              // ##############################
+              
+                try {
+                  let geneID = gene.id
+                  this.progressObject[geneID].FDACurrentCount = n +1
+                  // console.log("## CALC PROGRESS ##")
+                  
+                  // this.progressObject[geneID].currentCount = i
+                  this.componentKey = this.componentKey + 1;
+                }
+                catch {
+                  // console.log("progress NO WORKY")
+                }
 
-                    // this.progressObject[geneID].currentCount = i
-                    this.componentKey = this.componentKey + 1;
-                  } catch {
-                    // console.log("progress NO WORKY")
-                  }
-
-                  // ##############################
-                  // END - GET CALCULATING PROGRESS
-                  // ##############################
+              // ##############################
+              // END - GET CALCULATING PROGRESS
+              // ##############################
                   const chem = chems[n];
                   this.componentKey = this.componentKey + 1;
-                  this.currentDrug = chem.objectName;
+                  this.currentDrug = chem.objectName
                   let chembls = chem.objectChemblArray;
                   resultWithDrugs[i].chemResults[n].objectChemFDA = 0;
                   // console.log("hit # = ", i, "-", n);
@@ -2088,13 +1971,8 @@ export default {
             })
             .then(async (resultWithDrugs) => {
               // ##############################
-              // SAVE JSON FOR USE IN TESTING DOWNSTREAM
-              // ##############################
-              this.testSave(resultWithDrugs);
-              // ##############################
               // MAKE TABLE FOR DRUG RESULTS
               // ##############################
-
               this.timeArray.push({
                 step: "MAKE TABLE FOR DRUG RESULTS",
                 time: new Date(),
@@ -2198,6 +2076,7 @@ export default {
           // let PRparentData = await PostService.queryMedik(query);
           geneinfo.PRparent = await PostService.getPRparent(query);
           return geneinfo;
+
         })
 
         .then(async (geneinfo) => {
@@ -3327,7 +3206,6 @@ export default {
             cell = cell.replace(/,/gi, ";");
           } catch (err) {
             console.error(err);
-            console.log(cell)
           }
           // if(n == 0){
           //   text = this.geneInfo.prowl_symbol + ','
@@ -3441,7 +3319,85 @@ export default {
       // document.body.removeChild(element);
     },
 
- 
+    async getPubmed(item, index) {
+      console.log("***** START getPubmed");
+      console.log("index = ", index);
+      console.log(item);
+      console.log(this.groupedResultsTable[index]);
+
+      if (item._showDetails) {
+        // this.$set(item, '_showDetails', false)
+        this.groupedResultsTable[index]._showDetails = false;
+      } else {
+        //   console.log(item);
+        // console.log(index);
+        // console.log(fields)
+
+        let pubs = item.publicationsListAll;
+        let pubString = "";
+        for (let n = 0; n < pubs.length; n++) {
+          console.log("started pub loop");
+          const pub = pubs[n];
+          pubString = pubString.concat(",", pub);
+
+          if (n == pubs.length - 1) {
+            try {
+              let pubmedurl =
+                "https://eutils.ncbi.nlm.nih.gov/entrez/eutils/efetch.fcgi?db=pubmed&id=" +
+                pubString +
+                "&rettype=json";
+              // let pubmedurl =
+              // "https://eutils.ncbi.nlm.nih.gov/entrez/eutils/efetch.fcgi?db=pubmed&id=30945334&rettype=json";
+              // "https://eutils.ncbi.nlm.nih.gov/entrez/eutils/efetch.fcgi?db=pubmed&id=30945334,30612693&rettype=json";
+
+              console.log("link2 = ", pubmedurl);
+              const res = await axios.get(pubmedurl);
+
+              const xmlData = res.data;
+              // console.log("xmlData")
+              // console.log(xmlData)
+              var pmjson = parser.parse(xmlData);
+              // console.log("length = ",pmjson.PubmedArticleSet.PubmedArticle.length);
+              // console.log( pmjson.PubmedArticleSet.PubmedArticle);
+              // let articles = []
+              // articles.push(pmjson.PubmedArticleSet.PubmedArticle)
+              let pub = [];
+              if (Array.isArray(pmjson.PubmedArticleSet.PubmedArticle)) {
+                pub = pmjson.PubmedArticleSet.PubmedArticle;
+              } else {
+                pub.push(pmjson.PubmedArticleSet.PubmedArticle);
+              }
+
+              // console.log(pmjson.PubmedArticleSet)
+              console.log(Array.isArray(pmjson.PubmedArticleSet.PubmedArticle));
+              // console.log("length = ", pmjson.PubmedArticleSet.PubmedArticle.length)
+              // console.log(pmjson)
+              // console.log(pub)
+
+              let pubData = await PubCleanService.cleanPubmed(pub);
+              console.log("pubData processsed");
+              console.log(pubData);
+              this.groupedResultsTable[index].pubData = pubData;
+              this.groupedResultsTable[index]._showDetails = true;
+              console.log(this.groupedResultsTable);
+              console.log("index = ", index);
+              console.log(this.groupedResultsTable[index]);
+              console.log("***** END getPubmed");
+
+              // this.$set(item, '_showDetails', true)
+              // let newitem = item
+              // newitem._showDetails = true
+              // item = Object.assign({}, item, newitem)
+              // let filterdata = this.filteredTableData
+              // this.filteredTableData = filterdata
+              this.groupedTableKey += 1;
+            } catch (err) {
+              console.error(err);
+            }
+          }
+        }
+      }
+    },
     filterTable(row, filter) {
       // this.filtercount = 0
       if (filter.indexOf(row.predicate_cleaned) == -1) {

@@ -145,12 +145,15 @@ class PostService {
         });
         const data = res.data;
         // });
+        console.log("res")
+        console.log(res)
 
         console.log("***mongoumls data")
-        // console.log(data)
+        console.log(data)
 
         resolve(data);
       } catch (err) {
+        console.log("***mongoumls error in PostService")
         reject(err);
       }
     });

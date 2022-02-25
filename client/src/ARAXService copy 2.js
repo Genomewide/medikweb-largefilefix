@@ -150,61 +150,61 @@ let ARAXquery_gg = {
   "stream_progress": true
 }
 
-let ARAXquery_dg = {
-  "message": {
-      "query_graph": {
-          "edges": {
-              "e00": {
-                  "constraints": [],
-                  "object": "n01",
-                  "predicates": [
-                      "biolink:decreases_degradation_of",
-                      "biolink:increases_activity_of",
-                      "biolink:increases_expression_of",
-                      "biolink:increases_stability_of",
-                      "biolink:increases_synthesis_of",
-                      "biolink:activator",
-                      "biolink:agonist",
-                      "biolink:inducer",
-                      "biolink:inverse_agonist",
-                      "biolink:partial_agonist",
-                      "biolink:positive_allosteric_modulator",
-                      "biolink:stimulates",
-                      "biolink:stimulator",
-                      "biolink:positively_regulates"
-                  ],
-                  "subject": "n00"
-              }
+// let ARAXquery_dg = {
+//   "message": {
+//       "query_graph": {
+//           "edges": {
+//               "e00": {
+//                   "constraints": [],
+//                   "object": "n01",
+//                   "predicates": [
+//                       "biolink:decreases_degradation_of",
+//                       "biolink:increases_activity_of",
+//                       "biolink:increases_expression_of",
+//                       "biolink:increases_stability_of",
+//                       "biolink:increases_synthesis_of",
+//                       "biolink:activator",
+//                       "biolink:agonist",
+//                       "biolink:inducer",
+//                       "biolink:inverse_agonist",
+//                       "biolink:partial_agonist",
+//                       "biolink:positive_allosteric_modulator",
+//                       "biolink:stimulates",
+//                       "biolink:stimulator",
+//                       "biolink:positively_regulates"
+//                   ],
+//                   "subject": "n00"
+//               }
  
-          },
-          "nodes": {
+//           },
+//           "nodes": {
       
-              "n00": {
-                  "categories": [
-                      "biolink:Protein",
-                      "biolink:Gene"
-                  ],
-                  "constraints": [],
-                  "ids": [
-                      "HGNC:11098"
-                  ],
-                  "is_set": false
-              },
-              "n01": {
-                "categories": [
-                    "biolink:Drug",
-                    "biolink:Chemical"
-                ],
-                "constraints": [],
+//               "n00": {
+//                   "categories": [
+//                       "biolink:Protein",
+//                       "biolink:Gene"
+//                   ],
+//                   "constraints": [],
+//                   "ids": [
+//                       "HGNC:11098"
+//                   ],
+//                   "is_set": false
+//               },
+//               "n01": {
+//                 "categories": [
+//                     "biolink:Drug",
+//                     "biolink:Chemical"
+//                 ],
+//                 "constraints": [],
           
-                "is_set": false
-            }
-          }
-      }
-  },
-  "submitter": "UI Team ABC",
-  "stream_progress": true
-}
+//                 "is_set": false
+//             }
+//           }
+//       }
+//   },
+//   "submitter": "UI Team ABC",
+//   "stream_progress": true
+// }
 
 // let query_onehop = {
 //   "message": {
@@ -334,29 +334,29 @@ class ARAXService {
     });
   }
 
-  static araxQuery_dg = (searchterm) => {
-    console.log(searchterm) 
-    console.log(ARAXquery_dg) 
-    // console.log("started getSynonyms");
-    return new Promise(async (resolve, reject) => { // eslint-disable-line
-      ARAXquery_dg.message.query_graph.nodes.n00.ids = [searchterm]
-      // console.log(ARAXquery_gg)
-      let url = "https://arax.ncats.io/beta/api/arax/v1.2/query"
-      // let url = 'https://arax.ncats.io/api/arax/v1.2/query'
-      // console.log(ARAXquery_gg)
-      try {
-        const res = await axios.post(url, ARAXquery_dg);
-        const data = res.data;
-        // });
+  // static araxQuery_dg = (searchterm) => {
+  //   console.log(searchterm) 
+  //   console.log(ARAXquery_dg) 
+  //   // console.log("started getSynonyms");
+  //   return new Promise(async (resolve, reject) => { // eslint-disable-line
+  //     ARAXquery_dg.message.query_graph.nodes.n00.ids = [searchterm]
+  //     // console.log(ARAXquery_gg)
+  //     let url = "https://arax.ncats.io/beta/api/arax/v1.2/query"
+  //     // let url = 'https://arax.ncats.io/api/arax/v1.2/query'
+  //     // console.log(ARAXquery_gg)
+  //     try {
+  //       const res = await axios.post(url, ARAXquery_dg);
+  //       const data = res.data;
+  //       // });
   
-        console.log("ARAXquery_dg ran")
-        // console.log(data)
-        resolve(data);
-      } catch (err) {
-        reject(err);
-      }
-    });
-  }
+  //       console.log("ARAXquery_dg ran")
+  //       // console.log(data)
+  //       resolve(data);
+  //     } catch (err) {
+  //       reject(err);
+  //     }
+  //   });
+  // }
     static getSynonyms = (searchterm) => {
         // console.log("started getSynonyms");
         return new Promise(async (resolve, reject) => { // eslint-disable-line

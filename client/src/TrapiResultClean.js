@@ -5,8 +5,9 @@ class TrapiResultClean {
     // console.log("started PubCleanService");
 
     return new Promise(async (resolve, reject) => { // eslint-disable-line
-      // console.log("########## Start TrapiResultClean")
-      // console.log(TrapiResults)
+      console.log("########## Start TrapiResultClean")
+      console.log("TrapiResults")
+      console.log(TrapiResults)
       // console.log(prResults.length)
       let clenaedData = []
 

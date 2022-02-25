@@ -13,6 +13,7 @@ import starburst from './components/starburst.vue';
 import svgtest from './components/svgtest.vue';
 import conceptExplorePlus from './components/conceptExplorePlus.vue';
 import geneAllSynToDrugs from './components/geneAllSynToDrugs.vue';
+import geneAllSynToDrugsARS from './components/geneAllSynToDrugsARS.vue';
 
 // client/src/components/conceptExplorePlus.vue geneAllSynToDrugs
 
@@ -82,6 +83,11 @@ Vue.use(Router)
         path: '/geneAllSynToDrugs', 
         name: 'geneAllSynToDrugs', 
         component: geneAllSynToDrugs 
+      },
+      { 
+        path: '/geneAllSynToDrugsARS', 
+        name: 'geneAllSynToDrugsARS', 
+        component: geneAllSynToDrugsARS 
       }
     ]
   })

@@ -806,7 +806,8 @@ export default {
         "antigen",
         "agent",
         "nucleotide",
-        "amide"
+        "amide",
+        "tes"
       ],
       rawresultstosave: null
     };
@@ -1059,6 +1060,8 @@ export default {
           // console.log("this.syn_ids");
           // console.log(this.syn_ids);
           let parent_result = await PostService.mongoumls(this.syn_ids); // send all of the ids, but only one will have a match in the mondgo db set up for this
+          console.log("######### parent_result")
+          console.log(parent_result)
           this.parentjson = parent_result;
           // [0]["UMLS"]
           this.synonyms_tosearch.push(parent_result[0]["UMLS"]);
