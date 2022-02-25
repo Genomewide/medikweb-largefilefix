@@ -687,9 +687,9 @@ export default {
       let chemTableForDownload = []
 
       // CREATE EMMITTERS FOR LOOP THROUGH PUBMEDS
-      const EventEmitter = require("events");
-      class Emitter extends EventEmitter {}
-      const eventEmitter = new Emitter();
+      // const EventEmitter = require("events");
+      // class Emitter extends EventEmitter {}
+      // const eventEmitter = new Emitter();
 
 
       try{
@@ -701,6 +701,7 @@ export default {
             const geneData = importResultWithDrugs[i];
             let chemResults = geneData.chemResults
             if(chemResults.length > 0){
+
               // CHEM LOOP 
             for (let n = 0; n < chemResults.length; n++) {
               // for (let n = 0; n < 5 || n < chemResults.length; n++) {
@@ -727,63 +728,75 @@ export default {
 
                 if(pubs != null && pubs != [null]){
                   if(pubs.length > 0){
-                    console.log("@@@@@@@@@ eventEmitter.eventNames()")
-                    console.log(eventEmitter.eventNames())
-                  console.log("RESULT TABLE LENGTH = ", chemTableForDownload.length)
-                  let emmiterCheck = eventEmitter.eventNames()
-                  if(emmiterCheck.indexOf('event')> -1){
-                    eventEmitter.removeAllListeners(['event'])
-                  }
-                  let x = 0
-                  let length = pubs.length
+                  //   console.log("@@@@@@@@@ eventEmitter.eventNames()")
+                  //   console.log(eventEmitter.eventNames())
+                  // console.log("RESULT TABLE LENGTH = ", chemTableForDownload.length)
+                  // let emmiterCheck = eventEmitter.eventNames()
+                  // if(emmiterCheck.indexOf('event')> -1){
+                  //   eventEmitter.removeAllListeners(['event'])
+                  // }
+                  // let x = 0
+                  // let length = pubs.length
 
-                  eventEmitter.on("event", async () => {
+                  // eventEmitter.on("event", async () => {
                  
-                    console.log("event emitted!");
+                  //   console.log("event emitted!");
 
-                    if (x < length) {
+                  //   if (x < length) {
 
-                       const pub = pubs[x];
+                  //      const pub = pubs[x];
+                  //       edgeInfo.link =  "https://pubmed.ncbi.nlm.nih.gov/" + pub
+                  //       edgeInfo.geneIndex = i
+                  //       edgeInfo.chemIndex = n
+                  //       edgeInfo.pubIndex = x
+
+                  //       chemTableForDownload.push(edgeInfo)
+                  //       // await this.waitforme(40)
+                  //       console.log(edgeInfo)                      
+
+                  //     x++;
+
+                  //     eventEmitter.emit("event");
+                  //   }
+                  // });
+
+                  // eventEmitter.emit("event");
+
+                    for (let x = 0; x < pubs.length; x++) {
+                        const pub = pubs[x];
+                        edgeInfo.link =  "https://pubmed.ncbi.nlm.nih.gov/" + pub
+                        edgeInfo.geneIndex = i
+                        edgeInfo.chemIndex = n
+                        edgeInfo.pubIndex = x
+                        
+                        const edgeInfoCopy = {...edgeInfo}
+                        chemTableForDownload.push(edgeInfoCopy)
+                        console.log(edgeInfoCopy)
+                      
+                    }
+
+
+
+
+
+
+                    for (let x = 0; x < pubs.length; x++) {
+                      // (function(x) {
+                        const pub = pubs[x];
                         edgeInfo.link =  "https://pubmed.ncbi.nlm.nih.gov/" + pub
                         edgeInfo.geneIndex = i
                         edgeInfo.chemIndex = n
                         edgeInfo.pubIndex = x
 
-                        chemTableForDownload.push(edgeInfo)
+                        let edgeInfoCopy = edgeInfo
+                        chemTableForDownload.push(edgeInfoCopy)
                         // await this.waitforme(40)
-                        console.log(edgeInfo)                      
+                        console.log(edgeInfoCopy)
+                      // })(x) 
 
-                      x++;
-
-                      eventEmitter.emit("event");
-                    }
-                  });
-
-                  eventEmitter.emit("event");
-
-
-
-
-
-
-
-
-                    // for (let x = 0; x < pubs.length; x++) {
-                    //   (function(x) {
-                    //     const pub = pubs[x];
-                    //     edgeInfo.link =  "https://pubmed.ncbi.nlm.nih.gov/" + pub
-                    //     edgeInfo.geneIndex = i
-                    //     edgeInfo.chemIndex = n
-                    //     edgeInfo.pubIndex = x
-
-                    //     chemTableForDownload.push(edgeInfo)
-                    //     // await this.waitforme(40)
-                    //     console.log(edgeInfo)
-                    //   })(i) 
-
-                    //   // chemTableForDownload = [...chemTableForDownload, ...chemPubTableArr]
+                      // chemTableForDownload = [...chemTableForDownload, ...chemPubTableArr]
                       
-                    // }
+                    }
 
 
 
@@ -3327,7 +3340,8 @@ export default {
             cell = cell.replace(/,/gi, ";");
           } catch (err) {
             console.error(err);
-            console.log(cell)
+            // console.log(cell)
+            cell = "not found"
           }
           // if(n == 0){
           //   text = this.geneInfo.prowl_symbol + ','
