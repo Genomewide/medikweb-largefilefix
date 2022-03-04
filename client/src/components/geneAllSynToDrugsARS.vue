@@ -58,6 +58,12 @@
                     v-on:click="tryARS"
                     >tryARS
                   </b-button>
+                  <b-button
+                    style="margin-left: 20px"
+                    variant="primary"
+                    v-on:click="getAllSynOrtho"
+                    >getAllSynOrtho
+                  </b-button>
                   <b-form-checkbox
                     style="margin-left: 20px"
                     id="checkbox-1"
@@ -333,6 +339,8 @@ import PubCleanService from "../PubCleanService";
 import TrapiResultClean from "../TrapiResultClean";
 import ARSService from "../ARSService";
 import ARAXService from "../ARAXService";
+import NodeService from "../NodeService";
+// 
 // import svgtest from "./svgtest.vue"
 // import importResultWithDrugs from "/Users/andycrouse/Downloads/resultWithDrugsWithFDA.json"
 import synonymService from "../synonymService";
@@ -384,7 +392,7 @@ export default {
       edges: [],
       subject: "chemical",
       predicate: "UMLS:C0004096",
-      concept_search: "HGNC:6884",
+      concept_search: "mapk8ip3",
       // HGNC:18481
       // HGNC:6884" MAPK8IP3
       // "HGNC:2625" CYP2D6
@@ -729,6 +737,27 @@ export default {
     showModal() {
       this.$refs["my-modal"].show();
       this.show_waiting_card = false;
+    },
+    async getAllSynOrtho (){
+      let symbol = this.concept_search
+      symbol = "mapk8ip3"
+      let ensembleIDData = await NodeService.getAllSynOrtho(symbol)
+      console.log(ensembleIDData)
+      let ensemblIDs = ensembleIDData.data[0].homologies
+      console.log("ensemblIDs")
+      console.log(ensemblIDs)
+
+      for (let i = 0; i < ensemblIDs.length; i++) {
+        const ensemblID = ensemblIDs[i].id
+        console.log("ensemblIDs[i].species")
+        console.log(ensemblIDs[i].species)
+
+        let orthoXREF = await NodeService.getXrefs(ensemblID)
+        console.log("orthoXREF")
+        console.log(orthoXREF)  
+
+      }
+
     },
     openPubmed: function (pmid) {
       window.open("https://pubmed.ncbi.nlm.nih.gov/" + pmid, "_blank");

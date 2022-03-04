@@ -43,7 +43,14 @@
                     :disabled="!validation"
                     >saveFile
                   </b-button>
-                  <!-- <b-button
+                  <b-button
+                    style="margin-left: 20px"
+                    variant="primary"
+                    v-on:click="trimTableForSave"
+                    :disabled="!validation"
+                    >trimTableForSave
+                  </b-button>
+                  <!-- <b-button trimTableForSave
                     style="margin-left: 20px"
                     variant="primary"
                     v-on:click="getGeneSynonyms"
@@ -807,7 +814,8 @@ export default {
         "agent",
         "nucleotide",
         "amide",
-        "tes"
+        "tes",
+        "chlorodiphenyl (54% chlorine)"
       ],
       rawresultstosave: null
     };
@@ -1724,6 +1732,114 @@ export default {
 
         });
     },
+
+    trimTableForSave(){
+      let dataTableToPrint = []
+      for (let i = 0; i < this.groupedResultsTable.length; i++) {
+        let row = this.groupedResultsTable[i]
+        // const edgeInfoCopy = {...edgeInfo}
+        let rowPrintInfo = {}
+        rowPrintInfo.chembl = row.chembl
+        rowPrintInfo.fdaApproved = row.fdaApproved
+        rowPrintInfo.fdaDescription = row.fdaDescription
+        rowPrintInfo.geneSymbol = row.geneSymbol
+        rowPrintInfo.name = row.name
+        rowPrintInfo.relation = row.relation
+        // rowPrintInfo.chembl = row.chembl
+        let rowPubs = row.publications
+        for (let n = 0; n < rowPubs.length; n++) {
+          const pub = rowPubs[n];
+          rowPrintInfo.pubID = pub.pubids[0][0]
+          rowPrintInfo.direction = pub.direction
+          rowPrintInfo.predicate = pub.predicate  
+          const rowPrintInfoPush = {...rowPrintInfo}
+          dataTableToPrint.push(rowPrintInfoPush)
+
+          if(i == this.groupedResultsTable.length - 1 && n == rowPubs.length -1){
+            this.newSaveFile(dataTableToPrint)
+
+          }          
+        }
+
+        
+      }
+
+
+    },
+
+    newSaveFile(tableData) {
+
+      let text = ""
+      console.log("save result")
+        
+      for (let index = 0; index < tableData.length; index++) {
+        
+        const result = tableData[index];
+         console.log(result)
+
+        let headers = Object.keys(result)
+        // console.log({headers})
+      
+      if(index == 0){
+        console.log("headers index == 0")
+        // HEADER ROW
+        for (let i = 0; i < headers.length; i++) {
+          const header = headers[i]
+          // if(i == 0){
+          //   text = "gene,"
+          // }
+          if(i != headers.length - 1){
+            text = text  + header + ','
+          } else {
+            text = text + header + '\r\n'
+          }        
+        }
+      } else {
+      // ADD REMAINING ROWS IN SAME ORDER BASED ON KEYS FROM HEADER ROW
+        for (let n = 0; n < headers.length; n++) {
+          let header = headers[n]
+          let cell = JSON.stringify(result[header])
+          // let cell = result[header]
+        
+          try {
+
+              cell = cell.replace(/,/gi,';')
+           
+          } catch(err){
+            
+            console.error(err)
+          }
+          // if(n == 0){
+          //   text = this.geneInfo.prowl_symbol + ','
+
+          // }
+          if(n != headers.length - 1){
+            text = text  + cell + ','
+          } else {
+            text = text + cell  + '\r\n'
+          }        
+        }
+
+      }
+
+      }
+
+      let filename = this.concept_search + "ONEhop results.csv";
+      let element = document.createElement("a");
+      element.setAttribute(
+        "href",
+        "data:application/json;charset=utf-8," + encodeURIComponent(text)
+      );
+      element.setAttribute("download", filename);
+
+      element.style.display = "none";
+      document.body.appendChild(element);
+
+      element.click();
+      document.body.removeChild(element);
+
+    },
+    
     saveFile() {
 
             let text = ""

@@ -160,6 +160,108 @@ class TrapiResultClean {
 
   }
 
+
+  static ARAXResultClean(TrapiResults) {
+    // console.log("started PubCleanService");
+
+    return new Promise(async (resolve, reject) => { // eslint-disable-line
+      console.log("########## Start TrapiResultClean")
+      console.log("TrapiResults")
+      console.log(TrapiResults)
+      // console.log(prResults.length)
+      let clenaedData = []
+
+      try {
+        let nodes = TrapiResults.message.knowledge_graph.nodes
+        let edges = TrapiResults.message.knowledge_graph.edges 
+        let edgeKeys = Object.keys(edges)
+
+        // console.log("length = ", edgeKeys.length)
+
+        if(edgeKeys.length > 0){
+
+          for (let index = 0; index < edgeKeys.length; index++) {
+            // console.log(index)
+            let data = {}
+            const key = edgeKeys[index];
+            // console.log("key = ", key)
+            let edge = edges[key]
+  
+            let subject = edge.subject
+            let object = edge.object
+            data.edgeinfo = edge
+            data.object = edge.object
+            data.predicate = edge.predicate
+            data.relation = edge.relation
+            data.subject = edge.subject
+            data.subjectName = nodes[subject].name
+            data.subjectCat = nodes[subject].category
+            data.objectName = nodes[object].name
+            data.objectCat = nodes[object].category
+            data.objectAtt = nodes[object].attributes
+            data.subjectAtt = nodes[subject].attributes
+            //
+            data.edgepubInfo = null
+            data.edgen_pmids = 0
+            data.edgeprovider = ""
+            data.edgepublicationsText = {}
+            data.edgepublications= []
+            data.edgeOriginalSource = ""
+            data.edgeSentences = {}
+// "biolink:original_knowledge_source"
+            for (let index = 0; index < data.edgeinfo.attributes.length; index++) {
+              const att = data.edgeinfo.attributes[index];
+              if(att.attribute_type_id == "biolink:aggregator_knowledge_source"){
+                data.edgeprovider = att.value
+              }
+              if(att.attribute_type_id == "biolink:original_knowledge_source"){
+                data.edgeOriginalSource = att.value
+              }
+
+              if(att.attribute_type_id == "n_pmids"){
+                data.edgen_pmids = att.value
+              }
+              if(att.attribute_type_id == "biolink:publications" || att.attribute_type_id == "publications"){
+                data.edgepublications = att.value    
+              }
+              if(att.attribute_type_id == "bts:sentence" || att.attribute_type_id == "publications"){
+                data.edgeSentences= att.value  
+              }
+           
+              if(index == data.edgeinfo.attributes.length - 1){
+                // withDrugHits[i].geneToGeneResultShown.push(result)
+                clenaedData.push(data)
+              } 
+              // if(typeof result.publications == 'undefined'){
+              //   result.publications = []
+ 
+              // }
+              
+            }
+            
+            // console.log("data = ", data)
+  
+            if(index == edgeKeys.length -1){
+              // console.log({clenaedData})
+              resolve(clenaedData)
+            }
+            
+          }
+        } else{
+          // console.log("no results")
+          resolve(clenaedData)
+        }
+
+      //  resolve(nodes)
+      } catch (err) {
+        console.error("ERROR IN ARAXResultClean")
+        
+        console.error(err)
+        reject({});
+      }
+    });
+
+  }
   static TrapiResultGroup(list, key) {
     // console.log("started PubCleanService");
     console.log("list = ", list)

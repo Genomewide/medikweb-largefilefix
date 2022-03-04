@@ -13,9 +13,10 @@ import starburst from './components/starburst.vue';
 import svgtest from './components/svgtest.vue';
 import conceptExplorePlus from './components/conceptExplorePlus.vue';
 import geneAllSynToDrugs from './components/geneAllSynToDrugs.vue';
+import geneAllSynToDrugsv2 from './components/geneAllSynToDrugsv2.vue';
 import geneAllSynToDrugsARS from './components/geneAllSynToDrugsARS.vue';
 
-// client/src/components/conceptExplorePlus.vue geneAllSynToDrugs
+// client/src/components/conceptExplorePlus.vue geneAllSynToDrugs geneAllSynToDrugsv2
 
 Vue.use(Router)
 // arsexplorer
@@ -88,9 +89,14 @@ Vue.use(Router)
         path: '/geneAllSynToDrugsARS', 
         name: 'geneAllSynToDrugsARS', 
         component: geneAllSynToDrugsARS 
+      },
+      { 
+        path: '/geneAllSynToDrugsv2', 
+        name: 'geneAllSynToDrugsv2', 
+        component: geneAllSynToDrugsv2 
       }
     ]
   })
    // conceptExplore conceptExplorePlus geneAllSynToDrugs
-   // drugtogene_complete starburst
+   // drugtogene_complete starburst geneAllSynToDrugsv2
  

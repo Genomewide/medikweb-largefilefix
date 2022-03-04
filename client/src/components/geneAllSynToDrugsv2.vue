@@ -177,11 +177,12 @@
                     <!-- concept_search -->
                   </template>
                   <h4 class="mb-0">Symbol: {{ concept_search }}</h4>
-
+<!-- {{synonymIdArrayCount}} -->
                   <br />
-                  <b-card-text v-for="syn in synonymsArray" :key="syn.id">
-                    <b>{{ syn.identifier }}: &nbsp;</b>{{ syn.name }} &nbsp;
-                    (Hits = {{ syn.hitCount }})
+                  <b-card-text v-for="syn in synonymIdArrayCount" :key="syn.id">
+                    <!-- <br/>{{syn}} -->
+                    <b>{{ syn.synonym }}: &nbsp;</b> &nbsp;
+                    (Hits = {{ syn.count }}) 
                   </b-card-text>
                   <!-- {{synonymsArray}} -->
                 </b-card>
@@ -665,6 +666,7 @@ export default {
         },
       ],
       predicateAll: [],
+      synonymIdArrayCount: {}
       // nodeGeneName
       //FAILED "HGNC:2348", "HGNC:13723", "HGNC:2514", "HGNC:2961", "HGNC:3373", reasoner_id
     };
@@ -883,70 +885,70 @@ export default {
       element.click();
       document.body.removeChild(element);
     },
-    async tryARAX() {
+    async tryARAX(searchTerms) {
       // console.log("twohopdata")
       // console.log(twohopdata)
       // GET GENES REGULATING TARGET
-      //   let araxResults = await ARAXService.araxQuery_gg(this.concept_search)
-      //   let context = '"context": "https://raw.githubusercontent'
-      //   let index = araxResults.indexOf(context) - 1
-      //   // console.log("index")
-      //   // console.log(index)
-      //   // console.log(araxResults.substring(index))
-      //   // console.log(JSON.parse( araxResults.substring(index)))
-      //   let araxJson = JSON.parse(araxResults.substring(index))
-      //   // console.log(araxJson)
-      //   console.log("araxJson.message.knowledge_graph.edges")
-      //   console.log(araxJson.message.knowledge_graph.edges)
-      //   console.log("araxJson.message.knowledge_graph.nodes")
-      //   console.log(araxJson.message.knowledge_graph.nodes)
-      //   let nodes = araxJson.message.knowledge_graph.nodes
-      //   // console.log(JSON.parse(araxResults) )
-      //   // console.log(araxResults)
-      //   console.log("araxJson.message.results")
-      //   console.log(araxJson.message.results)
-      //   let results = araxJson.message.results
-      //   // essence
-      //   // let resultsGrouped = await TrapiResultClean.TrapiResultGroup(results, "essence")
-      //   // console.log("resultsGrouped = ", resultsGrouped)
-      // // GET GENES REGULATING TARGET
-      //   let genes = Object.keys(nodes)
-      //   console.log("genes = ", genes)
-      //   let araxResults_dg = await ARAXService.araxQuery_dg(genes)
-      //   index = araxResults.indexOf(context) - 1
-      //   araxJson_dg = JSON.parse(araxResults_dg.substring(index))
-      //   let nodes_dg = araxJson_dg.message.knowledge_graph.nodes
-      //   console.log("nodes_dg")
-      //   console.log(nodes_dg)
-      // for (let i = 0; i < results.length; i++) {
-      //   const result = results[i];
-      //   let row = {}
-      //   // let predicates = []
-      //   console.log("result = ", result)
-      //   row.nodeDrug = result.node_bindings.n00[0].id
-      //   row.nodeGene = result.node_bindings.n02[0].id
-      //   row.nodeTarget = result.node_bindings.n01[0].id
-      //   row.nodeDrugName = nodes[row.nodeDrug].name
-      //   row.nodeGeneName = nodes[row.nodeGene].name
-      //   row.reasoner_id = result.reasoner_id
-      //   row.key = this.componentKey
-      //   let e00 = result.edge_bindings.e00
-      //   let e01 = result.edge_bindings.e01
-      //   // console.log("nodeDrugName = ", nodeDrugName)
-      //   // row.edgeOnetest = e00.map(edge => edge.id.split("biolink")[1])
-      //   // console.log("row.edgeOnetest = ", row.edgeOnetest)
-      //   row.edgeOne = e00.map(edge => edge.id.split("biolink:")[1].split("-")[0])
-      //   row.edgeTwo = e01.map(edge => edge.id.split("biolink:")[1].split("-")[0])
-      //   // row.edgeTwo = result
-      //   // console.log("nodes[row.nodeDrug] = ", nodes[row.nodeDrug])
-      //   this.araxResultTable.push(row)
-      //   this.componentKey++
-      //   if(i == results.length - 1){
-      //     let groupedGroupID = await TrapiResultClean.TrapiResultGroup(this.araxResultTable, "nodeDrugName")
-      //     console.log("groupedGroupID = ", groupedGroupID)
-      //   }
-      //   // groupedGroupID = await TrapiResultClean.TrapiResultGroup
-      // }
+        let araxResults = await ARAXService.araxQuery_gg(searchTerms)
+        let context = '"context": "https://raw.githubusercontent'
+        let index = araxResults.indexOf(context) - 1
+        // console.log("index")
+        // console.log(index)
+        // console.log(araxResults.substring(index))
+        // console.log(JSON.parse( araxResults.substring(index)))
+        let araxJson = JSON.parse(araxResults.substring(index))
+        // console.log(araxJson)
+        console.log("araxJson.message.knowledge_graph.edges")
+        console.log(araxJson.message.knowledge_graph.edges)
+        console.log("araxJson.message.knowledge_graph.nodes")
+        console.log(araxJson.message.knowledge_graph.nodes)
+        let nodes = araxJson.message.knowledge_graph.nodes
+        // console.log(JSON.parse(araxResults) )
+        // console.log(araxResults)
+        console.log("araxJson.message.results")
+        console.log(araxJson.message.results)
+        let results = araxJson.message.results
+        // essence
+        // let resultsGrouped = await TrapiResultClean.TrapiResultGroup(results, "essence")
+        // console.log("resultsGrouped = ", resultsGrouped)
+      // GET GENES REGULATING TARGET
+        let genes = Object.keys(nodes)
+        console.log("genes = ", genes)
+        let araxResults_dg = await ARAXService.araxQuery_dg(genes)
+        index = araxResults.indexOf(context) - 1
+        let araxJson_dg = JSON.parse(araxResults_dg.substring(index))
+        let nodes_dg = araxJson_dg.message.knowledge_graph.nodes
+        console.log("nodes_dg")
+        console.log(nodes_dg)
+      for (let i = 0; i < results.length; i++) {
+        const result = results[i];
+        let row = {}
+        // let predicates = []
+        console.log("result = ", result)
+        row.nodeDrug = result.node_bindings.n00[0].id
+        row.nodeGene = result.node_bindings.n02[0].id
+        row.nodeTarget = result.node_bindings.n01[0].id
+        row.nodeDrugName = nodes[row.nodeDrug].name
+        row.nodeGeneName = nodes[row.nodeGene].name
+        row.reasoner_id = result.reasoner_id
+        row.key = this.componentKey
+        let e00 = result.edge_bindings.e00
+        let e01 = result.edge_bindings.e01
+        // console.log("nodeDrugName = ", nodeDrugName)
+        // row.edgeOnetest = e00.map(edge => edge.id.split("biolink")[1])
+        // console.log("row.edgeOnetest = ", row.edgeOnetest)
+        row.edgeOne = e00.map(edge => edge.id.split("biolink:")[1].split("-")[0])
+        row.edgeTwo = e01.map(edge => edge.id.split("biolink:")[1].split("-")[0])
+        // row.edgeTwo = result
+        // console.log("nodes[row.nodeDrug] = ", nodes[row.nodeDrug])
+        this.araxResultTable.push(row)
+        this.componentKey++
+        if(i == results.length - 1){
+          let groupedGroupID = await TrapiResultClean.TrapiResultGroup(this.araxResultTable, "nodeDrugName")
+          console.log("groupedGroupID = ", groupedGroupID)
+        }
+        // groupedGroupID = await TrapiResultClean.TrapiResultGroup
+      }
     },
     // async testSection () {
     //   console.log("search term = ", this.concept_search)
@@ -1011,6 +1013,7 @@ export default {
       });
     },
     async getAllSynToDrugs() {
+      console.log("THIS IS TO TEST IT IS V2")
       this.progressObject = {};
       this.timeArray = [];
       let time = {
@@ -1024,79 +1027,147 @@ export default {
       try {
         return new Promise(async (resolve, reject) => { // eslint-disable-line
           // eslint-disable-line
-
+          // #########################
+          // GET ALL SYNONYMS THAT MAY HAVE A HIT FOR PROTEIN INTERACTION 
+          // #########################          
           synonymService
             .allSynonyms(this.concept_search)
-            .then(async (results) => {
+            .then(async (synonyms) => {
               let time = { step: "got synonyms", time: new Date() };
               this.timeArray.push(time);
               this.componentKey = this.componentKey + 1;
-              console.log(results);
-              // this.synonymsArray = results.araxSynonyms_equivalentids
-              this.synonymsArray = results.araxSynonyms_equivalentids.filter(
-                (syn) =>
-                  !syn.identifier.includes("ENSEMBL") &&
-                  !syn.identifier.includes("REACT")
-              );
+              console.log(synonyms);
+              this.synonymsArray = synonyms.synonymIdArray
+    
+              console.log("this.synonymsArray");
               console.log(this.synonymsArray);
-              // this.synonymsArray = results.allSynonyms
-              // let synonymIdArray = results.synonymIdArray
               let query = this.queryjson;
-              let rawResult = {};
-              let cleanedResultArray = [];
-              let searchType = "prot";
-              query.message.query_graph.nodes.n1.category = searchType;
+
+              query.message.query_graph.nodes.n1.category = ["biolink:Protein","biolink:Gene"]
+              query.message.query_graph.nodes.n2.id = this.synonymsArray 
+
+              let dgg_nodeEdges = {}
 
               // #########################
-              // SEND ALL SYNONYMS THAT MAY HAVE A HIT FOR PROTEIN INTERACTION TO SEARCH MEDIK
-              // TODO GET ALL FOR BOTH 'GENE' AND 'PROT'
+              // GET GENES REGULATING TARGET
               // #########################
 
-              for (let i = 0; i < this.synonymsArray.length; i++) {
-                const syn = this.synonymsArray[i].identifier;
+                let araxResults = await ARAXService.araxQuery_gg(this.synonymsArray)
+                let context = '"context": "https://raw.githubusercontent'
+                let index = araxResults.indexOf(context) - 1
+                // console.log("index")
+                // console.log(index)
+                // console.log(araxResults.substring(index))
+                // console.log(JSON.parse( araxResults.substring(index)))
+                let araxJson = JSON.parse(araxResults.substring(index))
+                // console.log(araxJson)
+                console.log("araxJson.message.knowledge_graph.edges")
+                console.log(araxJson.message.knowledge_graph.edges)
+                console.log("araxJson.message.knowledge_graph.nodes")
+                console.log(araxJson.message.knowledge_graph.nodes)
+                let nodes = araxJson.message.knowledge_graph.nodes
+                // console.log(JSON.parse(araxResults) )
+                // console.log(araxResults)
+                console.log("araxJson.message.results")
+                console.log(araxJson.message.results)
+                let results = araxJson.message.results
+                console.log(results)
 
-                // console.log("---------")
-                // console.log(syn)
-                // console.log(typeof syn)
-                if (typeof syn !== "undefined") {
-                  // console.log(syn)
-                  // console.log(!syn.includes("ENSEMBL"))
-                  // console.log(!syn.includes("REACT"))
-                  query.message.query_graph.nodes.n2.id = syn;
-                  rawResult = await PostService.query_raw(query);
+                dgg_nodeEdges["nodes_gg"] = araxJson.message.knowledge_graph.nodes
+                dgg_nodeEdges["edges_gg"] = araxJson.message.knowledge_graph.edges
 
-                  let cleanedResults = await TrapiResultClean.TrapiResultClean(
-                    rawResult
+
+              // GET GENES REGULATING TARGET
+                let genes = Object.keys(nodes)
+                console.log("genes = ", genes)
+
+                let cleanedResults_gg = await TrapiResultClean.ARAXResultClean(
+                    araxJson
                   );
-                  // console.log("finished cleanedResults")
+                  console.log("______________  cleanedResults_gg")
+                  console.log(cleanedResults_gg)
 
-                  // console.log(cleanedResults)
-                  this.synonymsArray[i].hitCount = cleanedResults.length;
-                  this.synonymsArray[i].protHitCount = cleanedResults.length;
-                  this.componentKey = this.componentKey + 1;
-                  // console.log("this.synonymsArray[i].hitCount = ", this.synonymsArray[i].hitCount)
-                  cleanedResultArray =
-                    cleanedResultArray.concat(cleanedResults);
+              // #########################
+              // GET DRUGS REGULATING GENES
+              // #########################
+                let araxResults_dg = await ARAXService.araxQuery_dg(genes)
+
+              // ARAX RETURNS LOG INFO AS WELL - THE LAST LINE OF TEXT IS THE RESUTLS - SO USE SPLIT GET LAST LINE
+                let araxResultsArray = araxResults_dg.split("\n")
+                let araxResults_dgResults = araxResultsArray[araxResultsArray.length - 2]
+
+                let araxJson_dg =JSON.parse(araxResults_dgResults) 
+                console.log("araxJson_dg")
+                console.log(araxJson_dg)
+
+                let nodes_dg = araxJson_dg.message.knowledge_graph.nodes
+                console.log("nodes_dg")
+                console.log(nodes_dg)
+
+              // GET GENES REGULATING TARGET
+                let drugNodes = araxJson_dg.message.knowledge_graph.nodes
+                let drugs = Object.keys(drugNodes)
+                console.log("drugs = ", drugs)
+
+                let cleanedResults_dg = await TrapiResultClean.ARAXResultClean(
+                    araxJson_dg
+                  );
+                  console.log("______________  cleanedResults_dg")
+                  console.log(cleanedResults_dg)
+
+                // dgg_nodeEdges["nodes_dg"] = araxJson_dg.message.knowledge_graph.nodes
+                // dgg_nodeEdges["edges_dg"] = araxJson_dg.message.knowledge_graph.edges
+
+            })
+            .then(async (results) => {
+              // #########################
+              // SET UP OBJECT TO COUNT HITS 
+              // ######################### 
+              for (let i = 0; i < this.synonymsArray.length; i++) {
+                const syn = this.synonymsArray[i];
+                this.synonymIdArrayCount[syn] = {"synonym" : syn, "count": 0}
+                  // for (let n = 0; n < results.length; n++) {
+                  //   const result = results[n];
+                    
+                  // }
+
+                if( i == this.synonymsArray.length - 1){
+                  console.log("this.synonymIdArrayCount")
+                  console.log(this.synonymIdArrayCount)
+                  
+                  return results
                 }
 
-                if (i == this.synonymsArray.length - 1) {
-                  this.componentKey = this.componentKey + 1;
-                  // console.log("cleanedResultArray from prot = ", cleanedResultArray)
-                  for (let n = 0; n < cleanedResultArray.length; n++) {
-                    cleanedResultArray[n].source = searchType;
-                    if (n == cleanedResultArray.length - 1) {
-                      this.onehitGeneProtList = cleanedResultArray;
-                      time = { step: "got protein", time: new Date() };
-
-                      this.timeArray.push(time);
-                      this.componentKey = this.componentKey + 1;
-                      return cleanedResultArray;
-                    }
-                  }
-                }
+                
               }
             })
+            .then(async (results) => {
+              // #########################
+              // COUNT RESULTS FOR SUMMARY 
+              // ######################### 
+
+              for (let i = 0; i < results.length; i++) {
+                const result = results[i];
+                let subject = result.subject
+                console.log("subject")
+                console.log(subject)
+                console.log(this.synonymIdArrayCount[subject])
+                this.synonymIdArrayCount[subject].count++ 
+                if( i == results.length - 1){
+                  console.log("this.synonymIdArrayCount")
+                  console.log(this.synonymIdArrayCount)
+                  this.componentKey++
+                  return result
+                }
+                
+              }
+
+            })
+            .then(async (results) => {
+              console.log(results.a.b)
+            })
             .then(async () => {
+              
               // #########################
               // SEND ALL SYNONYMS THAT MAY HAVE A HIT FOR GENE INTERACTION TO SEARCH MEDIK
               // #########################
@@ -1164,7 +1235,7 @@ export default {
               // ##############################
               // GET SYNONYMS SO RESULTS THAT ARE THE SAME CAN BE COMBINED
               // ##############################
-
+              console.log(results.crouse)
               for (let i = 0; i < results.length; i++) {
                 try {
                   const element = results[i];
