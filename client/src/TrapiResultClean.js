@@ -221,11 +221,18 @@ class TrapiResultClean {
               if(att.attribute_type_id == "n_pmids"){
                 data.edgen_pmids = att.value
               }
-              if(att.attribute_type_id == "biolink:publications" || att.attribute_type_id == "publications"){
-                data.edgepublications = att.value    
+
+              if(att.attribute_type_id == "biolink:supporting_document"){
+                data.edgepublications = att.value.split("|")  
+                data.edgen_pmids = att.value.split("|").length   
+              }
+              if(att.attribute_type_id == "biolink:publications"){
+                data.edgepublications = att.value 
+                data.edgen_pmids = att.value.length   
               }
               if(att.attribute_type_id == "bts:sentence" || att.attribute_type_id == "publications"){
                 data.edgeSentences= att.value  
+                data.edgen_pmids = att.value.length
               }
            
               if(index == data.edgeinfo.attributes.length - 1){
@@ -285,6 +292,76 @@ class TrapiResultClean {
 
       } catch (err) {
         console.error("ERROR IN TrapiResultGroup")
+        console.error(err)
+        reject({});
+      }
+    });
+
+  }
+
+  static createTwoHopObject(hopOne, hopTwo) {
+    // console.log("started PubCleanService");
+    // console.log("pubInfo = ", pubInfo)
+    // console.log("pubs = ", pubs)
+    // let returnArray = []
+    return new Promise(async (resolve, reject) => { // eslint-disable-line
+      console.log("########## Start createTwoHopObject")
+      let tableDataArray = []
+   
+
+      try {
+        for (let i = 0; i < hopTwo.length; i++) {
+          const hop2res = hopTwo[i];
+          
+          for (let n = 0; n < hopOne.length; n++) {
+            
+            let row = {}
+            const hop1res = hopOne[n];
+            if(hop1res.object == hop2res.subject){
+              // HOPE 1 INFO
+              row.direction_gg = hop1res.direction
+              row.edgen_pmids_gg = []
+              row.edgen_pmids_gg_len = hop1res.edgepublications.length
+              row.edgen_pmids_gg = hop1res.edgepublications
+              row.object_gg = hop1res.object
+              row.objectName_gg = hop1res.objectName
+              row.predicate_gg = hop1res.predicate
+              row.subject_gg = hop1res.subject
+              row.subjectName_gg = hop1res.subjectName
+              // HOP 2 INFO
+              row.direction_dg = hop2res.direction
+              row.edgen_pmids_dg = []
+              row.edgen_pmids_dg_len = hop2res.edgepublications.length
+              row.edgen_pmids_dg = hop2res.edgepublications
+              row.object_dg = hop2res.object
+              row.objectName_dg = hop2res.objectName
+              row.predicate_dg = hop2res.predicate
+              row.subject_dg = hop2res.subject
+              row.subjectName_dg = hop2res.subjectName
+
+              row.direction_combined = ""
+
+              if( (hop1res.direction == "Increase" && hop2res.direction == "Increase") || (hop1res.direction == "Decrease" && hop2res.direction == "Decrease")){
+                row.direction_combined = "Increase"
+              } else if ((hop1res.direction == "Decrease" && hop2res.direction == "Increase") || (hop1res.direction == "Increase" && hop2res.direction == "Decrease")){
+                row.direction_combined = "Decrease"
+              } else {
+                row.direction_combined = "Ambiguos"
+              }
+
+
+              
+              tableDataArray.push(row)
+            }
+            if( n == hopOne.length - 1 && i == hopTwo.length - 1){
+              console.log("########## END createTwoHop Result Table")
+              resolve(tableDataArray)
+            } 
+          }
+        }
+      } catch (err) {
+        console.error("ERROR IN createTwoHopObject")
+        console.log("Results got here then failed", tableDataArray)
         console.error(err)
         reject({});
       }
