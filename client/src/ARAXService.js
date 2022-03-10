@@ -103,6 +103,8 @@ let ARAXquery_gg = {
                   "constraints": [],
                   "object": "n01",
                   "predicates": [
+                    "biolink:entity_negatively_regulates_entity",
+                    "biolink:entity_positively_regulates_entity",
                       "biolink:decreases_degradation_of",
                       "biolink:increases_activity_of",
                       "biolink:increases_expression_of",
@@ -181,6 +183,8 @@ let ARAXquery_dg = {
                   "constraints": [],
                   "object": "n01",
                   "predicates": [
+                    "biolink:entity_negatively_regulates_entity",
+                    "biolink:entity_positively_regulates_entity",
                       "biolink:decreases_degradation_of",
                       "biolink:increases_activity_of",
                       "biolink:increases_expression_of",

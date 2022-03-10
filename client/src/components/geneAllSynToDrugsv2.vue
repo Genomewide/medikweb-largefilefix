@@ -1,6 +1,6 @@
 <template>
   <div class="container" style="margin-bottom: 100px">
-    <h1 class="text-center">MEDIK GENE TO GENE TO DRUG QUERY NEXT</h1>
+    <h1 class="text-center">ARAX GENE TO GENE TO DRUG QUERY NEXT</h1>
 
     <div style="margin-top: 20px">
       <b-modal
@@ -140,21 +140,7 @@
               :items="araxResultTable"
               :fields="fields"
             >
-              <template #cell(publications)="data">
-                {{ data }}
-                <!-- <div v-if="data.item.pubLength > 0">
-                    <b-button
-                      size="sm"
-                      @click="data.toggleDetails"
-                      class="mr-2"
-                    >
-                      Pubs =
-                      <b-badge variant="light">{{
-                        data.item.pubLength
-                      }}</b-badge>
-                    </b-button>
-                  </div> -->
-              </template>
+   
             </b-table>
             <!-- <b-card-text v-for="syn in synonymsArray" :key="syn.id">
                     <b>{{ syn.identifier }}: &nbsp;</b>{{ syn.name }} &nbsp;
@@ -215,53 +201,10 @@
             </b-card>
           </b-col>
         </b-row>
-        <!-- <b-row style="margin-top: 20px"> -->
 
         <b-row>
           <b-col>
-            <!-- <b-card>
-              <template #header>
-                <h6 class="mb-0">Drug Gene</h6>
-                Rows = {{ geneToGeneTable.length }}
-              </template>
-
-              <b-form style="margin-top: 20px; margin-bottom: 20px">
-                <b-form-group
-                  label="Filter"
-                  label-for="filter-input"
-                  label-cols-sm="1"
-                  label-align-sm="left"
-                  label-size="sm"
-                  class="mb-0"
-                >
-                  <b-input-group size="sm">
-                    <b-form-input
-                      id="filter-input"
-                      v-model="filter"
-                      type="search"
-                      placeholder="Type to Search"
-                    ></b-form-input>
-
-                    <b-input-group-append>
-                      <b-button :disabled="!filter" @click="filter = ''"
-                        >Clear</b-button
-                      >
-                    </b-input-group-append>
-                  </b-input-group>
-                </b-form-group>
-              </b-form>
-              <b-pagination
-                style="padding-bottom: 20px"
-                v-model="currentPage"
-                :total-rows="dgTotalRows"
-                :per-page="perPage"
-                align="fill"
-                size="sm"
-                class="my-0"
-              ></b-pagination>
-
-    
-            </b-card> -->
+           
           </b-col>
         </b-row>
         <b-container>
@@ -348,7 +291,8 @@ import PostService from "../PostService";
 import PubCleanService from "../PubCleanService";
 import TrapiResultClean from "../TrapiResultClean";
 import ARAXService from "../ARAXService";
-// import svgtest from "./svgtest.vue"
+import FDAService from "../FDAService";
+// import svgtest from "./svgtest.vue" FDAService
 import importResultWithDrugs from "/Users/andycrouse/Downloads/HGNC_68842hopJSON.json";
 import synonymService from "../synonymService";
 // import twohopdata from "../../../datafiles/twohopggd.json"
@@ -466,6 +410,7 @@ export default {
       predicate_increase: [
         "decreases_degradation_of",
         "positively_regulates,_entity_to_entity",
+        "entity_positively_regulates_entity",
         "increases_activity_of",
         "increases_expression_of",
         "increases_stability_of",
@@ -482,7 +427,7 @@ export default {
         "positively_regulates_entity_to_entity",
       ],
       predicate_decrease: [
-        "positively_regulates_entity_to_entity",
+        "entity_negatively_regulates_entity",
         "decreases_expression_of",
         "decreases_stability_of",
         "decreases_synthesis_of",
@@ -632,41 +577,85 @@ export default {
       progressObject: {},
       geneIDList: [],
       currentDrug: "test",
-      araxResultTable: [],
+            //  row.edgen_pmids_gg = []
+            //   row.edgen_pmids_gg = hop1res.edgepublications.length
+            //   row.object_gg = hop1res.object
+            //   row.objectName_gg = hop1res.objectName
+            //   row.predicate_gg = hop1res.predicate
+            //   row.subject_gg = hop1res.subject
+            //   row.subjectName_gg = hop1res.subjectName direction_dg
       fields: [
         {
-          key: "nodeDrugName",
+          key: "objectName_dg",
           label: "Drug",
           sortable: true,
           tdClass: "colwidth",
         },
         {
-          key: "edgeOne",
-          label: "dg_pred",
+          key: "object_dg",
+          label: "ID",
+          sortable: true,
+          tdClass: "colwidth",
+        },        
+        {
+          key: "direction_dg",
+          label: "Reg DG",
           sortable: true,
           tdClass: "colwidth",
         },
         {
-          key: "nodeGeneName",
+          key: "predicate_dg",
+          label: "Reg DG",
+          sortable: true,
+          tdClass: "colwidth",
+        },
+// {
+        //   key: "edgen_pmids_dg",
+        //   label: "Pubs DG",
+        //   sortable: true,
+        //   tdClass: "db_colwidth",
+        // },
+        {
+          key: "objectName_gg",
           label: "Gene",
           sortable: true,
           tdClass: "colwidth",
         },
+        // {
+        //   key: "object_gg",
+        //   label: "ID",
+        //   sortable: true,
+        //   tdClass: "colwidth",
+        // },
         {
-          key: "edgeTwo",
-          label: "gg_pred",
+          key: "predicate_gg",
+          label: "Reg GG",
+          sortable: true,
+          tdClass: "colwidth",
+        },
+        {
+          key: "direction_gg",
+          label: "Reg GG",
+          sortable: true,
+          tdClass: "colwidth",
+        },
+        // {
+        //   key: "edgen_pmids_gg",
+        //   label: "Pubs GG",
+        //   sortable: true,
+        //   tdClass: "db_colwidth",
+        // },
+        {
+          key: "direction_combined",
+          label: "2h Reg",
           sortable: true,
           tdClass: "db_colwidth",
         },
-        {
-          key: "nodeTarget",
-          label: "Target",
-          sortable: true,
-          tdClass: "db_colwidth",
-        },
+  
       ],
       predicateAll: [],
-      synonymIdArrayCount: {}
+      synonymIdArrayCount: {},
+      araxResultTable: [],
       // nodeGeneName
       //FAILED "HGNC:2348", "HGNC:13723", "HGNC:2514", "HGNC:2961", "HGNC:3373", reasoner_id
     };
@@ -897,7 +886,7 @@ export default {
         // console.log(araxResults.substring(index))
         // console.log(JSON.parse( araxResults.substring(index)))
         let araxJson = JSON.parse(araxResults.substring(index))
-        // console.log(araxJson)
+        console.log(araxJson)
         console.log("araxJson.message.knowledge_graph.edges")
         console.log(araxJson.message.knowledge_graph.edges)
         console.log("araxJson.message.knowledge_graph.nodes")
@@ -1060,16 +1049,16 @@ export default {
                 // console.log(araxResults.substring(index))
                 // console.log(JSON.parse( araxResults.substring(index)))
                 let araxJson = JSON.parse(araxResults.substring(index))
-                // console.log(araxJson)
+                console.log(araxJson)
                 console.log("araxJson.message.knowledge_graph.edges")
                 console.log(araxJson.message.knowledge_graph.edges)
-                console.log("araxJson.message.knowledge_graph.nodes")
-                console.log(araxJson.message.knowledge_graph.nodes)
+                // console.log("araxJson.message.knowledge_graph.nodes")
+                // console.log(araxJson.message.knowledge_graph.nodes)
                 let nodes = araxJson.message.knowledge_graph.nodes
                 // console.log(JSON.parse(araxResults) )
                 // console.log(araxResults)
-                console.log("araxJson.message.results")
-                console.log(araxJson.message.results)
+                // console.log("araxJson.message.results")
+                // console.log(araxJson.message.results)
                 let results = araxJson.message.results
                 console.log(results)
 
@@ -1079,7 +1068,7 @@ export default {
 
               // GET GENES REGULATING TARGET
                 let genes = Object.keys(nodes)
-                console.log("genes = ", genes)
+                // console.log("genes = ", genes)
 
                 let cleanedResults_gg = await TrapiResultClean.ARAXResultClean(
                     araxJson
@@ -1097,17 +1086,17 @@ export default {
                 let araxResults_dgResults = araxResultsArray[araxResultsArray.length - 2]
 
                 let araxJson_dg =JSON.parse(araxResults_dgResults) 
-                console.log("araxJson_dg")
-                console.log(araxJson_dg)
+                // console.log("araxJson_dg")
+                // console.log(araxJson_dg)
 
-                let nodes_dg = araxJson_dg.message.knowledge_graph.nodes
-                console.log("nodes_dg")
-                console.log(nodes_dg)
+                // let nodes_dg = araxJson_dg.message.knowledge_graph.nodes
+                // console.log("nodes_dg")
+                // console.log(nodes_dg)
 
               // GET GENES REGULATING TARGET
-                let drugNodes = araxJson_dg.message.knowledge_graph.nodes
-                let drugs = Object.keys(drugNodes)
-                console.log("drugs = ", drugs)
+                // let drugNodes = araxJson_dg.message.knowledge_graph.nodes
+                // let drugs = Object.keys(drugNodes)
+                // console.log("drugs = ", drugs)
 
                 let cleanedResults_dg = await TrapiResultClean.ARAXResultClean(
                     araxJson_dg
@@ -1118,1110 +1107,148 @@ export default {
                 // dgg_nodeEdges["nodes_dg"] = araxJson_dg.message.knowledge_graph.nodes
                 // dgg_nodeEdges["edges_dg"] = araxJson_dg.message.knowledge_graph.edges
 
-            })
-            .then(async (results) => {
-              // #########################
-              // SET UP OBJECT TO COUNT HITS 
-              // ######################### 
-              for (let i = 0; i < this.synonymsArray.length; i++) {
-                const syn = this.synonymsArray[i];
-                this.synonymIdArrayCount[syn] = {"synonym" : syn, "count": 0}
-                  // for (let n = 0; n < results.length; n++) {
-                  //   const result = results[n];
-                    
-                  // }
-
-                if( i == this.synonymsArray.length - 1){
-                  console.log("this.synonymIdArrayCount")
-                  console.log(this.synonymIdArrayCount)
-                  
-                  return results
-                }
-
-                
-              }
-            })
-            .then(async (results) => {
-              // #########################
-              // COUNT RESULTS FOR SUMMARY 
-              // ######################### 
-
-              for (let i = 0; i < results.length; i++) {
-                const result = results[i];
-                let subject = result.subject
-                console.log("subject")
-                console.log(subject)
-                console.log(this.synonymIdArrayCount[subject])
-                this.synonymIdArrayCount[subject].count++ 
-                if( i == results.length - 1){
-                  console.log("this.synonymIdArrayCount")
-                  console.log(this.synonymIdArrayCount)
-                  this.componentKey++
-                  return result
-                }
-                
-              }
-
-            })
-            .then(async (results) => {
-              console.log(results.a.b)
-            })
-            .then(async () => {
-              
-              // #########################
-              // SEND ALL SYNONYMS THAT MAY HAVE A HIT FOR GENE INTERACTION TO SEARCH MEDIK
-              // #########################
-              let query = this.queryjson;
-              let rawResult = {};
-              let cleanedResultArray = [];
-              let searchType = "gene";
-              query.message.query_graph.nodes.n1.category = searchType;
-
-              for (let i = 0; i < this.synonymsArray.length; i++) {
-                const syn = this.synonymsArray[i].identifier;
-
-                // console.log("---------")
-                // console.log(syn)
-                // console.log(typeof syn)
-                if (typeof syn !== "undefined") {
-                  // console.log(syn)
-                  // console.log(!syn.includes("ENSEMBL"))
-                  // console.log(!syn.includes("REACT"))
-                  query.message.query_graph.nodes.n2.id = syn;
-                  rawResult = await PostService.query_raw(query);
-
-                  let cleanedResults = await TrapiResultClean.TrapiResultClean(
-                    rawResult
-                  );
-                  // console.log("finished cleanedResults")
-
-                  // console.log(cleanedResults)
-                  this.synonymsArray[i].hitCount =
-                    this.synonymsArray[i].hitCount + cleanedResults.length;
-                  this.synonymsArray[i].geneHitCount = cleanedResults.length;
-
-                  this.componentKey = this.componentKey + 1;
-                  // console.log("this.synonymsArray[i].hitCount = ", this.synonymsArray[i].hitCount)
-                  cleanedResultArray =
-                  cleanedResultArray.concat(cleanedResults);
-                }
-
-                if (i == this.synonymsArray.length - 1) {
-                  this.componentKey = this.componentKey + 1;
-                  // console.log(
-                  //   "cleanedResultArray from gene = ",
-                  //   cleanedResultArray
-                  // );
-                  for (let n = 0; n < cleanedResultArray.length; n++) {
-                    cleanedResultArray[n].source = searchType;
-                    this.onehitGeneProtList.push(cleanedResultArray[n]);
-                    if (n == cleanedResultArray.length - 1) {
-                      console.log(this.onehitGeneProtList);
-                      // this.onehitGeneProtList.concat(cleanedResultArray)
-
-                      this.timeArray.push({
-                        step: "got gene and concat them",
-                        time: new Date(),
-                      });
-                      this.componentKey = this.componentKey + 1;
-                      return this.onehitGeneProtList;
-                    }
+                let hopOne = cleanedResults_gg.filter(row => row.predicate != "biolink:has_normalized_google_distance_with")
+                let hopTwo = cleanedResults_dg.filter(row => row.predicate != "biolink:has_normalized_google_distance_with")
+                let hopOneDir = hopOne.map((res) => {
+                  res.direction = "Unknown"
+                  // console.log(res)
+                  console.log(res.predicate.split(":")[1])
+                  if(this.predicate_decrease.indexOf(res.predicate.split(":")[1]) != -1  ){
+                    res.direction = "Decrease"
+                    return res
+                  } else if (this.predicate_increase.indexOf(res.predicate.split(":")[1]) != -1  ){
+                    res.direction = "Increase"
+                    return res
+                  } else {
+                    return res
                   }
-                }
-              }
-            })
+                })
 
+                let hopTwoDir = hopTwo.map((res) => {
+                  res.direction = "Unknown"
+                  // console.log(res)
+                  console.log(res.predicate.split(":")[1])
+                  if(this.predicate_decrease.indexOf(res.predicate.split(":")[1]) != -1  ){
+                    res.direction = "Decrease"
+                    return res
+                  } else if (this.predicate_increase.indexOf(res.predicate.split(":")[1]) != -1  ){
+                    res.direction = "Increase"
+                    return res
+                  } else {
+                    return res
+                  }
+                })
+                console.log("hopOneDir")
+                console.log(hopOneDir)
+
+
+                // console.log("hopOne")
+                // console.log(hopOne)
+                console.log("hopTwoDir")
+                console.log(hopTwoDir)
+
+                this.araxResultTable = await TrapiResultClean.createTwoHopObject(hopOneDir, hopTwoDir)
+                console.log("this.araxResultTable")
+                console.log(this.araxResultTable)
+
+                this.saveCleanedTrapi(hopOne, "hopOne")
+                this.saveCleanedTrapi(hopTwo, "hopTwo")
+
+                let result = {"araxResultTable": this.araxResultTable, "hopOne": hopOne, "hopTwo": hopTwo}
+                return result
+
+
+
+                
+            })
             .then(async (results) => {
-              // ##############################
-              // GET SYNONYMS SO RESULTS THAT ARE THE SAME CAN BE COMBINED
-              // ##############################
-              console.log(results.crouse)
-              for (let i = 0; i < results.length; i++) {
+              let araxResultTable = results.araxResultTable
+              // for (let i = 0; i < araxResultTable.length; i++) {
+              for (let i = 0; i < 2; i++) {
+                const line = araxResultTable[i];
+                let chemCurie = line.object_dg
+                console.log(chemCurie)
+
                 try {
-                  const element = results[i];
-                  // getARAXSynonyms
-                  let synonyms = await ARAXService.getARAXSynonyms(
-                    element.object
-                  );
-                  results[i].objectSynonyms = synonyms;
-                  // console.log("synonyms from arax = ", synonyms);
-                  // console.log("synonyms from arax");
-                  results[i].groupID = "";
+                let chemData = await FDAService.myChemInfo(chemCurie)
+                console.log("chemData.unii.unii")
+                console.log(chemData.unii.unii)
+                let unii = chemData.unii.unii
 
-                  if (synonyms[element.object]) {
-                    results[i].groupNormalID =
-                      synonyms[element.object].id.SRI_normalizer_curie;
-                  } else {
-                    results[i].groupNormalID = element.object;
-                  }
 
-                  // console.log("result = ",element)
-                  let object = results[i].object;
-                  // console.log("object = ",object)
-                  let synData = results[i].objectSynonyms[object];
-                  results[i].chemSearchSynArray = [];
-                  if (synData != null) {
-                    if (
-                      Object.prototype.hasOwnProperty.call(synData, "nodes")
-                    ) {
-                      // console.log("FOUND NODES!!")
-
-                      /*eslint no-unused-vars: ["error", { "caughtErrorsIgnorePattern": "^ignore" }]*/
-                      let nodes = synData.nodes;
-                      let chemSearchSynArray = [];
-                      let HGNCidHold = "";
-                      let PRidHold = "";
-                      let UMLSHold = "";
-                      let UniProtKBHold = "";
-                      let NCBIGeneHold = "";
-                      let NCITHold = "";
-                      let removeValues = [
-                        "UMLS:C0600388",
-                        "UMLS:C0030956",
-                        "UMLS:C1305923",
-                        "NCIT:C735",
-                        "UMLS:C0031727",
-                        "PR:000000001",
-                        "NCIT:C17021",
-                        "UMLS:C0033684",
-                        "UMLS:C0030956",
-                        "UMLS:C1305923",
-                        "NCIT:C735",
-                        "UMLS:C0066772",
-                      ];
-                      // Protein complex = UMLS:C1180347
-                      // protein polypeptide chain = PR:000000001 UMLS:C0033684 NCIT:C17021
-                      // Phosphotransferases UMLS:C0031727
-                      // peptide 'UMLS:C0030956', 'UMLS:C1305923', 'NCIT:C735'
-                      // Extracellular Signal Regulated Kinases UMLS:C0600388
-
-                      chemSearchSynArray = nodes.filter(
-                        (node) => node.identifier
-                      );
-                      results[i].chemSearchSynArray = chemSearchSynArray;
-
-                      for (let n = 0; n < nodes.length; n++) {
-                        const node = nodes[n];
-                        // console.log("node = ", node) //UniProtKB UMLS NCBIGene NCIT
-                        if (removeValues.indexOf(node.identifier) == -1) {
-                          if (node.identifier.includes("HGNC")) {
-                            // console.log("found HGNC")
-                            HGNCidHold = node.identifier;
-                            // n = nodes.length
-                          }
-                          if (node.identifier.includes("UniProtKB")) {
-                            UniProtKBHold = node.identifier;
-                            chemSearchSynArray.push(node.identifier);
-                          } else if (node.identifier.includes("PR:00")) {
-                            PRidHold = node.identifier;
-                            chemSearchSynArray.push(node.identifier);
-                          } else if (node.identifier.includes("UMLS")) {
-                            UMLSHold = node.identifier;
-                            chemSearchSynArray.push(node.identifier);
-                          } else if (node.identifier.includes("NCBIGene")) {
-                            NCBIGeneHold = node.identifier;
-                            chemSearchSynArray.push(node.identifier);
-                          } else if (node.identifier.includes("NCIT")) {
-                            NCITHold = node.identifier;
-                            chemSearchSynArray.push(node.identifier);
-                            console.log(UniProtKBHold, NCBIGeneHold, NCITHold);
-                          }
-                        }
-                        if (n == nodes.length - 1) {
-                          results[i].chemSearchSynArray = chemSearchSynArray;
-                        }
-                        if (n == nodes.length - 1 && HGNCidHold != "") {
-                          results[i].groupID = HGNCidHold;
-                        } else if (n == nodes.length - 1 && PRidHold != "") {
-                          results[i].groupID = PRidHold;
-                        } else if (n == nodes.length - 1 && UMLSHold != "") {
-                          results[i].groupID = UMLSHold;
-                        } else {
-                          results[i].groupID = results[i].object;
-                        }
-                      }
-                    }
-                  }
-
-                  if (i == results.length - 1) {
-                    return results;
-                  }
-                } catch (err) {
-                  console.log(err);
-                  if (i == results.length - 1) {
-                    return results;
-                  }
+                let FDAData = await FDAService.openFDA(unii)
+                console.log("FDAData")
+                console.log(FDAData)
+                } catch (err)
+                {
+                  console.log(err)
                 }
+
+                
               }
+
             })
-            // .then(async (results) => {
-            //   console.log("results = ", results)
-            // })
-            .then(async (results) => {
-              // ##############################
-              // GROUPING
-              // SEPARATE AND GROUP BY THE PRESENCE OR LACK OF HGNC - THEN GROUP BY GROUPID OR NAME
-              // ##############################
-              this.timeArray.push({
-                step: "SEPARATE AND GROUP BY THE PRESENCE OR LACK OF HGNC - THEN GROUP BY GROUPID OR NAME",
-                time: new Date(),
-              });
-              this.componentKey = this.componentKey + 1;
-              // let noChebResutls = results.filter(result => result.groupID == "")
-              let chebResutls = results.filter(
-                (result) => result.groupID != ""
-              );
-              let groupedGroupID = [];
-              // let groupedGroupIDnormalNode = [];
-              // groupedChebi = await TrapiResultClean.TrapiResultGroup(chebResutls, "objectCHEBI")
-              groupedGroupID = await TrapiResultClean.TrapiResultGroup(
-                chebResutls,
-                "groupID"
-              );
-              // groupedGroupIDnormalNode =
-              //   await TrapiResultClean.TrapiResultGroup(
-              //     chebResutls,
-              //     "groupNormalID"
-              //   );
-              // let groupedObjName = []
-              // groupedObjName= await TrapiResultClean.TrapiResultGroup(noChebResutls, "object")
-              // console.log("groupedChebi")
-              // console.log(groupedChebi)
-              // console.log(Object.keys(groupedChebi))
-              // console.log("groupedGroupID");
-              // console.log(groupedGroupID);
-              // console.log("groupedGroupIDnormalNode");
-              // console.log(groupedGroupIDnormalNode);
-
-              // console.log(Object.keys(groupedObjName))
-              let groupKeys = Object.keys(groupedGroupID);
-              // let objNameKeys = Object.keys(groupedObjName)
-              let resultsArray = [];
-              for (let i = 0; i < groupKeys.length; i++) {
-                let obj = {};
-                let id = groupKeys[i];
-                obj.id = id;
-                obj.data = groupedGroupID[id];
-                resultsArray.push(obj);
-
-                if (i == groupKeys.length - 1) {
-                  console.log(
-                    "grouped by synonyms for gene and protein = ",
-                    resultsArray
-                  );
-                  return resultsArray;
-                }
-              }
-            })
-            // .then(async (allSynGeneResultsArray)=>{
-            //   console.log("end = ", allSynGeneResultsArray)
-            // })
-            .then(async (allSynGeneResultsArray) => {
-              // ##############################
-              // REMOVE UNWANTED CURRIES THAT ARE TOO GENERAL AND UNWANTED PREDICATES
-              // ##############################
-              this.timeArray.push({
-                step: "REMOVE UNWANTED CURRIES THAT ARE TOO GENERAL AND UNWANTED PREDICATES",
-                time: new Date(),
-              });
-              this.componentKey = this.componentKey + 1;
-              let removeValues = [
-                "UMLS:C0600388",
-                "UMLS:C0030956",
-                "UMLS:C1305923",
-                "NCIT:C735",
-                "UMLS:C0031727",
-                "PR:000000001",
-                "NCIT:C17021",
-                "UMLS:C0033684",
-                "UMLS:C0030956",
-                "UMLS:C1305923",
-                "NCIT:C735",
-                "UMLS:C0597357",
-                "UMLS:C0306371", // INSULTIN
-              ];
-              let badPredicates = [
-                "Has gene product",
-                "Subclass of",
-                "Same as",
-                "Subclass of",
-              ];
-
-              let synGeneResultsArray = allSynGeneResultsArray.filter(
-                (synResult) => removeValues.indexOf(synResult.id) == -1
-              );
-              synGeneResultsArray = synGeneResultsArray.filter(
-                (synResult) => badPredicates.indexOf(synResult.predicate) == -1
-              );
-              // synGeneResultsArray = synGeneResultsArray.map(synResult => badPredicates.indexOf(synResult.predicate) == -1)
-
-              console.log("removed broad terms = ", synGeneResultsArray);
-              for (let i = 0; i < synGeneResultsArray.length; i++) {
-                const id = synGeneResultsArray[i].id;
-                let synonymData = await synonymService.allSynonyms(id);
-                let synonymsArray = [];
-                // objectName
-                synGeneResultsArray[i].groupName =
-                  synGeneResultsArray[i].data[0].objectName;
-
-                if (synonymData.araxSynonyms_equivalentids != null) {
-                  synonymsArray = synonymData.araxSynonyms_equivalentids.filter(
-                    (syn) =>
-                      !syn.identifier.includes("ENSEMBL") &&
-                      !syn.identifier.includes("REACT")
-                  );
-                  if (synonymsArray.length != 0) {
-                    synGeneResultsArray[i].synonyms = synonymsArray;
-                  } else {
-                    synGeneResultsArray[i].synonyms = [
-                      { identifier: synGeneResultsArray[i].id },
-                    ];
-                  }
-                } else {
-                  synGeneResultsArray[i].synonyms = [
-                    { identifier: synGeneResultsArray[i].id },
-                  ];
-                  // console.log("syn is undefined");
-                }
-
-                if (i == synGeneResultsArray.length - 1) {
-                  this.timeArray.push({
-                    step: "filterd generic gene curries and ensembl react synonyms",
-                    time: new Date(),
-                  });
-                  this.componentKey = this.componentKey + 1;
-                  // console.log("synGeneResultsArray = ", synGeneResultsArray);
-                  return synGeneResultsArray;
-                  // return
-                }
-              }
-              // synonymService.allSynonyms(this.concept_search)
-            })
-            .then((synGeneResultsArray) => {
-              for (let i = 0; i < synGeneResultsArray.length; i++) {
-                const geneData = synGeneResultsArray[i].data;
-                synGeneResultsArray[i].predicateArray = [];
-                synGeneResultsArray[i].predRegulates = false;
-                for (let n = 0; n < geneData.length; n++) {
-                  const pred = geneData[n].predicate;
-                  if (
-                    synGeneResultsArray[i].predicateArray.indexOf(pred) == -1
-                  ) {
-                    synGeneResultsArray[i].predicateArray.push(pred);
-                  }
-                  if (pred.includes("regul")) {
-                    synGeneResultsArray[i].predRegulates = true;
-                  }
-                }
-                if (i == synGeneResultsArray.length - 1) {
-                  console.log(
-                    "synGeneResultsArray with pred array = ",
-                    synGeneResultsArray
-                  );
-                  return synGeneResultsArray;
-                }
-              }
-            })
-            // .then(async(resultsArray)=>{
-            //   console.log("resultsArray REMOVE UNWANTED CURRIES THAT ARE TOO GENERAL AND UNWANTED PREDICATES")
-            //   console.log(resultsArray)
-            // })
-            .then(async (resultsArray) => {
-              if (this.status == false) {
-                let filteredresultsArray = resultsArray.filter(
-                  (result) => result.predRegulates
-                );
-                console.log(
-                  "resultsArray with pFILTERED red array = ",
-                  resultsArray
-                );
-                console.log(
-                  "filteredresultsArray with pFILTERED red array = ",
-                  filteredresultsArray
-                );
-                return filteredresultsArray;
-              } else {
-                return resultsArray;
-              }
-            })
-
-            .then(async (resultsArray) => {
-              if (resultsArray.length == 0) {
-                resolve();
-              }
-              // ##############################
-              // FILTER FOR CLEAR PREDICATES AND THEN GET CHEM FOR ALL TERMS AND ALL SYNONYMS
-              // ##############################
-
-              this.timeArray.push({
-                step: "GETTING ALL CHEM RESULTS FOR ALL GENES AND SYNONYMS",
-                time: new Date(),
-              });
-              this.componentKey = this.componentKey + 1;
-              console.log("resultsArray");
-              console.log(resultsArray);
-
-              let query = this.queryjson;
-              let rawResult = {};
-              // let cleanedResultArray = []
-              query.message.query_graph.nodes.n1.category = "chem";
-              // query.message.query_graph.nodes.n1.category = "chem"
-
-              for (let i = 0; i < resultsArray.length; i++) {
-                const synArray = resultsArray[i].synonyms;
-                // console.log("resultsArray[i]")
-                // console.log(resultsArray[i])
-                resultsArray[i].chemResults = [];
-
-                if (synArray != null) {
-                  for (let n = 0; n < synArray.length; n++) {
-                    const syn = synArray[n].identifier;
-                    // console.log(syn);
-                    query.message.query_graph.nodes.n2.id = syn;
-
-                    rawResult = await PostService.query_raw(query);
-                    // console.log("rawResult getting chem = " ,rawResult)
-                    let cleanedResults = [];
-                    if (rawResult != null) {
-                      cleanedResults = await TrapiResultClean.TrapiResultClean(
-                        rawResult
-                      );
-                      // console.log("########## finished cleanedResults")
-                      // console.log(cleanedResults)
-                      resultsArray[i].chemResults =
-                        resultsArray[i].chemResults.concat(cleanedResults);
-                    }
-                  }
-                }
-                if (i == resultsArray.length - 1) {
-                  this.componentKey = this.componentKey + 1;
-
-                  return resultsArray;
-                }
-              }
-            })
-            // .then(async(resultsArray)=>{
-            //   console.log("resultsArray")
-            //   console.log(resultsArray)
-            // })
-            .then(async (resultsArray) => {
-              // ##############################
-              // FILTER OUT UNHELPFUL PREDICATES FOR CHEMICALS
-              // STORE ALL RESULTS IN CHEMRESULTSALL - FILTER CHEMRESULTS BASED ON PREDICATES
-              // ##############################
-              this.timeArray.push({
-                step: "FILTERING OUT AMBIGUOUS CHEM PREDICATES",
-                time: new Date(),
-              });
-              this.componentKey = this.componentKey + 1;
-
-              for (let n = 0; n < resultsArray.length; n++) {
-                const gene = resultsArray[n];
-                gene.chemResultsAll = gene.chemResults;
-                gene.chemResults = gene.chemResults.filter(
-                  (chem) =>
-                    chem.predicate.includes("regulate") ||
-                    chem.predicate.includes("negat") ||
-                    chem.predicate.includes("positiv") ||
-                    chem.predicate.includes("increase") ||
-                    chem.predicate.includes("decrease")
-                );
-                // this.chemPredicates = gene.chemResults.map(chem)
-                for (let i = 0; i < gene.chemResults.length; i++) {
-                  const chem = gene.chemResults[i];
-                  if (this.chemPredicates.indexOf(chem.predicate) == -1) {
-                    this.chemPredicates.push(chem.predicate);
-                  }
-                }
-                if (n == resultsArray.length - 1) {
-                  this.componentKey = this.componentKey + 1;
-
-                  return resultsArray;
-                }
-              }
-            })
-            .then(async (resultsArray) => {
-              // ##############################
-              // CONSOLIDATE GENE INFO TO TOP LEVEL - FROM GENE.DATA
-              // ##############################
-              this.timeArray.push({
-                step: "CONSOLIDATING GENE INFO TO TOP LEVEL - FROM GENE.DATA",
-                time: new Date(),
-              });
-              this.componentKey = this.componentKey + 1;
-
-              // console.log("test resultsArray");
-              // console.log(resultsArray);
-              for (let index = 0; index < resultsArray.length; index++) {
-                const gene = resultsArray[index];
-                resultsArray[index].chemCountTotal =
-                  resultsArray[index].chemResultsAll.length;
-                resultsArray[index].chemCount =
-                  resultsArray[index].chemResults.length;
-                resultsArray[index].geneName = [];
-                resultsArray[index].predicates = [];
-                resultsArray[index].pubTableInfo = [];
-                // console.log("gene.data");
-                // console.log(gene.data);
-                // CLEAN UP AND PUSH GENE INFO
-                for (let n = 0; n < gene.data.length; n++) {
-                  const genedata = gene.data[n];
-
-                  let genedataPredicate = genedata.predicate.replace(
-                    "biolink:",
-                    ""
-                  );
-                  let objectName = genedata.objectName;
-
-                  // console.log("resultsArray[index].predicates = ", resultsArray[index].predicates)
-                  // console.log("genedataPredicate = ", genedataPredicate)
-                  // console.log("resultsArray[index].geneName = ", resultsArray[index].geneName)
-                  // console.log("objectName = ", objectName)
-                  // let predicate = genedata.Predicate
-                  if (resultsArray[index].geneName.indexOf(objectName) == -1) {
-                    resultsArray[index].geneName.push(objectName);
-                  }
-                  if (
-                    resultsArray[index].predicates.indexOf(genedataPredicate) ==
-                    -1
-                  ) {
-                    resultsArray[index].predicates.push(genedataPredicate);
-                  }
-                }
-                if (index == resultsArray.length - 1) {
-                  this.resultWithDrugs = resultsArray;
-                  return resultsArray;
-                }
-              }
-            })
-            .then(async (resultsArray) => {
-              // ############################################################################################################
-              // CREATE OBJECT FOR TRACKING PROGRESS OF FDA STATUS SEARCH
-              // ############################################################################################################
-              console.log(
-                "resultsArray CONSOLIDATE GENE INFO TO TOP LEVEL - FROM GENE.DATA"
-              );
-              // console.log(resultsArray);
-              for (let i = 0; i < resultsArray.length; i++) {
-                let gene = resultsArray[i];
-                this.geneIDList.push(gene.id);
-                this.progressObject[gene.id] = {};
-                this.progressObject[gene.id].id = gene.id;
-                this.progressObject[gene.id].groupName = gene.groupName;
-                this.progressObject[gene.id].chemCount = gene.chemCount;
-                this.progressObject[gene.id].chemCountTotal =
-                  gene.chemCountTotal;
-                this.progressObject[gene.id].FDACurrentCount = 0;
-                this.progressObject[gene.id].synCurrentCount = 0;
-                if (i == resultsArray.length - 1) {
-                  // console.log("this.progressObject")
-                  // console.log(this.progressObject)
-                  return resultsArray;
-                }
-              }
-              // this.progressTable = resultsArray.map(gene => ({id: gene.id,  groupName:gene.groupName , chemCount: gene.chemCount, chemCountTotal : gene.chemCountTotal, currentCount: 0}))
-              // console.log("this.progressTable")
-              // console.log(this.progressTable)
-
-              // chemCount chemCountTotal groupName id
-            })
-            .then(async (resultWithDrugs) => {
-              // ##############################
-              // MAKE JSON FOR SAVING GENE INFO TO CSV
-              // ##############################
-              this.timeArray.push({
-                step: "MAKE JSON FOR SAVING GENE INFO TO CSV",
-                time: new Date(),
-              });
-              this.componentKey = this.componentKey + 1;
-
-              this.geneTableToSave = [];
-              // GET GENE INFO FOR SAVE TABLE
-              this.stopTime = new Date();
-              console.log("resultWithDrugs after filter");
-              // console.log(resultWithDrugs);
-              for (let i = 0; i < resultWithDrugs.length; i++) {
-                const gene = resultWithDrugs[i];
-                for (let n = 0; n < gene.data.length; n++) {
-                  const genedata = gene.data[n];
-                  // console.log("genedata");
-                  // console.log(genedata);
-                  let pubInfo = {};
-                  pubInfo.object = genedata.object;
-                  pubInfo.subject = genedata.subject;
-                  pubInfo.subjectName = genedata.subjectName;
-                  pubInfo.objectName = genedata.objectName;
-                  pubInfo.datacount = n;
-                  pubInfo.geneDatalen = gene.data.length;
-                  pubInfo.pubNumber = 0;
-                  pubInfo.id = "";
-                  // pubInfo.predicate = genedata.predicate
-                  pubInfo.predicate = genedata.predicate.replace(
-                    "biolink:",
-                    ""
-                  );
-                  pubInfo.edgeprovider = genedata.edgeprovider;
-                  // console.log(
-                  //   "genedata.edgepublications = ",
-                  //   genedata.edgepublications
-                  // );
-
-                  if (
-                    gene.data[n].edgepublications == null ||
-                    gene.data[n].edgepublications.length == 0
-                  ) {
-                    // await new Promise(resolve => setTimeout(resolve, 1000));
-                    pubInfo.pub = " ";
-                    pubInfo.pubNumber_x = 0;
-                    // console.log("order ID = ", i, "-", n, "-none");
-                    // pubInfo.id = "order ID = " + i + "-" + n + "-none"
-                    // console.log("pubInfo");
-                    // console.log(pubInfo);
-                    // let resultTable = this.geneTableToSave
-                    // console.log("resultTable")
-                    // console.log(resultTable.length)
-                    // console.log(resultTable)
-                    this.geneTableToSave.push(pubInfo);
-                  } else {
-                    // try{
-                    let pubs = genedata.edgepublications;
-                    pubInfo.pub = pubs;
-
-                    this.geneTableToSave.push(pubInfo);
-                  }
-                }
-                if (i == resultWithDrugs.length - 1) {
-                  console.log("ABOUT TO SAVE FILE GENE GENE");
-                  this.testSave(this.geneTableToSave, "GENE GENE");
-                  // console.log(resultWithDrugs);
-                  this.saveThisFile(this.geneTableToSave, "GENE GENE");
-                  // console.log("this.geneTableToSave");
-                  // console.log(this.geneTableToSave);
-
-                  return resultWithDrugs;
-                }
-              }
-            })
-            // .then(async (resultsArray) => {
-            //   console.log("resultsArray");
-            //   console.log(resultsArray);
-            // })
-            // .then(async (resultWithDrugs) => {
-            //   // ##############################
-            //   // CREATE UID VERSION OF CSV
-            //   // ##############################
-            //   let trynewtable = [];
-            //   for (let i = 0; i < this.geneTableToSave.length; i++) {
-            //     const result = this.geneTableToSave[i];
-            //     console.log("i = ", i);
-            //     if (result.pub == null) {
-            //       result.uid =
-            //         result.object + result.subject + result.predicate;
-            //       trynewtable.push(result);
-            //     } else {
-            //       for (let n = 0; n < result.pub.length; n++) {
-            //         const pubID = result.pub[n];
-            //         console.log("pubID = ", pubID);
-
-            //         let pubresult = result;
-            //         pubresult.edgepublications = pubID;
-            //         pubresult.uid =
-            //           pubresult.object +
-            //           pubresult.subject +
-            //           pubresult.predicate +
-            //           pubID;
-            //         trynewtable.push(pubresult);
-            //       }
-            //     }
-            //     if (i == this.geneTableToSave.length - 1) {
-            //       this.saveThisFile(trynewtable, " uid GENE GENE");
-            //       console.log("trynewtable = =", trynewtable);
-            //       return resultWithDrugs;
-            //     }
-            //   }
-            //   let stringresultWithDrugs = JSON.stringify(resultWithDrugs);
-            //   function download(content, fileName, contentType) {
-            //     var a = document.createElement("a");
-            //     var file = new Blob([content], { type: contentType });
-            //     a.href = URL.createObjectURL(file);
-            //     a.download = fileName;
-            //     a.click();
-            //   }
-            //   download(
-            //     stringresultWithDrugs,
-            //     "resultWithDrugspreChemSyn.json",
-            //     "text/plain"
-            //   );
-            //   return resultWithDrugs;
-            // })
-            .then(async (resultWithDrugs) => {
-              // ##############################
-              // GET CHEM SYNONYMS SO WE CAN GET FDA APPROVAL AND GROUP THEM USING UNIFIED ARAX ID - SRI_normalizer_curie
-              // ##############################
-              this.timeArray.push({
-                step: "GET CHEM SYNONYMS SO WE CAN GET FDA APPROVAL AND GROUP THEM USING UNIFIED ARAX ID - SRI_normalizer_curie",
-                time: new Date(),
-              });
-              this.componentKey = this.componentKey + 1;
-
-              console.log("resultWithDrugs chem synonyms process");
-              // console.log(resultWithDrugs);
-              let p = 0;
-              for (let i = 0; i < resultWithDrugs.length; i++) {
-                // console.log("############ i = ", i);
-                // for (let i = 0; i < 5; i++) {
-                const dgObject = resultWithDrugs[i];
-                // console.log("dgObject.chemResults");
-                // console.log(dgObject.chemResults);
-                // if(dgObject.chemResults.length > 0){
-                // ##############################
-                // START - GET START TIME TO SEE WHAT AVERAGE TIME PER DRUG IS
-                // ##############################
-                this.progressObject[dgObject.id].drugStartTime = new Date();
-
-                // ##############################
-                // START - GO THROUGH EACH DRUG
-                // ##############################
-                for (let n = 0; n < dgObject.chemResults.length; n++) {
-                  p++;
-
-                  try {
-                    if (p % 10 == 0) {
-                      console.log("p chems have been proces = ", p);
-                    }
-                    resultWithDrugs[i].chemResults[n].objectChemblArray = [];
-                    resultWithDrugs[i].chemResults[n].objectChemSynArray = [];
-                    // for (let n = 0; n < 1; n++) {
-                    const chemData = dgObject.chemResults[n];
-                    this.currentDrug = chemData.objectName;
-                    // ##############################
-                    // ADJUST COUNTER FOR FINDING CHEM SYNONYMS
-                    // ##############################
-
-                    this.progressObject[dgObject.id].synCurrentCount = n + 1;
-                    this.componentKey = this.componentKey + 1;
-
-                    // ##############################
-                    // END - ADJUST COUNTER FOR FINDING CHEM SYNONYMS
-                    // ##############################
-
-                    // console.log(dgObject)
-                    // console.log(chemData)
-                    // console.log("chemData.object")
-                    // console.log(chemData.object)
-                    if (this.badChemResults.indexOf(chemData.object) == -1) {
-                      let startchemsyn = new Date();
-                      let synonymData = await synonymService.chemSynonyms(
-                        chemData.object
-                      );
-                      let endchemsyn = new Date();
-                      // console.log("synonymData = ", synonymData);
-                      console.log("synonymData = ");
-                      console.log(
-                        "chem turnaround syn time (sec)= ",
-                        (endchemsyn - startchemsyn) / 1000
-                      );
-
-                      if (synonymData[chemData.object] != null) {
-                        resultWithDrugs[i].chemResults[n].objectChemSynArray =
-                          synonymData[chemData.object].nodes;
-                        let chemblArray = synonymData[
-                          chemData.object
-                        ].nodes.filter((node) =>
-                          node.identifier.includes("CHEMBL")
-                        );
-                        resultWithDrugs[i].chemResults[n].objectChemblArray =
-                          chemblArray;
-                        resultWithDrugs[i].chemResults[n].objectAraxid =
-                          synonymData[chemData.object].id.identifier;
-                        if (
-                          synonymData[chemData.object].id
-                            .SRI_normalizer_curie == null
-                        ) {
-                          resultWithDrugs[i].chemResults[n].objectSRINormid =
-                            chemData.object;
-                        } else {
-                          resultWithDrugs[i].chemResults[n].objectSRINormid =
-                            synonymData[
-                              chemData.object
-                            ].id.SRI_normalizer_curie;
-                        }
-                      }
-                    }
-
-                    // if(n == 10){
-                    //   n = dgObject.chemResults.length
-                    // }
-                    if (n == dgObject.chemResults.length - 1) {
-                      // console.log(
-                      //   "done with chembl array = ",
-                      //   resultWithDrugs[i].chemResults[n]
-                      // );
-                      this.progressObject[dgObject.id].drugStopTime =
-                        new Date();
-                      this.progressObject[dgObject.id].drugTotalTime =
-                        (this.progressObject[dgObject.id].drugStOPTime -
-                          this.progressObject[dgObject.id].drugStopTime) /
-                        1000;
-                    }
-                  } catch (err) {
-                    console.error(err);
-                    this.timeArray.push({
-                      step: "error - GET CHEM SYNONYMS SO WE CAN GET FDA APPROVAL AND GROUP THEM USING UNIFIED ARAX ID - SRI_normalizer_curie",
-                      time: new Date(),
-                    });
-                    if (n == dgObject.chemResults.length - 1) {
-                      // console.log(
-                      //   "done with chembl array = ",
-                      //   resultWithDrugs[i].chemResults[n]
-                      // );
-                    }
-                  }
-                }
-                // }
-
-                if (i == resultWithDrugs.length - 1) {
-                  console.log(
-                    "FINISHED GETTING CHEMBL AND HOPE I DID MORE THAN ONE GENE"
-                  );
-                  this.timeArray.push({
-                    step: "GOT ALL POSSIBLE CHEMBL CURRIE ",
-                    time: new Date(),
-                  });
-                  this.componentKey = this.componentKey + 1;
-                  return resultWithDrugs;
-                }
-              }
-            })
-
-            .then(async (resultWithDrugs) => {
-              // ##############################
-              // GET FDA APPROVAL STATUS FOR DRUGS WITH CHEMBL ID
-              // ##############################
-              this.timeArray.push({
-                step: "GET FDA APPROVAL STATUS FOR DRUGS WITH CHEMBL ID",
-                time: new Date(),
-              });
-              this.componentKey = this.componentKey + 1;
-
-              // let stringresultWithDrugs = JSON.stringify(resultWithDrugs)
-              // function download(content, fileName, contentType) {
-              //       var a = document.createElement("a");
-              //       var file = new Blob([content], {type: contentType});
-              //       a.href = URL.createObjectURL(file);
-              //       a.download = fileName;
-              //       a.click();
-              //   }
-              // download(stringresultWithDrugs, 'resultWithDrugsWSynbeforeFDA.json', 'text/plain');
-              // let testdata = resultWithDrugs
-              // console.log(testdata)
-              for (let i = 0; i < resultWithDrugs.length; i++) {
-                // console.log("@@@@@@@@@@@ gene count = ", i);
-
-                const gene = resultWithDrugs[i];
-
-                let chems = gene.chemResults;
-                // console.log("chems = ", chems);
-                for (let n = 0; n < chems.length; n++) {
-                  // ##############################
-                  // GET CALCULATING PROGRESS
-                  // ##############################
-
-                  try {
-                    let geneID = gene.id;
-                    this.progressObject[geneID].FDACurrentCount = n + 1;
-                    // console.log("## CALC PROGRESS ##")
-
-                    // this.progressObject[geneID].currentCount = i
-                    this.componentKey = this.componentKey + 1;
-                  } catch {
-                    // console.log("progress NO WORKY")
-                  }
-
-                  // ##############################
-                  // END - GET CALCULATING PROGRESS
-                  // ##############################
-                  const chem = chems[n];
-                  this.componentKey = this.componentKey + 1;
-                  this.currentDrug = chem.objectName;
-                  let chembls = chem.objectChemblArray;
-                  resultWithDrugs[i].chemResults[n].objectChemFDA = 0;
-                  // console.log("hit # = ", i, "-", n);
-                  // try{
-
-                  // console.log("gene")
-                  // console.log(gene)
-                  // console.error(err)
-                  if (chembls != null && chembls.length > 0) {
-                    // console.log("chembls != null", chembls != null)
-                    // console.log("chems = ", chems)
-                    // console.log("chem = ", chem)
-                    // console.log("chembls = ", chembls)
-                    for (let x = 0; x < chembls.length; x++) {
-                      const chembl = chembls[x];
-                      // console.log("chembl.identifier")
-                      // console.log(chembl.identifier)
-                      let drugNameConceptData = await PostService.getConcept(
-                        chembl.identifier
-                      );
-                      // console.log(
-                      //   "drugNameConceptData = ",
-                      //   drugNameConceptData
-                      // );
-                      try {
-                        // let asArray = Object.entries(
-                        //   drugNameConceptData["concepts"]["rtx2_2021_02_04"][chembl.identifier]
-                        // );
-                        let attArray =
-                          drugNameConceptData["concepts"]["rtx2_2021_02_04"][
-                            chembl.identifier
-                          ].attributes;
-                        // console.log("attArray = ", attArray)
-                        // console.log(asArray)
-                        let attfiltered = attArray.filter(
-                          (att) => att.name == "description"
-                        );
-                        // console.log("attfiltered length= ", attfiltered.length)
-                        // console.log("attfiltered = ", attfiltered)
-                        let descriptionArray = attfiltered[0].value.split(";");
-                        // console.log("descriptionArray = ", descriptionArray)
-
-                        if (
-                          attfiltered[0].value.includes(
-                            "MAX_FDA_APPROVAL_PHASE"
-                          )
-                        ) {
-                          for (let m = 0; m < descriptionArray.length; m++) {
-                            const descript = descriptionArray[m];
-                            if (descript.includes("MAX_FDA_APPROVAL_PHASE")) {
-                              let fda = parseInt(descript.split(" ")[2]);
-                              // console.log("FDA = ", fda);
-                              // console.log(descript.split(" "));
-                              if (
-                                fda >
-                                resultWithDrugs[i].chemResults[n].objectChemFDA
-                              ) {
-                                resultWithDrugs[i].chemResults[
-                                  n
-                                ].objectChemFDA = fda;
-                              }
-                            }
-                          }
-                        }
-                      } catch (err) {
-                        console.error(
-                          i,
-                          "-",
-                          x,
-                          "  - error getting rtx data - likely none available"
-                        );
-                        console.error(err);
-                      }
-                    }
-                  }
-                }
-
-                if (i == resultWithDrugs.length - 1) {
-                  this.timeArray.push({
-                    step: "CHECKED FDA APPROVAL FOR ALL CHEMBL IDS",
-                    time: new Date(),
-                  });
-                  this.componentKey = this.componentKey + 1;
-                  // console.log("resultWithDrugs");
-                  // console.log(resultWithDrugs);
-                  return resultWithDrugs;
-                }
-              }
-            })
-            .then(async (resultWithDrugs) => {
-              // ##############################
-              // SAVE JSON FOR USE IN TESTING DOWNSTREAM
-              // ##############################
-                this.testSave(resultWithDrugs);
-              // ##############################
-              // SEND JSON TO BE TURNED TO TABLE AND SAVED
-              // ##############################
-                this.testSection(resultWithDrugs)
-              // ##############################
-              // MAKE TABLE FOR DRUG RESULTS
-              // ##############################
-
-              this.timeArray.push({
-                step: "MAKE TABLE FOR DRUG RESULTS",
-                time: new Date(),
-              });
-              this.componentKey = this.componentKey + 1;
-              // let resultWithDrugs =  importResultWithDrugs
-              this.geneTableToSave = [];
-              // let resultWithDrugs =  "importResultWithDrugs"
-              // GET GENE INFO FOR SAVE TABLE
-              console.log("making drug table to convert to csv");
-
-              // drugToGenePrintTable
-              for (let i = 0; i < resultWithDrugs.length; i++) {
-                const gene = resultWithDrugs[i];
-                this.drugToGenePrintTable = this.drugToGenePrintTable.concat(
-                  gene.chemResults
-                );
-                console.log("this.drugToGenePrintTable.length");
-                // console.log(this.drugToGenePrintTable.length)
-                if (i == resultWithDrugs.length - 1) {
-                  for (let n = 0; n < this.drugToGenePrintTable.length; n++) {
-                    // const drugInfo = this.drugToGenePrintTable[n];
-                    delete this.drugToGenePrintTable[n].edgeinfo;
-                    delete this.drugToGenePrintTable[n].edgepublicationsText;
-                    // delete this.drugToGenePrintTable[n].objectAtt;
-                    delete this.drugToGenePrintTable[n].objectChemSynArray;
-                    delete this.drugToGenePrintTable[n].pubInfo;
-                    // delete this.drugToGenePrintTable[n].subjectAtt;
-                    // console.log("this.drugToGenePrintTable[n]")
-                    // console.log(this.drugToGenePrintTable[n])
-                    if (n == this.drugToGenePrintTable.length - 1) {
-                      console.log("about to save file");
-                      this.saveThisFile(
-                        this.drugToGenePrintTable,
-                        "DRUG GENE "
-                      );
-                    }
-                  }
-                }
-              }
-              return resultWithDrugs;
-            })
-            .then(async () => {
-              // ##############################
-              // SAVE TABLE FOR DRUG RESULTS
-              // ##############################
-              this.timeArray.push({
-                step: "SAVE TABLE FOR DRUG RESULTS",
-                time: new Date(),
-              });
-              this.componentKey = this.componentKey + 1;
-              for (let i = 0; i < this.timeArray.length; i++) {
-                this.timeArray[i].gene = this.concept_search;
-                if (i == this.timeArray.length - 1) {
-                  this.saveThisFile(
-                    this.timeArray,
-                    this.concept_search + "TIME "
-                  );
-                  resolve(
-                    "!@#$#@!@#$#@!@#$#@! - FINISHED FOR " + this.concept_search
-                  );
-                  return;
-                }
-              }
-            })
-            .catch((error) => {
-              console.error("error ");
-              console.error(error);
-              reject(" ^^^^^^^^^^^^^ - REJECTED FOR " + this.concept_search);
-            });
+ 
         });
       } catch (err) {
         console.error(err);
       }
     },
 
+   async saveCleanedTrapi(results, name) {
+     console.log("START saveCleanedTrapi ")
+      // this.startTime = new Date()
+      // console.log(importResultWithDrugs);
+      let tableForDownload = []
+
+      try{
+        
+        for (let i = 0; i < results.length; i++) {
+
+            const trapiData = results[i];
+            let data = {}
+            data.edgeOriginalSource = trapiData.edgeOriginalSource
+            data.edgeprovider = trapiData.edgeprovider
+            data.object = trapiData.object
+            data.objectName = trapiData.objectName
+            data.predicate = trapiData.predicate
+            data.subject = trapiData.subject
+            data.subjectName = trapiData.subjectName
+      
+            if(trapiData.edgepublications.length > 0){
+              // console.log("data")
+              // console.log(data)
+              for (let n = 0; n < trapiData.edgepublications.length; n++) {
+                let pub = trapiData.edgepublications[n]
+                data.pubID = pub
+                let dataCopy = {...data}
+                tableForDownload.push(dataCopy)
+                      
+                  if(i == results.length -1 && n == trapiData.edgepublications.length - 1){
+                    console.log("FINISHED ", name)
+                    this.saveThisFile(tableForDownload, name);
+                    // this.trySection(chemTableForDownload)
+                  }
+                }
+            } else {
+              data.pubID = "none found"
+              if(i == results.length -1){
+                console.log("FINISHED ",name )
+                this.saveThisFile(tableForDownload, name);
+                // this.trySection(chemTableForDownload)
+              }
+            }
+            
+          }
+      } catch (err){
+        console.error(err)
+        console.log("WRITING FILE FOR ", name)
+        this.saveThisFile(tableForDownload, name);
+      }
+ 
+
+
+    },
     async getGeneSynonyms() {
       // SEND HGNC TO GET ALL SYNONYMS
       PostService.getGeneSynonyms(this.concept_search)
@@ -3343,6 +2370,8 @@ export default {
     saveThisFile(file, nametag) {
       let text = "";
       console.log("save result");
+      console.log("file")
+      console.log(file)
 
       for (let index = 0; index < file.length; index++) {
         // const result = this.groupedResultsTable[index];
@@ -3394,7 +2423,7 @@ export default {
       }
 
       let filename =
-        this.concept_search + "-" + nametag + " two hop results.csv";
+        this.concept_search + "-" + nametag + " results.csv";
       let element = document.createElement("a");
       element.setAttribute(
         "href",
