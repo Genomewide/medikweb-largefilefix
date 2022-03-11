@@ -29,7 +29,7 @@ class FDAService {
     console.log(unii) 
 
     return new Promise(async (resolve, reject) => { // eslint-disable-line
-      let url = "https://api.fda.gov/drug/drugsfda.json?search=openfda.unii:" + unii 
+      let url = "https://api.fda.gov/drug/drugsfda.json?api_key=EWKpb1cjDAJYTwDcQNmAuCYTFtf99kIWb67KnI1m&search=openfda.unii:" + unii 
 
       console.log(url)
 
@@ -38,7 +38,29 @@ class FDAService {
         const data = res.data;
         // });
   
-        console.log("myChemInfo ran")
+        console.log("openFDA ran")
+        console.log(data)
+        resolve(data);
+      } catch (err) {
+        reject(err);
+      }
+    });
+  }
+
+  static openFDAGetUnii = (name) => {
+    console.log(name) 
+
+    return new Promise(async (resolve, reject) => { // eslint-disable-line
+      let url = "https://api.fda.gov/other/substance.json?search=names.name:%22" + name + "%22"  
+
+      console.log(url)
+
+      try {
+        const res = await axios.get(url);
+        const data = res.data;
+        // });
+  
+        console.log("openFDAGetUnii ran")
         console.log(data)
         resolve(data);
       } catch (err) {

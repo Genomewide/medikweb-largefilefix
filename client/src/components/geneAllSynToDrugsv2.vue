@@ -124,7 +124,34 @@
         <b-row>
           <b-card header="featured" header-tag="header" :key="componentKey">
             <template #header>
-              <h6 class="mb-0">Test ARAX:</h6>
+              <h6 class="mb-0">ARAX Result Summary:</h6>
+              <!-- concept_search -->
+            </template>
+            <!-- <h4 class="mb-0">Symbol: {{ concept_search }}</h4> -->
+
+            <br />
+            <b-table
+              bordered
+              striped
+              hover
+              ref="araxResultTableSummary"
+              table-layout:
+              fixed
+              :items="araxResultTableSummaryDisplay"
+            >
+   
+            </b-table>
+            <!-- <b-card-text v-for="syn in synonymsArray" :key="syn.id">
+                    <b>{{ syn.identifier }}: &nbsp;</b>{{ syn.name }} &nbsp;
+                    (Hits = {{ syn.hitCount }})
+                  </b-card-text> -->
+            <!-- {{synonymsArray}} -->
+          </b-card>
+        </b-row>
+        <b-row>
+          <b-card header="featured" header-tag="header" :key="componentKey">
+            <template #header>
+              <h6 class="mb-0">ARAX Result Count: {{araxResultTable.length}}</h6>
               <!-- concept_search -->
             </template>
             <!-- <h4 class="mb-0">Symbol: {{ concept_search }}</h4> -->
@@ -651,11 +678,31 @@ export default {
           sortable: true,
           tdClass: "db_colwidth",
         },
+       {
+          key: "submission",
+          label: "FDA",
+          sortable: true,
+          tdClass: "colwidth",
+        },
+      //  {
+      //     key: "fdaData",
+      //     label: "FDA",
+      //     sortable: true,
+      //     tdClass: "colwidth",
+      //   },
+       {
+          key: "time",
+          label: "Time",
+          sortable: true,
+          tdClass: "colwidth",
+        },
   
       ],
       predicateAll: [],
       synonymIdArrayCount: {},
       araxResultTable: [],
+      araxResultTableSummary: {},
+      araxResultTableSummaryDisplay: []
       // nodeGeneName
       //FAILED "HGNC:2348", "HGNC:13723", "HGNC:2514", "HGNC:2961", "HGNC:3373", reasoner_id
     };
@@ -1112,7 +1159,7 @@ export default {
                 let hopOneDir = hopOne.map((res) => {
                   res.direction = "Unknown"
                   // console.log(res)
-                  console.log(res.predicate.split(":")[1])
+                  // console.log(res.predicate.split(":")[1])
                   if(this.predicate_decrease.indexOf(res.predicate.split(":")[1]) != -1  ){
                     res.direction = "Decrease"
                     return res
@@ -1162,12 +1209,142 @@ export default {
                 
             })
             .then(async (results) => {
+              console.log("CREATING SUMMARY TABLE")
+              let araxResultTable = results.araxResultTable
+              let uniqueGenes = []
+                // for (let i = 0; i < 5; i++) {
+               for (let i = 0; i < araxResultTable.length; i++) {
+                 const row = araxResultTable[i];
+
+                 if(uniqueGenes.indexOf(row.objectName_gg) == -1){
+                  //  let obj = {}
+                  this.araxResultTableSummary[row.objectName_gg] = {gene: row.objectName_gg, direction: "", TotalDrugs: 0, inhibitor: 0, inhibitorFDA: 0, activator: 0, activatorFDA: 0}
+                  // let objCopy = {...obj}
+                   uniqueGenes.push(row.objectName_gg)
+                   
+                  //  console.log(this.araxResultTableSummary)
+                  //  console.log("uniqueGenes")
+                  //  console.log(uniqueGenes)
+                     this.araxResultTableSummaryDisplay.push(this.araxResultTableSummary[row.objectName_gg])
+                     this.componentKey++                   
+                 }
+                 if(i == araxResultTable.length - 1){
+                   for (let n = 0; n < uniqueGenes.length; n++) {
+                     const gene = uniqueGenes[n];
+                     let array = araxResultTable.filter(x => x.objectName_gg == gene)
+                     this.araxResultTableSummary[gene].TotalDrugs = array.length
+                    //  this.araxResultTableSummaryDisplay.push(this.araxResultTableSummary[row.objectName_gg])
+                     this.componentKey++
+
+                    //  resultsGrouped
+                   }
+                  //  let resultsGrouped = await TrapiResultClean.TrapiResultGroup(this.araxResultTableSummary, "objectName_gg")
+                  //  this.araxResultTableSummaryDisplay
+                  // console.log("resultsGrouped")
+                  // console.log(resultsGrouped)
+                 }
+ 
+
+
+                 
+               }
+            })
+            .then(async (results) => {
               let araxResultTable = results.araxResultTable
               // for (let i = 0; i < araxResultTable.length; i++) {
-              for (let i = 0; i < 2; i++) {
+              for (let i = 0; i < 5; i++) {
                 const line = araxResultTable[i];
+                this.componentKey++
+                araxResultTable[i].submission = "NA"
                 let chemCurie = line.object_dg
                 console.log(chemCurie)
+                console.log(line.objectName_dg) 
+                console.log(line)
+                let drugData = {}
+                drugData.brand_name = []
+                drugData.generic_name = []
+                drugData.manufacturer_name = []
+                drugData.pharm_class_epc = []
+                drugData.pharm_class_pe = []
+                drugData.substance_name = [] 
+                drugData.product_type = [] 
+                drugData.route = [] 
+                drugData.substance_name = [] 
+                drugData.products = [] 
+                drugData.submission_status = "NA"
+                araxResultTable[i].fdaData = drugData
+                araxResultTable[i].time = new Date()
+                
+
+
+                try {
+                let openFDAGetUnii = await FDAService.openFDAGetUnii(line.objectName_dg)
+                console.log("openFDAGetUnii")
+                console.log(openFDAGetUnii)
+                let unii = openFDAGetUnii.result[0].unii
+
+
+                let FDAData = await FDAService.openFDA(unii)
+                console.log("FDAData")
+                console.log(FDAData)
+                let result = FDAData.results[0]
+                console.log(result)
+                console.log(result.openfda)
+                console.log(result.openfda.brand_name)
+
+                drugData.brand_name = result.openfda.brand_name
+                drugData.generic_name = result.openfda.generic_name
+                drugData.manufacturer_name = result.openfda.manufacturer_name
+                drugData.pharm_class_epc = result.openfda.pharm_class_epc
+                drugData.pharm_class_pe = result.openfda.pharm_class_pe
+                drugData.substance_name = result.openfda.substance_name
+                drugData.product_type = result.openfda.product_type
+                drugData.route = result.openfda.route
+                drugData.substance_name = result.openfda.substance_name
+                drugData.products = result.openfda.products
+                drugData.submission_status = result.submissions[0].submission_status
+                drugData.number_submissions = result.submissions.length
+                araxResultTable[i].submission = result.submissions[0].submission_status
+                araxResultTable[i].fdaData = drugData
+                // console.log("araxResultTable")
+                // console.log(araxResultTable)
+                this.araxResultTable = araxResultTable
+
+                } catch (err)
+                {
+                  console.log(err)
+                }
+
+                
+              }
+
+            })
+            // ORIGINAL FDA
+            .then(async (results) => {
+              let araxResultTable = results.araxResultTable
+              for (let i = 0; i < araxResultTable.length; i++) {
+              // for (let i = 0; i < 5; i++) {
+                const line = araxResultTable[i];
+                this.componentKey++
+                araxResultTable[i].submission = "NA"
+                let chemCurie = line.object_dg
+                console.log(chemCurie)
+                let drugData = {}
+                drugData.brand_name = []
+                drugData.generic_name = []
+                drugData.manufacturer_name = []
+                drugData.pharm_class_epc = []
+                drugData.pharm_class_pe = []
+                drugData.substance_name = [] 
+                drugData.product_type = [] 
+                drugData.route = [] 
+                drugData.substance_name = [] 
+                drugData.products = [] 
+                drugData.submission_status = "NA"
+                araxResultTable[i].fdaData = drugData
+                araxResultTable[i].time = new Date()
+                
+
 
                 try {
                 let chemData = await FDAService.myChemInfo(chemCurie)
@@ -1179,6 +1356,29 @@ export default {
                 let FDAData = await FDAService.openFDA(unii)
                 console.log("FDAData")
                 console.log(FDAData)
+                let result = FDAData.results[0]
+                console.log(result)
+                console.log(result.openfda)
+                console.log(result.openfda.brand_name)
+
+                drugData.brand_name = result.openfda.brand_name
+                drugData.generic_name = result.openfda.generic_name
+                drugData.manufacturer_name = result.openfda.manufacturer_name
+                drugData.pharm_class_epc = result.openfda.pharm_class_epc
+                drugData.pharm_class_pe = result.openfda.pharm_class_pe
+                drugData.substance_name = result.openfda.substance_name
+                drugData.product_type = result.openfda.product_type
+                drugData.route = result.openfda.route
+                drugData.substance_name = result.openfda.substance_name
+                drugData.products = result.openfda.products
+                drugData.submission_status = result.submissions[0].submission_status
+                drugData.number_submissions = result.submissions.length
+                araxResultTable[i].submission = result.submissions[0].submission_status
+                araxResultTable[i].fdaData = drugData
+                // console.log("araxResultTable")
+                // console.log(araxResultTable)
+                this.araxResultTable = araxResultTable
+
                 } catch (err)
                 {
                   console.log(err)
