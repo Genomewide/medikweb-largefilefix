@@ -37,7 +37,7 @@
                     v-on:click="getAllSynToDrugs"
                     >getAllSynToDrugs
                   </b-button>
-                  <b-button
+                  <!-- <b-button
                     style="margin-left: 20px"
                     variant="secondary"
                     v-on:click="saveFile"
@@ -72,7 +72,7 @@
 
                   <div>
                     State: <strong>{{ status }}</strong>
-                  </div>
+                  </div> -->
 
                   <b-icon
                     v-if="show_waiting_card"
@@ -95,7 +95,7 @@
             </div>
           </b-form>
         </b-col>
-        <!-- <b-col>
+        <b-col>
 
           <transition name="fade">
             <div v-if="show_waiting_card">
@@ -117,37 +117,81 @@
               </b-card>
             </div>
           </transition>
-        </b-col> -->
+        </b-col>
       </b-row>
 
-      <b-container style="margin-top: 20px" fluid>
-        <b-row>
-          <b-card header="featured" header-tag="header" :key="componentKey">
+      <b-container style="margin: 20px; width:100%"  fluid>
+                <!-- <b-row style="width:100%">
+          <b-card header="featured" header-tag="header" style=" width: 100%" :key="componentKey">
             <template #header>
               <h6 class="mb-0">ARAX Result Summary:</h6>
-              <!-- concept_search -->
             </template>
-            <!-- <h4 class="mb-0">Symbol: {{ concept_search }}</h4> -->
-
             <br />
-            <b-table
-              bordered
-              striped
-              hover
-              ref="araxResultTableSummary"
-              table-layout:
-              fixed
-              :items="araxResultTableSummaryDisplay"
-            >
-   
-            </b-table>
-            <!-- <b-card-text v-for="syn in synonymsArray" :key="syn.id">
-                    <b>{{ syn.identifier }}: &nbsp;</b>{{ syn.name }} &nbsp;
-                    (Hits = {{ syn.hitCount }})
-                  </b-card-text> -->
-            <!-- {{synonymsArray}} -->
+            <table :key="componentKey" style=" width: 100%">
+              <thead>
+                <tr>
+                <th>Gene</th>
+                <th class="text-center" style="margin: 20px;" >Direction</th>
+                <th class="text-center"  style="margin: 20px;" >Total Drugs</th>
+                <th class="text-center" style="margin: 20px;" >Checked</th>
+                <th class="text-center" style="margin: 20px;" >Inhibitors (FDA+)</th>
+                <th class="text-center" style="margin: 20px;" >Activator (FDA+)</th>
+                </tr>
+              </thead>
+              <tbody id="araxResultTableSummary" :key="componentKey">
+              <tr v-for="result in araxResultTableSummary " :key="result.gene">
+                <td >{{ result.gene }}</td>
+                <td class="text-center">{{ result.direction }}</td>
+                <td class="text-center">{{ result.TotalDrugs }}</td>
+                <td class="text-center">{{ result.TotalDrugs2 }}</td>
+                <td class="text-center">{{ result.inhibitor }} ({{ result.inhibitorFDA }})</td>
+                <td class="text-center">{{ result.activator }} ({{ result.activatorFDA }})</td>
+              </tr>
+              </tbody>
+              </table>
+          
+          </b-card>
+        </b-row> -->
+        <b-row style=" marigin-bottom: 20px">
+          <b-card header="featured" header-tag="header" style=" width: 100%; marigin-bottom: 20px" :key="componentKey">
+            <template #header>
+              <h6 class="mb-0">ARAX Result Summary:</h6>
+            </template>
+            <br />
+            <table :key="componentKey" style=" width: 100%">
+              <thead>
+                <tr>
+                <th>Gene</th>
+                <th class="text-center" style="margin: 20px;" >Direction</th>
+                <th class="text-center"  style="margin: 20px;" >Total Drugs</th>
+                <th class="text-center" style="margin: 20px;" >Checked</th>
+                <th class="text-center" style="margin: 20px;" >Inhibitors (FDA+)</th>
+                <th class="text-center" style="margin: 20px;" >Activator (FDA+)</th>
+                </tr>
+              </thead>
+              <tbody id="araxResultTableSummary" :key="componentKey">
+              <tr v-for="result in araxResultTableSummary " :key="result.gene">
+                
+                <td >{{ result.gene }}</td>
+                <td class="text-center">{{ result.direction }}</td>
+                <td class="text-center">{{ result.TotalDrugs }}</td>
+                <td class="text-center">    <b-progress
+                    :max="result.TotalDrugs"
+                    :value="result.CheckedDrugs"
+                    show-progress
+                    animated
+                  ></b-progress></td>
+                <td class="text-center">{{ result.inhibitor }} ({{ result.inhibitorFDA }})</td>
+                <td class="text-center">{{ result.activator }} ({{ result.activatorFDA }})</td>
+              </tr >
+            
+  
+              </tbody>
+              </table>
+          
           </b-card>
         </b-row>
+    <br />
         <b-row>
           <b-card header="featured" header-tag="header" :key="componentKey">
             <template #header>
@@ -158,6 +202,7 @@
 
             <br />
             <b-table
+            
               bordered
               striped
               hover
@@ -169,145 +214,16 @@
             >
    
             </b-table>
-            <!-- <b-card-text v-for="syn in synonymsArray" :key="syn.id">
-                    <b>{{ syn.identifier }}: &nbsp;</b>{{ syn.name }} &nbsp;
-                    (Hits = {{ syn.hitCount }})
-                  </b-card-text> -->
-            <!-- {{synonymsArray}} -->
+           
           </b-card>
         </b-row>
-        <b-row>
-          <b-col>
-            <div>
-              <b-card-group deck>
-                <b-card
-                  header="featured"
-                  header-tag="header"
-                  :key="componentKey + 5"
-                >
-                  <template #header>
-                    <h6 class="mb-0">Gene info:</h6>
-                    <!-- concept_search -->
-                  </template>
-                  <h4 class="mb-0">Symbol: {{ concept_search }}</h4>
-<!-- {{synonymIdArrayCount}} -->
-                  <br />
-                  <b-card-text v-for="syn in synonymIdArrayCount" :key="syn.id">
-                    <!-- <br/>{{syn}} -->
-                    <b>{{ syn.synonym }}: &nbsp;</b> &nbsp;
-                    (Hits = {{ syn.count }}) 
-                  </b-card-text>
-                  <!-- {{synonymsArray}} -->
-                </b-card>
-              </b-card-group>
-            </div>
-          </b-col>
-        </b-row>
-        <b-row>
-          <b-col> this is a test </b-col>
-        </b-row>
 
-        <b-row style="margin-top: 20px">
-          <b-col>
-            <b-card :key="componentKey + 1000">
-              <template #header>
-                <h6 class="mb-0">
-                  Gene Gene Start: {{ startTime }} - Stop: {{ stopTime }}
-                </h6>
-              </template>
-              <b-table
-                bordered
-                striped
-                hover
-                ref="timepersteptable"
-                table-layout:
-                fixed
-                :items="timeArray"
-              >
-              </b-table>
-            </b-card>
-          </b-col>
-        </b-row>
 
-        <b-row>
-          <b-col>
-           
-          </b-col>
-        </b-row>
-        <b-container>
-          <b-row>
-            <b-card style="margin-top: 20px; width: 100%" :key="componentKey">
-              <template #header>
-                <h4 class="mb-0">Drug Gene Progress:</h4>
-              </template>
 
-              <!-- <b-card-title>{{gene.predicates}}</b-card-title> -->
 
-              <!-- <b-card-sub-title  v-for="(predicate, index) in resultWithDrugs.predicates" :key="index" >Predicate: {{predicate}} </b-card-sub-title> -->
-              <b-card-text>
-                {{ currentDrug }}
-                <!-- <b-table
-                  bordered
-                  striped
-                  hover
-                  ref="progressTable"
-                  table-layout:
-                  fixed
-                  :items="progressTable"
-                >
-                </b-table> -->
-              </b-card-text>
-              <b-card-body> </b-card-body>
-            </b-card>
-            <!-- <b-col> </b-col> -->
-          </b-row>
-        </b-container>
-        <b-container :key="componentKey">
-          <b-row
-            style="margin-top: 20px; width: 100%"
-            v-for="gene in geneIDList"
-            :key="gene.id"
-          >
-            <b-card
-              style="margin-top: 20px; width: 100%"
-              :key="gene.id + componentKey"
-            >
-              <template #header>
-                <h4 class="mb-0">{{ progressObject[gene].groupName }}</h4>
-                (all drugs with any predicate:
-                {{ progressObject[gene].chemCountTotal }})
-              </template>
-
-              <b-card-text>
-                Drugs with clear predicate ({{
-                  progressObject[gene].chemCount
-                }})
-                <div>
-                  <h5>Getting and filtering synonyms:</h5>
-                  <b-progress
-                    :value="progressObject[gene].synCurrentCount"
-                    :max="progressObject[gene].chemCount"
-                    show-progress
-                    animated
-                  ></b-progress>
-                  {{ progressObject[gene] }}
-                </div>
-                <div>
-                  <h5>Checking FDA status:</h5>
-                  <b-progress
-                    :value="progressObject[gene].FDACurrentCount"
-                    :max="progressObject[gene].chemCount"
-                    show-progress
-                    animated
-                  ></b-progress>
-                  {{ progressObject[gene] }}
-                </div>
-              </b-card-text>
-              <b-card-body> </b-card-body>
-            </b-card>
-            <!-- <b-col> </b-col> -->
-          </b-row>
-        </b-container>
+      
+        
+        
       </b-container>
     </div>
   </div>
@@ -613,23 +529,23 @@ export default {
             //   row.subjectName_gg = hop1res.subjectName direction_dg
       fields: [
         {
-          key: "objectName_dg",
+          key: "subjectName_dg",
           label: "Drug",
           sortable: true,
           tdClass: "colwidth",
         },
         {
-          key: "object_dg",
+          key: "subject_dg",
           label: "ID",
           sortable: true,
           tdClass: "colwidth",
         },        
-        {
-          key: "direction_dg",
-          label: "Reg DG",
-          sortable: true,
-          tdClass: "colwidth",
-        },
+        // {
+        //   key: "direction_dg",
+        //   label: "Reg DG",
+        //   sortable: true,
+        //   tdClass: "colwidth",
+        // },
         {
           key: "predicate_dg",
           label: "Reg DG",
@@ -643,7 +559,7 @@ export default {
         //   tdClass: "db_colwidth",
         // },
         {
-          key: "objectName_gg",
+          key: "subjectName_gg",
           label: "Gene",
           sortable: true,
           tdClass: "colwidth",
@@ -654,12 +570,12 @@ export default {
         //   sortable: true,
         //   tdClass: "colwidth",
         // },
-        {
-          key: "predicate_gg",
-          label: "Reg GG",
-          sortable: true,
-          tdClass: "colwidth",
-        },
+        // {
+        //   key: "predicate_gg",
+        //   label: "Reg GG",
+        //   sortable: true,
+        //   tdClass: "colwidth",
+        // },
         {
           key: "direction_gg",
           label: "Reg GG",
@@ -690,19 +606,60 @@ export default {
       //     sortable: true,
       //     tdClass: "colwidth",
       //   },
-       {
-          key: "time",
-          label: "Time",
+      //  {
+      //     key: "time",
+      //     label: "Time",
+      //     sortable: true,
+      //     tdClass: "colwidth",
+      //   },
+  
+      ],
+      fields_hop_two: [
+  
+        {
+          key: "subject",
+          label: "subject",
           sortable: true,
           tdClass: "colwidth",
         },
+   
+        {
+          key: "subjectName",
+          label: "subjectName",
+          sortable: true,
+          tdClass: "colwidth",
+        },
+        {
+          key: "predicate",
+          label: "predicate",
+          sortable: true,
+          tdClass: "colwidth",
+        },
+        {
+          key: "object",
+          label: "object",
+          sortable: true,
+          tdClass: "colwidth",
+        },        
+        {
+          key: "objectName",
+          label: "objectName",
+          sortable: true,
+          tdClass: "colwidth",
+        },
+
+       
   
       ],
       predicateAll: [],
       synonymIdArrayCount: {},
       araxResultTable: [],
       araxResultTableSummary: {},
-      araxResultTableSummaryDisplay: []
+      araxResultTableSummaryDisplay: [],
+      hopTwo: [],
+      hopOne: [],
+      cleanedResults_dg: [],
+      cleanedResults_gg: []
       // nodeGeneName
       //FAILED "HGNC:2348", "HGNC:13723", "HGNC:2514", "HGNC:2961", "HGNC:3373", reasoner_id
     };
@@ -1049,7 +1006,11 @@ export default {
       });
     },
     async getAllSynToDrugs() {
+      this.show_waiting_card = true
+      this.waitingfor_text = " GETTING SYNONYMS AND ORTHOLOGS FROM ARAX"
       console.log("THIS IS TO TEST IT IS V2")
+      this.araxResultTableSummary = {}
+      this.araxResultTableSummaryDisplay = []
       this.progressObject = {};
       this.timeArray = [];
       let time = {
@@ -1069,6 +1030,14 @@ export default {
           synonymService
             .allSynonyms(this.concept_search)
             .then(async (synonyms) => {
+              // let searchterm = this.concept_search
+              console.log([this.concept_search])
+              console.log(synonyms) // SRI_normalizer_name
+              console.log(synonyms.id)
+              console.log(synonyms.id.SRI_normalizer_name)
+              let SRI_normalizer_name = synonyms.id.SRI_normalizer_name
+              console.log(SRI_normalizer_name)
+
               let time = { step: "got synonyms", time: new Date() };
               this.timeArray.push(time);
               this.componentKey = this.componentKey + 1;
@@ -1087,74 +1056,95 @@ export default {
               // #########################
               // GET GENES REGULATING TARGET
               // #########################
+                this.waitingfor_text = " GETTING GENE - GENE INTERACTIONS FROM ARAX"
 
                 let araxResults = await ARAXService.araxQuery_gg(this.synonymsArray)
-                let context = '"context": "https://raw.githubusercontent'
-                let index = araxResults.indexOf(context) - 1
-                // console.log("index")
-                // console.log(index)
-                // console.log(araxResults.substring(index))
-                // console.log(JSON.parse( araxResults.substring(index)))
-                let araxJson = JSON.parse(araxResults.substring(index))
+                // let context = '"context": "https://raw.githubusercontent'
+                // let index = araxResults.indexOf(context) - 1
+                console.log("araxResults")
+                console.log(araxResults)
+                // let araxResultsArray_gg = araxResults.split("\n")
+                // let araxResults_ggResults = araxResultsArray_gg[araxResultsArray_gg.length - 2]
+                // console.log(araxResults_ggResults)
+                let araxJson = araxResults
+                console.log(araxJson)
+                // let araxJson = JSON.parse(araxResults.substring(index))
                 console.log(araxJson)
                 console.log("araxJson.message.knowledge_graph.edges")
                 console.log(araxJson.message.knowledge_graph.edges)
-                // console.log("araxJson.message.knowledge_graph.nodes")
-                // console.log(araxJson.message.knowledge_graph.nodes)
+
                 let nodes = araxJson.message.knowledge_graph.nodes
-                // console.log(JSON.parse(araxResults) )
-                // console.log(araxResults)
-                // console.log("araxJson.message.results")
-                // console.log(araxJson.message.results)
+            
                 let results = araxJson.message.results
+                console.log("results")
                 console.log(results)
+                let essence = results.map(x => x.essence)
+                console.log("essence = ", essence)
 
                 dgg_nodeEdges["nodes_gg"] = araxJson.message.knowledge_graph.nodes
                 dgg_nodeEdges["edges_gg"] = araxJson.message.knowledge_graph.edges
 
 
               // GET GENES REGULATING TARGET
-                let genes = Object.keys(nodes)
-                // console.log("genes = ", genes)
+                // let hopOne = cleanedResults_gg.map((row) => if(row.predicate != "biolink:has_normalized_google_distance_with"){
+                //   return object
+                // })
 
+
+
+                let genes = Object.keys(nodes)
+                console.log("genes = ", genes)
+                this.waitingfor_text = " CLEANING UP GENE - GENE RESULTS"
                 let cleanedResults_gg = await TrapiResultClean.ARAXResultClean(
                     araxJson
                   );
+                  
                   console.log("______________  cleanedResults_gg")
                   console.log(cleanedResults_gg)
 
+                let cleanedResults_gg_genes = cleanedResults_gg.map((row) => {
+           
+                  if(row.predicate != "biolink:has_normalized_google_distance_with" && row.subjectName != SRI_normalizer_name){
+                    // console.log(row.predicate)
+                    // console.log(row.subject)
+                    return row.subject
+                  } else {
+                    return
+                  }
+                })
+                cleanedResults_gg_genes = cleanedResults_gg_genes.filter(x => x != null)
+
+                function onlyUnique(value, index, self) {
+                  return self.indexOf(value) === index;
+                }
+
+                // usage example:
+                cleanedResults_gg_genes = cleanedResults_gg_genes.filter(onlyUnique);
+
+                console.log("cleanedResults_gg_genes")
+                console.log(cleanedResults_gg_genes)
+
               // #########################
               // GET DRUGS REGULATING GENES
-              // #########################
-                let araxResults_dg = await ARAXService.araxQuery_dg(genes)
-
+              // ######################### 
+              this.waitingfor_text = " GETTING DRUG - GENE INTERACTIONS FROM ARAX"
+                // let araxResults_dg = await ARAXService.araxQuery_dg(genes)
+                let araxResults_dg = await ARAXService.araxQuery_dg(cleanedResults_gg_genes)
+                console.log(araxResults_dg)
               // ARAX RETURNS LOG INFO AS WELL - THE LAST LINE OF TEXT IS THE RESUTLS - SO USE SPLIT GET LAST LINE
-                let araxResultsArray = araxResults_dg.split("\n")
-                let araxResults_dgResults = araxResultsArray[araxResultsArray.length - 2]
+                // let araxResultsArray = araxResults_dg.split("\n")
+                // let araxResults_dgResults = araxResultsArray[araxResultsArray.length - 2]
 
-                let araxJson_dg =JSON.parse(araxResults_dgResults) 
-                // console.log("araxJson_dg")
-                // console.log(araxJson_dg)
-
-                // let nodes_dg = araxJson_dg.message.knowledge_graph.nodes
-                // console.log("nodes_dg")
-                // console.log(nodes_dg)
-
-              // GET GENES REGULATING TARGET
-                // let drugNodes = araxJson_dg.message.knowledge_graph.nodes
-                // let drugs = Object.keys(drugNodes)
-                // console.log("drugs = ", drugs)
-
+                let araxJson_dg = araxResults_dg
+                this.waitingfor_text = " CLEANING DRUG - GENE INTERACTIONS FROM ARAX"
                 let cleanedResults_dg = await TrapiResultClean.ARAXResultClean(
                     araxJson_dg
                   );
+                  this.cleanedResults_dg = cleanedResults_dg
                   console.log("______________  cleanedResults_dg")
                   console.log(cleanedResults_dg)
 
-                // dgg_nodeEdges["nodes_dg"] = araxJson_dg.message.knowledge_graph.nodes
-                // dgg_nodeEdges["edges_dg"] = araxJson_dg.message.knowledge_graph.edges
-
-                let hopOne = cleanedResults_gg.filter(row => row.predicate != "biolink:has_normalized_google_distance_with")
+                let hopOne = cleanedResults_gg.filter(row => row.predicate != "biolink:has_normalized_google_distance_with" && row.subjectName != SRI_normalizer_name)
                 let hopTwo = cleanedResults_dg.filter(row => row.predicate != "biolink:has_normalized_google_distance_with")
                 let hopOneDir = hopOne.map((res) => {
                   res.direction = "Unknown"
@@ -1174,7 +1164,7 @@ export default {
                 let hopTwoDir = hopTwo.map((res) => {
                   res.direction = "Unknown"
                   // console.log(res)
-                  console.log(res.predicate.split(":")[1])
+                  console.log("getting direction")
                   if(this.predicate_decrease.indexOf(res.predicate.split(":")[1]) != -1  ){
                     res.direction = "Decrease"
                     return res
@@ -1194,54 +1184,69 @@ export default {
                 console.log("hopTwoDir")
                 console.log(hopTwoDir)
 
+                this.waitingfor_text = " COMBINING HOPS"
+
                 this.araxResultTable = await TrapiResultClean.createTwoHopObject(hopOneDir, hopTwoDir)
                 console.log("this.araxResultTable")
                 console.log(this.araxResultTable)
 
                 this.saveCleanedTrapi(hopOne, "hopOne")
                 this.saveCleanedTrapi(hopTwo, "hopTwo")
+                this.hopOne = hopOne
+                this.hopTwo = hopTwo
 
-                let result = {"araxResultTable": this.araxResultTable, "hopOne": hopOne, "hopTwo": hopTwo}
-                return result
+                // let result = {"araxResultTable": this.araxResultTable, "hopOne": hopOne, "hopTwo": hopTwo}
+                // let grouped = await TrapiResultClean.TrapiResultGroup(this.araxResultTable, "subjectName_dg")
+                // console.log("grouped")
+                // console.log(grouped)
+                return 
 
-
-
-                
             })
-            .then(async (results) => {
+            .then(async () => {
               console.log("CREATING SUMMARY TABLE")
-              let araxResultTable = results.araxResultTable
+              let araxResultTable = this.araxResultTable
+              console.log("araxResultTable")
+              console.log(araxResultTable)
+              // SET ARAY TO CELLECT UNIQUE GENES BY OBJECTNAME
               let uniqueGenes = []
-                // for (let i = 0; i < 5; i++) {
-               for (let i = 0; i < araxResultTable.length; i++) {
-                 const row = araxResultTable[i];
+              // for (let i = 0; i < 5; i++) {
+                for (let i = 0; i < araxResultTable.length; i++) {
+                const row = araxResultTable[i];
 
-                 if(uniqueGenes.indexOf(row.objectName_gg) == -1){
+                  if(uniqueGenes.indexOf(row.subjectName_gg) == -1){
                   //  let obj = {}
-                  this.araxResultTableSummary[row.objectName_gg] = {gene: row.objectName_gg, direction: "", TotalDrugs: 0, inhibitor: 0, inhibitorFDA: 0, activator: 0, activatorFDA: 0}
+                  console.log("row = ", row)
+                  console.log("row.direction_gg = ", row.direction_gg)
+                  this.araxResultTableSummary[row.subjectName_gg] = {gene: row.subjectName_gg, direction: row.direction_gg, TotalDrugs: 0, CheckedDrugs: 0,inhibitor: 0, inhibitorFDA: 0, activator: 0, activatorFDA: 0}
                   // let objCopy = {...obj}
-                   uniqueGenes.push(row.objectName_gg)
-                   
-                  //  console.log(this.araxResultTableSummary)
-                  //  console.log("uniqueGenes")
-                  //  console.log(uniqueGenes)
-                     this.araxResultTableSummaryDisplay.push(this.araxResultTableSummary[row.objectName_gg])
-                     this.componentKey++                   
+                  uniqueGenes.push(row.subjectName_gg)
+                  
+                  console.log(this.araxResultTableSummary)
+                  console.log("uniqueGenes")
+                  console.log(uniqueGenes)
+                    this.araxResultTableSummaryDisplay.push(this.araxResultTableSummary[row.subjectName_gg])
+                    this.componentKey++                   
                  }
                  if(i == araxResultTable.length - 1){
                    for (let n = 0; n < uniqueGenes.length; n++) {
                      const gene = uniqueGenes[n];
-                     let array = araxResultTable.filter(x => x.objectName_gg == gene)
+                     let array = araxResultTable.filter(x => x.subjectName_gg == gene)
+                     let arrayDecrease = araxResultTable.filter(x => x.subjectName_gg == gene && x.direction_dg == "Decrease")
+                     let arrayIncrease = araxResultTable.filter(x => x.subjectName_gg == gene  && x.direction_dg == "Increase")
                      this.araxResultTableSummary[gene].TotalDrugs = array.length
-                    //  this.araxResultTableSummaryDisplay.push(this.araxResultTableSummary[row.objectName_gg])
+                     this.araxResultTableSummary[gene].inhibitor = arrayDecrease.length
+                     this.araxResultTableSummary[gene].activator = arrayIncrease.length
+                    //  this.araxResultTableSummary[gene].direction = row.direction_gg
                      this.componentKey++
 
-                    //  resultsGrouped
+                     if(n == uniqueGenes.length -1 && i == araxResultTable.length - 1){
+                       console.log("this.araxResultTableSummary")
+                       console.log(this.araxResultTableSummary)
+                       return 
+                     }
+
                    }
-                  //  let resultsGrouped = await TrapiResultClean.TrapiResultGroup(this.araxResultTableSummary, "objectName_gg")
-                  //  this.araxResultTableSummaryDisplay
-                  // console.log("resultsGrouped")
-                  // console.log(resultsGrouped)
+      
                  }
  
 
@@ -1249,17 +1254,31 @@ export default {
                  
                }
             })
-            .then(async (results) => {
-              let araxResultTable = results.araxResultTable
-              // for (let i = 0; i < araxResultTable.length; i++) {
-              for (let i = 0; i < 5; i++) {
+            // .then(async (results) => {
+
+                
+            
+           // ORIGINAL FDA
+            .then(async () => {
+              this.waitingfor_text = " GETTING FDA INFO FOR EACH DRUG"
+              console.log("START FDA SEARCH")
+              console.log("this.araxResultTable")
+              console.log(this.araxResultTable)
+              let araxResultTable = this.araxResultTable
+
+
+              for (let i = 0; i < araxResultTable.length; i++) {
+                
+
+              // for (let i = 0; i < 5; i++) {
                 const line = araxResultTable[i];
+
+                this.araxResultTableSummary[line.subjectName_gg].CheckedDrugs++
+
                 this.componentKey++
                 araxResultTable[i].submission = "NA"
                 let chemCurie = line.object_dg
                 console.log(chemCurie)
-                console.log(line.objectName_dg) 
-                console.log(line)
                 let drugData = {}
                 drugData.brand_name = []
                 drugData.generic_name = []
@@ -1274,23 +1293,26 @@ export default {
                 drugData.submission_status = "NA"
                 araxResultTable[i].fdaData = drugData
                 araxResultTable[i].time = new Date()
-                
 
 
                 try {
-                let openFDAGetUnii = await FDAService.openFDAGetUnii(line.objectName_dg)
-                console.log("openFDAGetUnii")
-                console.log(openFDAGetUnii)
-                let unii = openFDAGetUnii.result[0].unii
+                // let chemData = await FDAService.myChemInfo(chemCurie)
+                // console.log("chemData.unii.unii")
+                // console.log(chemData.unii.unii)
+                // let unii = chemData.unii.unii
 
+                let openFDAGetUnii = await FDAService.openFDAGetUnii(line.subjectName_dg)
+                // console.log("openFDAGetUnii")
+                // console.log(openFDAGetUnii)
+                let unii = openFDAGetUnii.results[0].unii
 
                 let FDAData = await FDAService.openFDA(unii)
-                console.log("FDAData")
-                console.log(FDAData)
+                // console.log("FDAData")
+                // console.log(FDAData)
                 let result = FDAData.results[0]
-                console.log(result)
-                console.log(result.openfda)
-                console.log(result.openfda.brand_name)
+                // console.log(result)
+                // console.log(result.openfda)
+                // console.log(result.openfda.brand_name)
 
                 drugData.brand_name = result.openfda.brand_name
                 drugData.generic_name = result.openfda.generic_name
@@ -1309,79 +1331,66 @@ export default {
                 // console.log("araxResultTable")
                 // console.log(araxResultTable)
                 this.araxResultTable = araxResultTable
+                  
+                  //ADD TO COUNT OF ALL CHEMICALS
+
+                  // console.log(araxResultTable[i])
+                  // console.log(araxResultTable[i].direction_dg)
+                  // console.log(result.submissions[0].submission_status)
+                  if(araxResultTable[i].direction_dg == "Decrease" && result.submissions[0].submission_status == "AP"){
+                    //ADD TO COUNT OF ALL CHEMICALS AND FDA IF APPROVED
+                    this.araxResultTableSummary[line.subjectName_gg].inhibitorFDA++
+                    this.componentKey++
+                    // this.araxResultTableSummary[row.objectName_gg].TotalDrugs++
+                  } else if (araxResultTable[i].direction_dg == "Increase" && result.submissions[0].submission_status == "AP"){
+                    this.araxResultTableSummary[line.subjectName_gg].activatorFDA++
+                    this.componentKey++
+                  }
+                  this.componentKey++
 
                 } catch (err)
                 {
                   console.log(err)
                 }
-
+                // console.log(i, "--- this.araxResultTableSummary")
+                // console.log(this.araxResultTableSummary)
+                if(i == araxResultTable.length - 1){
+                  console.log("$$$$$$$$$$$$ - this.araxResultTableSummary")
+                  console.log(this.araxResultTableSummary)
+                  return
+                }
                 
               }
 
             })
-            // ORIGINAL FDA
-            .then(async (results) => {
-              let araxResultTable = results.araxResultTable
-              for (let i = 0; i < araxResultTable.length; i++) {
-              // for (let i = 0; i < 5; i++) {
-                const line = araxResultTable[i];
-                this.componentKey++
-                araxResultTable[i].submission = "NA"
-                let chemCurie = line.object_dg
-                console.log(chemCurie)
-                let drugData = {}
-                drugData.brand_name = []
-                drugData.generic_name = []
-                drugData.manufacturer_name = []
-                drugData.pharm_class_epc = []
-                drugData.pharm_class_pe = []
-                drugData.substance_name = [] 
-                drugData.product_type = [] 
-                drugData.route = [] 
-                drugData.substance_name = [] 
-                drugData.products = [] 
-                drugData.submission_status = "NA"
-                araxResultTable[i].fdaData = drugData
-                araxResultTable[i].time = new Date()
-                
+            .then(async () => {
+              // this.araxResultTableSummaryDisplay
+              for (let i = 0; i < this.hopTwo.length; i++) {
+                const drug = this.hopTwo[i].objectName
+                // console.log("this.hopTwo[i]")
+                // console.log(this.hopTwo[i])
+                // console.log("########## twohop drug = ", drug)
+                this.hopTwo[i].fda = ""
+                // console.log("drug = ", drug)
+                for (let n = 0; n < this.araxResultTable.length; n++) {
+                  const drugCheck = this.araxResultTable[n]
+                  // console.log(drugCheck)
+                  if(drug == drugCheck.objectName_dg){
+                    // console.log("FOUND MATCH")
+                    // console.log(drugCheck)
+                    this.hopTwo[i].fda = drugCheck.submission
+                    n = this.araxResultTable.length
+                  }
+                  
+                  
+                  
+                  
+                }
+                //this.saveCleanedTrapi(hopTwo, "hopTwo")
+                if(i == this.hopTwo.length - 1){
+                  this.show_waiting_card = false
+                  this.saveCleanedTrapi(this.hopTwo, "hopTwo-FDA")
 
-
-                try {
-                let chemData = await FDAService.myChemInfo(chemCurie)
-                console.log("chemData.unii.unii")
-                console.log(chemData.unii.unii)
-                let unii = chemData.unii.unii
-
-
-                let FDAData = await FDAService.openFDA(unii)
-                console.log("FDAData")
-                console.log(FDAData)
-                let result = FDAData.results[0]
-                console.log(result)
-                console.log(result.openfda)
-                console.log(result.openfda.brand_name)
-
-                drugData.brand_name = result.openfda.brand_name
-                drugData.generic_name = result.openfda.generic_name
-                drugData.manufacturer_name = result.openfda.manufacturer_name
-                drugData.pharm_class_epc = result.openfda.pharm_class_epc
-                drugData.pharm_class_pe = result.openfda.pharm_class_pe
-                drugData.substance_name = result.openfda.substance_name
-                drugData.product_type = result.openfda.product_type
-                drugData.route = result.openfda.route
-                drugData.substance_name = result.openfda.substance_name
-                drugData.products = result.openfda.products
-                drugData.submission_status = result.submissions[0].submission_status
-                drugData.number_submissions = result.submissions.length
-                araxResultTable[i].submission = result.submissions[0].submission_status
-                araxResultTable[i].fdaData = drugData
-                // console.log("araxResultTable")
-                // console.log(araxResultTable)
-                this.araxResultTable = araxResultTable
-
-                } catch (err)
-                {
-                  console.log(err)
                 }
 
                 
@@ -1395,6 +1404,10 @@ export default {
       }
     },
 
+
+
+
+
    async saveCleanedTrapi(results, name) {
      console.log("START saveCleanedTrapi ")
       // this.startTime = new Date()
@@ -1407,13 +1420,19 @@ export default {
 
             const trapiData = results[i];
             let data = {}
-            data.edgeOriginalSource = trapiData.edgeOriginalSource
-            data.edgeprovider = trapiData.edgeprovider
-            data.object = trapiData.object
-            data.objectName = trapiData.objectName
-            data.predicate = trapiData.predicate
-            data.subject = trapiData.subject
-            data.subjectName = trapiData.subjectName
+            try {
+              data.edgeOriginalSource = trapiData.edgeOriginalSource
+              data.edgeprovider = trapiData.edgeprovider
+              data.object = trapiData.object
+              data.objectName = trapiData.objectName
+              data.predicate = trapiData.predicate
+              data.subject = trapiData.subject
+              data.subjectName = trapiData.subjectName
+              data.fda = trapiData.fda
+            } catch (err){
+              console.error(err)
+            }
+
       
             if(trapiData.edgepublications.length > 0){
               // console.log("data")
@@ -1449,6 +1468,80 @@ export default {
 
 
     },
+
+    saveThisFile(file, nametag) {
+      let text = "";
+      console.log("save result");
+      console.log("file")
+      console.log(file)
+
+      for (let index = 0; index < file.length; index++) {
+        // const result = this.groupedResultsTable[index];
+        const result = file[index];
+        // console.log(result);
+
+        let headers = Object.keys(result);
+        // console.log({headers})
+
+        if (index == 0) {
+          // console.log("headers index == 0");
+          // HEADER ROW
+          for (let i = 0; i < headers.length; i++) {
+            const header = headers[i];
+            // if(i == 0){
+            //   text = "gene,"
+            // }
+            if (i != headers.length - 1) {
+              text = text + header + ",";
+            } else {
+              text = text + header + "\r\n";
+            }
+          }
+        }
+        // ADD REMAINING ROWS IN SAME ORDER BASED ON KEYS FROM HEADER ROW
+        for (let n = 0; n < headers.length; n++) {
+          let header = headers[n];
+          let cell = JSON.stringify(result[header]);
+          // let cell = result[header]
+          // console.log("cell = ", cell)
+
+          // try {
+          //   cell = cell.replace(/,/gi, ";");
+          // } catch (err) {
+          //   // console.error(err);
+          //   // console.log("row to be writien = ", result)
+          //   cell = "not found"
+          // }
+          // if(n == 0){
+          //   text = this.geneInfo.prowl_symbol + ','
+
+          // }
+          if (n != headers.length - 1) {
+            text = text + cell + ",";
+          } else {
+            text = text + cell + "\r\n";
+          }
+        }
+      }
+
+      let filename =
+        this.concept_search + "-" + nametag + " results.csv";
+      let element = document.createElement("a");
+      element.setAttribute(
+        "href",
+        "data:application/json;charset=utf-8," + encodeURIComponent(text)
+      );
+      element.setAttribute("download", filename);
+
+      element.style.display = "none";
+      document.body.appendChild(element);
+
+      element.click();
+      document.body.removeChild(element);
+      console.log("file saved!!");
+    },
+
+
     async getGeneSynonyms() {
       // SEND HGNC TO GET ALL SYNONYMS
       PostService.getGeneSynonyms(this.concept_search)
@@ -2567,77 +2660,7 @@ export default {
         });
     },
 
-    saveThisFile(file, nametag) {
-      let text = "";
-      console.log("save result");
-      console.log("file")
-      console.log(file)
 
-      for (let index = 0; index < file.length; index++) {
-        // const result = this.groupedResultsTable[index];
-        const result = file[index];
-        // console.log(result);
-
-        let headers = Object.keys(result);
-        // console.log({headers})
-
-        if (index == 0) {
-          // console.log("headers index == 0");
-          // HEADER ROW
-          for (let i = 0; i < headers.length; i++) {
-            const header = headers[i];
-            // if(i == 0){
-            //   text = "gene,"
-            // }
-            if (i != headers.length - 1) {
-              text = text + header + ",";
-            } else {
-              text = text + header + "\r\n";
-            }
-          }
-        }
-        // ADD REMAINING ROWS IN SAME ORDER BASED ON KEYS FROM HEADER ROW
-        for (let n = 0; n < headers.length; n++) {
-          let header = headers[n];
-          let cell = JSON.stringify(result[header]);
-          // let cell = result[header]
-          // console.log("cell = ", cell)
-
-          try {
-            cell = cell.replace(/,/gi, ";");
-          } catch (err) {
-            console.error(err);
-            // console.log(cell)
-            cell = "not found"
-          }
-          // if(n == 0){
-          //   text = this.geneInfo.prowl_symbol + ','
-
-          // }
-          if (n != headers.length - 1) {
-            text = text + cell + ",";
-          } else {
-            text = text + cell + "\r\n";
-          }
-        }
-      }
-
-      let filename =
-        this.concept_search + "-" + nametag + " results.csv";
-      let element = document.createElement("a");
-      element.setAttribute(
-        "href",
-        "data:application/json;charset=utf-8," + encodeURIComponent(text)
-      );
-      element.setAttribute("download", filename);
-
-      element.style.display = "none";
-      document.body.appendChild(element);
-
-      element.click();
-      document.body.removeChild(element);
-      console.log("file saved!!");
-    },
     saveFile() {
       let text = "";
       console.log("save result");

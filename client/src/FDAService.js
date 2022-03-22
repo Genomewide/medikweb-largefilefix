@@ -31,15 +31,15 @@ class FDAService {
     return new Promise(async (resolve, reject) => { // eslint-disable-line
       let url = "https://api.fda.gov/drug/drugsfda.json?api_key=EWKpb1cjDAJYTwDcQNmAuCYTFtf99kIWb67KnI1m&search=openfda.unii:" + unii 
 
-      console.log(url)
+      // console.log(url)
 
       try {
         const res = await axios.get(url);
         const data = res.data;
         // });
   
-        console.log("openFDA ran")
-        console.log(data)
+        // console.log("openFDA ran")
+        // console.log(data)
         resolve(data);
       } catch (err) {
         reject(err);
@@ -53,15 +53,15 @@ class FDAService {
     return new Promise(async (resolve, reject) => { // eslint-disable-line
       let url = "https://api.fda.gov/other/substance.json?search=names.name:%22" + name + "%22"  
 
-      console.log(url)
+      // console.log(url)
 
       try {
         const res = await axios.get(url);
         const data = res.data;
         // });
   
-        console.log("openFDAGetUnii ran")
-        console.log(data)
+        // console.log("openFDAGetUnii ran")
+        // console.log(data)
         resolve(data);
       } catch (err) {
         reject(err);

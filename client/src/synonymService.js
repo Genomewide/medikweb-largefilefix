@@ -16,8 +16,8 @@ let getARAXSynonyms = (searchterm) => {
       const data = res.data;
       // });
 
-      // console.log("***2")
-      // console.log(data)
+      console.log("Synonyms")
+      console.log(data)
       resolve(data);
     } catch (err) {
       reject(err);
@@ -64,7 +64,23 @@ class synonymService {
     });
   }
 
+  static synonymsData = (searchterm) => {
+    console.log("started allSynonyms - seatrchterm ");
+    return new Promise(async (resolve, reject) => { // eslint-disable-line
+      try {
+        getARAXSynonyms(searchterm)
+        .then(async(araxsyns) =>{
+          // console.log("araxsyns")
+          // console.log(araxsyns)
+          resolve(araxsyns)
+        })
+      }
+      catch (err){
+        resolve(err)
+      }
 
+    });
+  }
 
       static allSynonyms = (searchterm) => {
         console.log("started allSynonyms - seatrchterm = ", searchterm);
@@ -92,6 +108,7 @@ class synonymService {
                 
                 arax.araxSynonyms_nodes = araxSynonyms_nodes
                 arax.searchterm = searchterm
+                arax.id = araxsyns[searchterm].id
                 // console.log(araxSynonyms_equivalentids)
                 arax.araxSynonyms_equivalentids = araxSynonyms_equivalentids
                 return arax                 

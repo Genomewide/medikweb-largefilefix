@@ -312,12 +312,13 @@ class TrapiResultClean {
       try {
         for (let i = 0; i < hopTwo.length; i++) {
           const hop2res = hopTwo[i];
+          // console.log(hop2res)
           
           for (let n = 0; n < hopOne.length; n++) {
             
             let row = {}
             const hop1res = hopOne[n];
-            if(hop1res.object == hop2res.subject){
+            if(hop1res.subjectName == hop2res.objectName){
               // HOPE 1 INFO
               row.direction_gg = hop1res.direction
               row.edgen_pmids_gg = []
@@ -350,7 +351,8 @@ class TrapiResultClean {
               }
 
 
-              
+              // console.log("combined row = ")
+              // console.log(row)
               tableDataArray.push(row)
             }
             if( n == hopOne.length - 1 && i == hopTwo.length - 1){
