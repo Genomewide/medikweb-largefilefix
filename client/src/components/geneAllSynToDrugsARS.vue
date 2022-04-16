@@ -61,8 +61,8 @@
                   <b-button
                     style="margin-left: 20px"
                     variant="primary"
-                    v-on:click="getAllSynOrtho"
-                    >getAllSynOrtho
+                    v-on:click="metagraph"
+                    >metagraph
                   </b-button>
                   <b-form-checkbox
                     style="margin-left: 20px"
@@ -340,6 +340,7 @@ import TrapiResultClean from "../TrapiResultClean";
 import ARSService from "../ARSService";
 import ARAXService from "../ARAXService";
 import NodeService from "../NodeService";
+import metagraph from "/Users/andycrouse/Documents/GitHub/medikweb-largefilefix/datafiles/metaknowledgegraph.json"
 // 
 // import svgtest from "./svgtest.vue"
 // import importResultWithDrugs from "/Users/andycrouse/Downloads/resultWithDrugsWithFDA.json"
@@ -425,14 +426,14 @@ export default {
                       "biolink:stimulates",
                       "biolink:stimulator",
                       "biolink:positively_regulates",
-                              "biolink:regulates",
-        "biolink:negatively_regulates",
-        "biolink:positively_regulates",
-        "biolink:entity_positively_regulates_entity",
-        "biolink:entity_negatively_regulates_entity",
-        "biolink:entity_regulates_entity",
-        "biolink:correlated_with",
-        "biolink:affects"
+                      "biolink:regulates",
+                      "biolink:negatively_regulates",
+                      "biolink:positively_regulates",
+                      "biolink:entity_positively_regulates_entity",
+                      "biolink:entity_negatively_regulates_entity",
+                      "biolink:entity_regulates_entity",
+                      "biolink:correlated_with",
+                      "biolink:affects"
 
                   ],
                   "subject": "gene0"
@@ -731,9 +732,62 @@ export default {
 
 // nodeGeneName
       //FAILED "HGNC:2348", "HGNC:13723", "HGNC:2514", "HGNC:2961", "HGNC:3373", reasoner_id
+        //       {
+        //     "subject": "ClinicalFinding",
+        //     "object": "ClinicalFinding",
+        //     "predicate": "correlated_with",
+        //     "api": {
+        //         "name": "Multiomics Wellness KP API",
+        //         "smartapi": {
+        //             "metadata": "https://raw.githubusercontent.com/Hadlock-Lab/multiomics_wellness_kp/main/multiomics_wellness.yaml",
+        //             "id": "02af7d098ab304e80d6f4806c3527027",
+        //             "ui": "https://smart-api.info/ui/02af7d098ab304e80d6f4806c3527027"
+        //         },
+        //         "x-translator": {
+        //             "component": "KP",
+        //             "team": [
+        //                 "Multiomics Provider",
+        //                 "Service Provider"
+        //             ],
+        //             "infores": "infores:biothings-multiomics-wellness"
+        //         }
+        //     }
+        // },
     };
   },
   methods: {
+    metagraph(){
+      let example = metagraph.associations[0]
+      let associations = metagraph.associations
+      console.log("example")
+      console.log(example)
+      let metaTable =[]
+      for (let i = 0; i < associations.length; i++) {
+      // for (let i = 0; i < 10; i++) {
+        let el = associations[i];
+        let meta = {}
+        meta.subject = el.subject
+        meta.object = el.object
+        meta.predicate = el.predicate
+        meta.name = el.api.name
+        meta.component = el.api["x-translator"].component
+        meta.team = el.api["x-translator"].team
+        meta.infores = el.api["x-translator"].infores
+        metaTable.push(meta)
+        console.log("meta")
+        // console.log(meta)
+        // console.log("el")
+        // console.log(el)
+        if(i == associations.length - 1){
+        // if(i == 9){
+          this.saveThisFile(metaTable, " metaTable")
+        }
+
+        
+      }
+      
+
+    },
     showModal() {
       this.$refs["my-modal"].show();
       this.show_waiting_card = false;

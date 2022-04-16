@@ -37,6 +37,26 @@
                     >getalldrugs
                   </b-button>
                   <b-button
+                    variant="primary"
+                    v-on:click="eventLoop"
+                    :disabled="!validation"
+                    >eventLoop
+                  </b-button>
+                  <!-- eventLoop -->
+                  <div>
+                    <b-form-checkbox
+                    id="checkbox-1"
+                    v-model="bulksearch"
+                    name="checkbox-1"
+                    value="TRUE"
+                    unchecked-value="FALSE"
+                    >
+                    Bulk search
+                    </b-form-checkbox>
+
+                  <div>State: <strong>{{ bulksearch }}</strong></div>
+                </div> 
+                  <!-- <b-button
                     style="margin-left: 20px"
                     variant="primary"
                     v-on:click="saveFile"
@@ -49,13 +69,8 @@
                     v-on:click="trimTableForSave"
                     :disabled="!validation"
                     >trimTableForSave
-                  </b-button>
-                  <!-- <b-button trimTableForSave
-                    style="margin-left: 20px"
-                    variant="primary"
-                    v-on:click="getGeneSynonyms"
-                    >getGeneSynonyms
                   </b-button> -->
+       
                   <b-icon
                     v-if="show_waiting_card"
                     style="margin-left: 5px"
@@ -72,10 +87,26 @@
                   </b-form-valid-feedback>
 
                   <p text-muted>Enter the HGNC ID in the format shown</p>
+                    
+
                 </b-form>
+                <b-form v-if="bulksearch == 'TRUE'">
+    <b-form-textarea
+      id="textarea"
+      v-model="text"
+      placeholder="Enter something..."
+      rows="3"
+      max-rows="6"
+    ></b-form-textarea>
+
+    <pre class="mt-3 mb-0">{{ text }}</pre>
+    <pre class="mt-3 mb-0">{{ geneList }}</pre>
+                </b-form>
+                
               </b-form-group>
             </div>
           </b-form>
+
         </b-col>
         <b-col>
           <!-- <b-card bg-variant="primary" text-variant="white"  header-tag="header" class="text-center"> -->
@@ -462,6 +493,7 @@ export default {
   name: "Gene2Drugs",
   data() {
     return {
+      bulksearch: "FALSE",
       perPage: 5,
       totalRows: 1,
       currentPage: 1,
@@ -483,9 +515,9 @@ export default {
       // "HGNC:2625" CYP2D6
       // "HGNC:11998" TP53"
       // "HGNC:3236" EGFR  - 3546 hits
-      // 1100 BRCA1
-      // 9588 PTEN
-      // 5173 HRAS
+      // HGNC:1100 BRCA1
+      // HGNC:9588 PTEN
+      // HGNC:5173 HRAS
       object: "HGNC:9588",
       concept_data: {},
       //concept table
@@ -889,6 +921,61 @@ export default {
         console.log("got UMLS info = " , geneinfo)
       })
     },
+async eventLoop() {
+      // concept_search
+    let searchTerms = this.geneList
+      // this.progressTable = [];
+      // this.progressObject = {};
+      // this.geneIDList = [];
+      let length = searchTerms.length;
+      let i = 0;
+
+      const EventEmitter = require("events");
+      class Emitter extends EventEmitter {}
+      const eventEmitter = new Emitter();
+      eventEmitter.on("event", async () => {
+        // this.progressTable = [];
+        // this.progressObject = {};
+        // this.geneIDList = [];
+        console.log("event emitted!");
+        // console.log(this.hgncAll[i]);
+
+
+        // console.log("this.i < 2");
+        // console.log(i < length - 1)
+        console.log(i < 2);
+        console.log("length = ", length);
+        // console.log("i = ", i);
+        // if(i < length ){
+        if (i < length) {
+          // console.log("this.i < length - 1");
+          this.concept_search = searchTerms[i];
+          console.log("SEARCHING FOR - ", this.concept_search)
+          let test = await this.getalldrugs();
+          // let test = await this.synonymtestemit()
+          i++;
+          console.log("test");
+          console.log(test);
+          eventEmitter.emit("event");
+        }
+      });
+
+      eventEmitter.emit("event");
+    },
+
+    // async bulkSearch() {
+
+    // return new Promise(async (resolve, reject) => { // eslint-disable-line
+
+    //   try {
+    //     this.getalldrugs()
+    //     resolve();
+    //   } catch (err) {
+    //     reject(err);
+    //   }
+    // });
+      
+    // },
 
     async getalldrugs() {
       this.headerBg = "primary";
@@ -904,7 +991,11 @@ export default {
       this.groupedResultsTable = [];
       console.log("concept_search");
       console.log(this.concept_search);
+      this.filtercategories = {"ambiguous":{"name": "ambiguous", "count" : 0}, "increase":{"name": "increase", "count" : 0}, "decrease":{"name": "decrease", "count" : 0}, "fda":{"name": "fda", "count" : 0}},
+
       // SEND HGNC TO GET ALL SYNONYMS
+      // return new Promise(async (resolve, reject) => { // eslint-disable-line
+
       PostService.getConcept(this.concept_search)
         .then((result) => {
           console.log("concept");
@@ -1590,8 +1681,8 @@ export default {
                     return false;
                   }
                 });
-                console.log("asfilteredArray")
-                console.log(asfilteredArray)
+                // console.log("asfilteredArray")
+                // console.log(asfilteredArray)
 
                 results[index].rtx = asfilteredArray[0][1];
                 results[index].chembl = asfilteredArray[0][0]
@@ -1664,14 +1755,14 @@ export default {
                       let description = element.value
                         .split("; ")
                         .filter((el) => el.includes("FDA"));
-                      console.log("FDA = ", description);
-                      console.log("FDA = ", description[0]);
+                      // console.log("FDA = ", description);
+                      // console.log("FDA = ", description[0]);
 
                       results[index].fdaDescription = description[0];
                       results[index].fdaApproved =
                         results[index].fdaDescription.split(" ")[1];
-                      console.log(results[index].fdaApproved);
-                      console.log(results[index].fdaDescription);
+                      // console.log(results[index].fdaApproved);
+                      // console.log(results[index].fdaDescription);
                     } else {
                       results[index].fdaDescription =
                         "No FDA Information Found";
@@ -1726,18 +1817,24 @@ export default {
             this.groupedResultsTable = results;
             this.busy = false;
             console.log(results);
+            this.trimTableForSave()
+            resolve(console.log(this.modal_text))
 
           }
         }
 
         });
+      // }); // FOR PROMISE
     },
 
     trimTableForSave(){
+      console.log("trimTableForSave started")
       let dataTableToPrint = []
       for (let i = 0; i < this.groupedResultsTable.length; i++) {
-        let row = this.groupedResultsTable[i]
-        // const edgeInfoCopy = {...edgeInfo}
+        let rowStart = this.groupedResultsTable[i]
+        console.log("rowStart")
+        console.log(rowStart)
+        const row = {...rowStart}
         let rowPrintInfo = {}
         rowPrintInfo.chembl = row.chembl
         rowPrintInfo.fdaApproved = row.fdaApproved
@@ -1747,12 +1844,18 @@ export default {
         rowPrintInfo.relation = row.relation
         // rowPrintInfo.chembl = row.chembl
         let rowPubs = row.publications
+          if(i == this.groupedResultsTable.length - 1 && rowPubs.length == 0){
+            this.newSaveFile(dataTableToPrint)
+          }
         for (let n = 0; n < rowPubs.length; n++) {
+          console.log("i = ",i, " and n = ",n)
           const pub = rowPubs[n];
           rowPrintInfo.pubID = pub.pubids[0][0]
           rowPrintInfo.direction = pub.direction
           rowPrintInfo.predicate = pub.predicate  
           const rowPrintInfoPush = {...rowPrintInfo}
+          console.log("rowPrintInfoPush")
+          console.log(rowPrintInfoPush)
           dataTableToPrint.push(rowPrintInfoPush)
 
           if(i == this.groupedResultsTable.length - 1 && n == rowPubs.length -1){
@@ -1764,7 +1867,7 @@ export default {
         
       }
 
-
+      
     },
 
     newSaveFile(tableData) {
@@ -2077,16 +2180,18 @@ export default {
       },
     },
   computed: {
-    // relationFilters: function() {
-    //   let uniqueRelations = [];
+    geneList: function() {
+      // let uniqueRelations = [];
+      let list = this.text.split(/[\n,]/)
+      return list.filter(item => item != "")
 
-    //   return this.synonym_tabledata.filter(drug => {
-    //     if (uniqueRelations.indexOf(drug.predicate_cleaned) == -1) {
-    //       uniqueRelations.push(drug.predicate_cleaned);
-    //       return drug.predicate_cleaned;
-    //     }
-    //   });
-    // },
+      // return this.synonym_tabledata.filter(drug => {
+      //   if (uniqueRelations.indexOf(drug.predicate_cleaned) == -1) {
+      //     uniqueRelations.push(drug.predicate_cleaned);
+      //     return drug.predicate_cleaned;
+      //   }
+      // });
+    },
     synonym_tabledata_filtered: function () {
       // synonym_tabledata
       return this.synonym_tabledata.filter((drug) => {

@@ -677,6 +677,7 @@ export default {
           setTimeout(() => { resolve('') }, milisec);
       })
     },
+    
     async testSection(results) {
       this.startTime = new Date()
       // console.log(importResultWithDrugs);
@@ -737,7 +738,7 @@ export default {
                         console.log(edgeInfoCopy)                      
                     }
 
-                   for (let x = 0; x < pubs.length; x++) {
+                    for (let x = 0; x < pubs.length; x++) {
                       // (function(x) {
                         const pub = pubs[x];
                         edgeInfo.link =  "https://pubmed.ncbi.nlm.nih.gov/" + pub
@@ -755,29 +756,6 @@ export default {
                       
                     }
 
-
-
-
-
-
-
-
-
-                    // await new Promise(resolve => setTimeout(resolve, 1000))
-                    // await this.waitforme(400)
-                    // let pubsJoined = pubs.join()
-                    // let pubinfo = await this.getPubmed(pubsJoined)
-                    // console.log("pubinfo")
-                    // console.log(pubinfo)
-                    // console.log(pubsJoined)
-                    // if(pubs != null && pubs != [null]){
-                    //   let chemPubTableArr = await PubCleanService.createPubReviewTable(pubinfo, edgeInfo)
-                    //   console.log(chemPubTableArr)
-                    //   chemTableForDownload = [...chemTableForDownload, ...chemPubTableArr]
-                    //   console.log("######$$$$$$$$    %%%%%%%%")
-                    //   console.log("chemTableForDownload")
-                    //   console.log(chemTableForDownload)
-                    // }
 
                   }  
                 }
@@ -799,12 +777,11 @@ export default {
         console.log("WRITING FILE FOR WHAT WE HAAVE SO FAR")
         this.saveThisFile(chemTableForDownload, "CHEM GENE");
       }
- 
 
 
     },
 
-   async getPubmed(pubs) {
+    async getPubmed(pubs) {
       return new Promise(async (resolve, reject) => { // eslint-disable-line
 
       console.log("***** START getPubmed");
@@ -1226,24 +1203,24 @@ export default {
                   console.log(uniqueGenes)
                     this.araxResultTableSummaryDisplay.push(this.araxResultTableSummary[row.subjectName_gg])
                     this.componentKey++                   
-                 }
-                 if(i == araxResultTable.length - 1){
-                   for (let n = 0; n < uniqueGenes.length; n++) {
-                     const gene = uniqueGenes[n];
-                     let array = araxResultTable.filter(x => x.subjectName_gg == gene)
-                     let arrayDecrease = araxResultTable.filter(x => x.subjectName_gg == gene && x.direction_dg == "Decrease")
-                     let arrayIncrease = araxResultTable.filter(x => x.subjectName_gg == gene  && x.direction_dg == "Increase")
-                     this.araxResultTableSummary[gene].TotalDrugs = array.length
-                     this.araxResultTableSummary[gene].inhibitor = arrayDecrease.length
-                     this.araxResultTableSummary[gene].activator = arrayIncrease.length
+                  }
+                  if(i == araxResultTable.length - 1){
+                    for (let n = 0; n < uniqueGenes.length; n++) {
+                    const gene = uniqueGenes[n];
+                    let array = araxResultTable.filter(x => x.subjectName_gg == gene)
+                    let arrayDecrease = araxResultTable.filter(x => x.subjectName_gg == gene && x.direction_dg == "Decrease")
+                    let arrayIncrease = araxResultTable.filter(x => x.subjectName_gg == gene  && x.direction_dg == "Increase")
+                    this.araxResultTableSummary[gene].TotalDrugs = array.length
+                    this.araxResultTableSummary[gene].inhibitor = arrayDecrease.length
+                    this.araxResultTableSummary[gene].activator = arrayIncrease.length
                     //  this.araxResultTableSummary[gene].direction = row.direction_gg
-                     this.componentKey++
+                    this.componentKey++
 
-                     if(n == uniqueGenes.length -1 && i == araxResultTable.length - 1){
-                       console.log("this.araxResultTableSummary")
-                       console.log(this.araxResultTableSummary)
-                       return 
-                     }
+                    if(n == uniqueGenes.length -1 && i == araxResultTable.length - 1){
+                      console.log("this.araxResultTableSummary")
+                      console.log(this.araxResultTableSummary)
+                      return 
+                    }
 
                    }
       

@@ -15,8 +15,9 @@ import conceptExplorePlus from './components/conceptExplorePlus.vue';
 import geneAllSynToDrugs from './components/geneAllSynToDrugs.vue';
 import geneAllSynToDrugsv2 from './components/geneAllSynToDrugsv2.vue';
 import geneAllSynToDrugsARS from './components/geneAllSynToDrugsARS.vue';
+import conceptExploreTextMatch from './components/conceptExploreTextMatch.vue';
 
-// client/src/components/conceptExplorePlus.vue geneAllSynToDrugs geneAllSynToDrugsv2
+// client/src/components/conceptExplorePlus.vue geneAllSynToDrugs geneAllSynToDrugsv2 conceptExploreTextMatch
 
 Vue.use(Router)
 // arsexplorer
@@ -94,6 +95,11 @@ Vue.use(Router)
         path: '/geneAllSynToDrugsv2', 
         name: 'geneAllSynToDrugsv2', 
         component: geneAllSynToDrugsv2 
+      },
+      { 
+        path: '/conceptExploreTextMatch', 
+        name: 'conceptExploreTextMatch', 
+        component: conceptExploreTextMatch 
       }
     ]
   })
