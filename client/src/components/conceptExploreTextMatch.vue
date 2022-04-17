@@ -2,12 +2,12 @@
   <div class="container" style="padding-bottom: 20px">
     <h1>TRAPI MEDIK CONCEPT TEXT MATCHER</h1>
     <div>
-      <b-card no-body style="padding-bottom: 20px">
+      <b-card no-body style="padding-bottom: 20px" :key="componentKey">
         <b-tabs card>
           <b-tab title="Find Objects related to genes" active>
-            <b-card-text>
-              <div class="create-post">
-                <div>
+            <b-card-text >
+              <div class="create-post" >
+                <div :key="componentKey">
                   <b-form @submit="onSubmit" inline>
                     <label class="sr-only" for="Object">Object</label>
                     <b-form-input
@@ -110,6 +110,7 @@
               ></b-pagination>
               <div>
                 <b-table
+                  
                   bordered
                   striped
                   hover
@@ -118,10 +119,10 @@
                   responsive="true"
                   table-layout:
                   fixed
+                  :fields="matchTermFields"
                   :select-mode="selectMode"
                   :current-page="currentPage"
                   :per-page="perPage"
-                  :fields="conceptFields"
                   :items="concepts_table"
                   @row-clicked="myRowClickHandler"
                   :filter="filter"
@@ -141,7 +142,7 @@
                 </b-table>
               </div>
               <hr />
-              <h2>Synonym node normalizer n = {{synonyms.length}}</h2> 
+              <h2>this.componentKey = {{this.componentKey}}</h2> 
 
                  <b-table
                   bordered
@@ -161,7 +162,7 @@
 
               <hr />
               <h2>araxsynonymTable equivalent identifiers n = {{araxSynonyms_equivalentids.length}}</h2> 
-                 <b-table
+                <b-table
                   bordered
                   striped
                   hover
@@ -178,7 +179,7 @@
 
               <hr />
               <h2>araxsynonymTable nodes n = {{araxSynonyms_nodes.length}}</h2> 
-                 <b-table
+                <b-table
                   bordered
                   striped
                   hover
@@ -187,7 +188,7 @@
                   responsive="true"
                   table-layout:
                   fixed
-         
+        
                   :items="araxSynonyms_nodes"
             
                 >
@@ -200,7 +201,7 @@
                 >
                 <b-collapse id="collapse-1" class="mt-2">
                   <b-card v-if="selectedRows.length > 0">
-               
+              
                     <b-table
                       bordered
                       striped
@@ -249,16 +250,14 @@
               <b-card-group deck>
                 <b-card title="Count of CURIEs">
                   <b-card-text>
-                    <!-- <b-table :items="curieCount"> </b-table> -->
+                    <b-table v-if="curieCount.length > 0" :items="curieCount"> </b-table>
                   </b-card-text>
                 </b-card>
 
-                <b-card title="Title" header-tag="header" footer-tag="footer">
-                  <template #header>
-                    <h6 class="mb-0">Count of KGs</h6>
-                  </template>
+                <b-card title="Count of Categories">
+                 
                   <b-card-text>
-                    <!-- <b-table :items="dbCount"> </b-table> -->
+                    <b-table :items="dbTable"> </b-table>
                   </b-card-text>
                 </b-card>
               </b-card-group>
@@ -314,7 +313,7 @@
               </div>
           </b-tab>
           <b-tab title="Diagram">
-<conceptExploreComponent :conceptData="tree" />
+<!-- <conceptExploreComponent :conceptData="tree" /> -->
  <!-- {{testjson}} -->
           </b-tab>
         </b-tabs>
@@ -334,7 +333,7 @@ import TrapiResultClean from "../TrapiResultClean";
 var parser = require("fast-xml-parser");
 import axios from "axios";
 // conceptExploreComponent
-import conceptExploreComponent from "./conceptExploreComponent";
+// import conceptExploreComponent from "./conceptExploreComponent";
 import NodeFinderService from "../NodeFinderService";
 
 // import * as d3 from "d3";
@@ -349,9 +348,9 @@ import testjson from "./testjson.json"
 
 export default {
   name: "ConceptExplorerPlus",
-     components: {
- conceptExploreComponent
-  },
+//      components: {
+//  conceptExploreComponent
+//   },
   // mounted: function () {
 
   // },
@@ -365,7 +364,8 @@ export default {
       edges: [],
       subject: "chemical",
       predicate: "UMLS:C0004096",
-      concept_search: "covid",
+      // concept_search: "covid",
+      concept_search: "diabetes",
       // HGNC:6884"
       // "HGNC:2625"
       object: "HGNC:6884",
@@ -380,6 +380,32 @@ export default {
       selected: [],
       shownItems: [],
       select_concepts: [],
+      matchTermFields: [
+        {
+          key: "selected",
+          label: "Select",
+          thStyle: { "max-width": "50px" },
+        },
+        {
+          key: "name",
+          label: "Name",
+          sortable: true,
+          thStyle: { "max-width": "50px" },
+        },
+        {
+          key: "curie",
+          label: "Curie",
+          sortable: true,
+          thStyle: { "max-width": "50px" },
+        },
+        {
+          key: "categories",
+          label: "Categories",
+          sortable: true,
+          thStyle: { "max-width": "50px" },
+        }
+  
+      ],
       countFields: [
                 {
           key: "category",
@@ -429,22 +455,20 @@ export default {
           key: "name",
           label: "Name",
           sortable: true,
+          thStyle: { "max-width": "50px" },
         },
         {
-          key: "category",
-          label: "Category",
+          key: "curie",
+          label: "Curie",
           sortable: true,
+          thStyle: { "max-width": "50px" },
         },
         {
-          key: "id",
-          label: "ID",
+          key: "categories",
+          label: "Categories",
           sortable: true,
-        },
-        {
-          key: "db",
-          label: "Database",
-          sortable: true,
-        },
+          thStyle: { "max-width": "50px" },
+        }
       ],
  
       queryResults: [],
@@ -503,7 +527,8 @@ export default {
       preCountTable: [],
       catCountTable: [],
       tree: {test: "test tree"},
-      componentKey: 0
+      componentKey: 0,
+      dbTable: []
     };
   },
   methods: {
@@ -882,11 +907,9 @@ export default {
     //   this.synonyms = []
     //   // let syns = await ARAXService.getSynonyms()
     //   // PostService.query_raw(this.JSONquery)
-     
-
-
-
+    
     // },
+
     async getConcept_service() {
       console.log("********* getconcept");
       this.concepts_table = [];
@@ -902,9 +925,65 @@ export default {
 
       // let i = 0;
       try {
-        this.concept_data = await NodeFinderService.textMatch(this.concept_search);
-        console.log("this.concept_data");
-        console.log(this.concept_data);
+        NodeFinderService.textMatch(this.concept_search)
+        .then(async (data) => {
+          this.concept_data = data
+          console.log("this.concept_data");
+          console.log(this.concept_data);
+          let matchKeys = Object.keys(this.concept_data);
+
+          // SET TOTAL ROWS FOR PAGINATION CALCULATION
+          this.totalRows = matchKeys.length
+
+          for (let i = 0; i < matchKeys.length; i++) {
+            let curie = matchKeys[i];
+            let match = this.concept_data[curie]
+            console.log("match")
+            console.log(match)
+            let matchObject = {"selected": false, "curie": curie, "name": this.concept_data[curie][0], "alternateName(s)": this.concept_data[curie], "categories" : "" }
+            this.concepts_table.push(matchObject)
+
+            if(i == matchKeys.length - 1){
+              console.log("this.concepts_table")
+              console.log(this.concepts_table)              
+              return
+            }
+            
+          }
+        })
+        .then(async () => {
+          for (let i = 0; i < this.concepts_table.length; i++) {
+            let curie = this.concepts_table[i].curie
+            this.concepts_table[i].curieInfo = await NodeFinderService.getARAXSynonyms(curie)
+            try {
+              let keys = Object.keys(this.concepts_table[i].curieInfo[curie].categories)
+              this.concepts_table[i].category = keys[0]
+              this.concepts_table[i].categories = keys[0] + " (of " + keys.length + ")"
+
+            }
+            catch (err){
+              this.concepts_table[i].categories = "None found"
+              this.concepts_table[i].category = "None found"
+              console.log(err)
+            }
+            this.componentKey++
+            if(i == this.concepts_table.length){
+              return
+            }
+            
+            
+          }
+        })
+        .then(async () => {
+          console.log("this.concepts_table")
+          console.log(this.concepts_table)
+          this.componentKey++
+          this.dbCount()
+        })
+
+        
+
+
 
         // let set = await PostService.getConcept(this.concept_search);
         // let results = set["concepts"];
@@ -951,11 +1030,40 @@ export default {
         this.error = err;
       }
     },
+    dbCount () {
+      console.log("start dbCount");
+      let dbs = [];
+      let dbTable = this.dbTable
+
+      let countTable = this.concepts_table;
+
+      for (let index = 0; index < countTable.length; index++) {
+        const el = countTable[index];
+
+        let db = el.category;
+        console.log("~~~~~~ DBCOUNT ", db)
+
+        // COUNT EACH DATABASE OCCURANCE
+        if (dbs.indexOf(db) == -1) {
+          dbs.push(db);
+          dbTable.push({ Category: db, Count: 1 });
+        } else {
+          for (let index = 0; index < dbTable.length; index++) {
+            const element = dbTable[index];
+            if (element.Category == db) {
+              dbTable[index].Count++;
+            }
+          }
+        }
+      }
+      
+    },
     myRowClickHandler(item) {
       // this.select_concepts = this.concepts_table.filter(row => row.selected == true)
       console.log("myRowClickHandler");
+      console.log("itemClicked = ", item)
       for (var i = 0; i < this.concepts_table.length; i++) {
-        if (this.concepts_table[i].index === item.index) {
+        if (this.concepts_table[i].curie === item.curie) {
           // console.log(item);
           // this.select_concepts.push(item);
           this.concepts_table[i].selected = !this.concepts_table[i].selected;
@@ -1046,58 +1154,65 @@ export default {
       return selectedRows;
     },
     curieCount: function () {
-      console.log("start curieCount");
-      let ids = [];
-      let idTable = [];
+      if(this.concepts_table.length > 0){
+          console.log("start curieCount");
+          let ids = [];
+          let idTable = [];
 
-      let countTable = this.concepts_table;
+          let countTable = this.concepts_table;
 
-      for (let index = 0; index < countTable.length; index++) {
-        const el = countTable[index];
+          for (let index = 0; index < countTable.length; index++) {
+            const el = countTable[index];
 
-        let id = el.id.split(":")[0];
-        // COUNT EACH TYPE OF CURIE
-        if (ids.indexOf(id) == -1) {
-          ids.push(id);
-          idTable.push({ idName: id, idcount: 1 });
-        } else {
-          for (let index = 0; index < idTable.length; index++) {
-            const element = idTable[index];
-            if (element.idName == id) {
-              idTable[index].idcount++;
+            let id = el.curie.split(":")[0];
+            // COUNT EACH TYPE OF CURIE
+            if (ids.indexOf(id) == -1) {
+              ids.push(id);
+              idTable.push({ idName: id, idcount: 1 });
+            } else {
+              for (let index = 0; index < idTable.length; index++) {
+                const element = idTable[index];
+                if (element.idName == id) {
+                  idTable[index].idcount++;
+                }
+              }
             }
           }
-        }
-      }
-      return idTable;
-    },
-    dbCount: function () {
-      console.log("start dbCount");
-      let dbs = [];
-      let dbTable = [];
-
-      let countTable = this.concepts_table;
-
-      for (let index = 0; index < countTable.length; index++) {
-        const el = countTable[index];
-
-        let db = el.db;
-
-        // COUNT EACH DATABASE OCCURANCE
-        if (dbs.indexOf(db) == -1) {
-          dbs.push(db);
-          dbTable.push({ dbName: db, dbcount: 1 });
-        } else {
-          for (let index = 0; index < dbTable.length; index++) {
-            const element = dbTable[index];
-            if (element.dbName == db) {
-              dbTable[index].dbcount++;
-            }
+          return idTable;
           }
-        }
-      }
-      return dbTable;
+          else {
+            return []
+          }
+      
     },
+    // dbCount: function () {
+    //   console.log("start dbCount");
+    //   let dbs = [];
+    //   let dbTable = [];
+
+    //   let countTable = this.concepts_table;
+
+    //   for (let index = 0; index < countTable.length; index++) {
+    //     const el = countTable[index];
+
+    //     let db = el.category;
+    //     console.log("~~~~~~ DBCOUNT ", db)
+
+    //     // COUNT EACH DATABASE OCCURANCE
+    //     if (dbs.indexOf(db) == -1) {
+    //       dbs.push(db);
+    //       dbTable.push({ Category: db, Count: 1 });
+    //     } else {
+    //       for (let index = 0; index < dbTable.length; index++) {
+    //         const element = dbTable[index];
+    //         if (element.Category == db) {
+    //           dbTable[index].Count++;
+    //         }
+    //       }
+    //     }
+    //   }
+    //   return dbTable;
+    // },
   },
   // created() {
   //   this.fetchUserData;
