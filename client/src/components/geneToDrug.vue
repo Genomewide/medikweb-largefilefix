@@ -1,6 +1,6 @@
 <template>
   <div class="container" style="margin-bottom: 100px">
-    <h1 class="text-center">MEDIK GENE TO DRUG QUERY</h1>
+    <h1 class="text-center">MEDIK GENE TO DRUG QUERY ?</h1>
     <div style="margin-top: 20px">
       <b-modal
         ref="my-modal"
@@ -853,6 +853,7 @@ export default {
     };
   },
   methods: {
+    
     showModal() {
       this.$refs["my-modal"].show();
       this.show_waiting_card = false;
@@ -1653,6 +1654,13 @@ async eventLoop() {
             }
           }
         })
+        .catch((error) => {
+          console.error("ERROR - SUMMARIZE THE GROUPED DATA - LIKELY NO DRUGS", error.message);
+          this.modal_text = "ERROR - SUMMARIZE THE GROUPED DATA - LIKELY NO DRUGS";
+          this.errorSteps.push("ERROR - SUMMARIZE THE GROUPED DATA - LIKELY NO DRUGS");
+          this.showModal();
+          throw new Error("Ran out of coffee");
+        })
         .then(async (results) => {
           // USE CONCEPT SERVICE TO GET RELATED CONCEPTS AND FIND THE CHEMBL RTX THAT WILL HAVE FDA APPROVAL
           console.log("GETTING FDA APROVAL INFO FROM RTX CHMBL DATA");
@@ -1818,7 +1826,7 @@ async eventLoop() {
             this.busy = false;
             console.log(results);
             this.trimTableForSave()
-            resolve(console.log(this.modal_text))
+            // resolve(console.log(this.modal_text))
 
           }
         }

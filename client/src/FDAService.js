@@ -3,6 +3,28 @@ import axios from 'axios';
 
 class FDAService {
 
+  static fdaBulk = (limit, offset) => {
+    let append = "&limit=" + limit + "&offset=" + offset
+    console.log(append) 
+
+    return new Promise(async (resolve, reject) => { // eslint-disable-line
+      // https://www.ebi.ac.uk/chembl/api/data/molecule.json?max_phase=4&limit=20
+
+      let url = "https://www.ebi.ac.uk/chembl/api/data/molecule.json?max_phase=0" + append
+
+      try {
+        const res = await axios.get(url);
+        const data = res.data;
+  
+        console.log("fdaBulk ran")
+        console.log(data)
+        resolve(data);
+      } catch (err) {
+        reject(err);
+      }
+    });
+  }
+
   static myChemInfo = (curie) => {
     console.log(curie) 
 

@@ -1,0 +1,458 @@
+[
+    {
+        "children": [
+            {
+                "name": "Activity",
+                "parent": "NamedThing"
+            },
+            {
+                "children": [
+                    {
+                        "name": "Agent",
+                        "parent": "AdministrativeEntity"
+                    }
+                ],
+                "name": "AdministrativeEntity",
+                "parent": "NamedThing"
+            },
+            {
+                "children": [
+                    {
+                        "children": [
+                            {
+                                "children": [
+                                    {
+                                        "name": "Behavior",
+                                        "parent": "BiologicalProcess"
+                                    },
+                                    {
+                                        "name": "PathologicalProcess",
+                                        "parent": "BiologicalProcess"
+                                    },
+                                    {
+                                        "name": "Pathway",
+                                        "parent": "BiologicalProcess"
+                                    },
+                                    {
+                                        "name": "PhysiologicalProcess",
+                                        "parent": "BiologicalProcess"
+                                    }
+                                ],
+                                "name": "BiologicalProcess",
+                                "parent": "BiologicalProcessOrActivity"
+                            },
+                            {
+                                "name": "MolecularActivity",
+                                "parent": "BiologicalProcessOrActivity"
+                            }
+                        ],
+                        "name": "BiologicalProcessOrActivity",
+                        "parent": "BiologicalEntity"
+                    },
+                    {
+                        "children": [
+                            {
+                                "name": "Disease",
+                                "parent": "DiseaseOrPhenotypicFeature"
+                            },
+                            {
+                                "children": [
+                                    {
+                                        "name": "BehavioralFeature",
+                                        "parent": "PhenotypicFeature"
+                                    },
+                                    {
+                                        "name": "ClinicalFinding",
+                                        "parent": "PhenotypicFeature"
+                                    }
+                                ],
+                                "name": "PhenotypicFeature",
+                                "parent": "DiseaseOrPhenotypicFeature"
+                            }
+                        ],
+                        "name": "DiseaseOrPhenotypicFeature",
+                        "parent": "BiologicalEntity"
+                    },
+                    {
+                        "name": "Gene",
+                        "parent": "BiologicalEntity"
+                    },
+                    {
+                        "name": "GeneFamily",
+                        "parent": "BiologicalEntity"
+                    },
+                    {
+                        "name": "Genome",
+                        "parent": "BiologicalEntity"
+                    },
+                    {
+                        "name": "Genotype",
+                        "parent": "BiologicalEntity"
+                    },
+                    {
+                        "name": "Haplotype",
+                        "parent": "BiologicalEntity"
+                    },
+                    {
+                        "name": "NucleicAcidSequenceMotif",
+                        "parent": "BiologicalEntity"
+                    },
+                    {
+                        "children": [
+                            {
+                                "children": [
+                                    {
+                                        "name": "Cell",
+                                        "parent": "AnatomicalEntity"
+                                    },
+                                    {
+                                        "name": "CellularComponent",
+                                        "parent": "AnatomicalEntity"
+                                    },
+                                    {
+                                        "name": "GrossAnatomicalStructure",
+                                        "parent": "AnatomicalEntity"
+                                    },
+                                    {
+                                        "name": "PathologicalAnatomicalStructure",
+                                        "parent": "AnatomicalEntity"
+                                    }
+                                ],
+                                "name": "AnatomicalEntity",
+                                "parent": "OrganismalEntity"
+                            },
+                            {
+                                "name": "CellLine",
+                                "parent": "OrganismalEntity"
+                            },
+                            {
+                                "children": [
+                                    {
+                                        "name": "Case",
+                                        "parent": "IndividualOrganism"
+                                    }
+                                ],
+                                "name": "IndividualOrganism",
+                                "parent": "OrganismalEntity"
+                            },
+                            {
+                                "name": "LifeStage",
+                                "parent": "OrganismalEntity"
+                            },
+                            {
+                                "children": [
+                                    {
+                                        "children": [
+                                            {
+                                                "name": "Cohort",
+                                                "parent": "StudyPopulation"
+                                            }
+                                        ],
+                                        "name": "StudyPopulation",
+                                        "parent": "PopulationOfIndividualOrganisms"
+                                    }
+                                ],
+                                "name": "PopulationOfIndividualOrganisms",
+                                "parent": "OrganismalEntity"
+                            }
+                        ],
+                        "name": "OrganismalEntity",
+                        "parent": "BiologicalEntity"
+                    },
+                    {
+                        "children": [
+                            {
+                                "children": [
+                                    {
+                                        "name": "ProteinIsoform",
+                                        "parent": "Protein"
+                                    }
+                                ],
+                                "name": "Protein",
+                                "parent": "Polypeptide"
+                            }
+                        ],
+                        "name": "Polypeptide",
+                        "parent": "BiologicalEntity"
+                    },
+                    {
+                        "name": "ProteinDomain",
+                        "parent": "BiologicalEntity"
+                    },
+                    {
+                        "name": "ProteinFamily",
+                        "parent": "BiologicalEntity"
+                    },
+                    {
+                        "name": "ReagentTargetedGene",
+                        "parent": "BiologicalEntity"
+                    },
+                    {
+                        "children": [
+                            {
+                                "name": "Snv",
+                                "parent": "SequenceVariant"
+                            }
+                        ],
+                        "name": "SequenceVariant",
+                        "parent": "BiologicalEntity"
+                    }
+                ],
+                "name": "BiologicalEntity",
+                "parent": "NamedThing"
+            },
+            {
+                "children": [
+                    {
+                        "children": [
+                            {
+                                "name": "ComplexMolecularMixture",
+                                "parent": "ChemicalMixture"
+                            },
+                            {
+                                "name": "Food",
+                                "parent": "ChemicalMixture"
+                            },
+                            {
+                                "children": [
+                                    {
+                                        "name": "Drug",
+                                        "parent": "MolecularMixture"
+                                    }
+                                ],
+                                "name": "MolecularMixture",
+                                "parent": "ChemicalMixture"
+                            },
+                            {
+                                "name": "ProcessedMaterial",
+                                "parent": "ChemicalMixture"
+                            }
+                        ],
+                        "name": "ChemicalMixture",
+                        "parent": "ChemicalEntity"
+                    },
+                    {
+                        "name": "EnvironmentalFoodContaminant",
+                        "parent": "ChemicalEntity"
+                    },
+                    {
+                        "name": "FoodAdditive",
+                        "parent": "ChemicalEntity"
+                    },
+                    {
+                        "children": [
+                            {
+                                "children": [
+                                    {
+                                        "name": "CodingSequence",
+                                        "parent": "NucleicAcidEntity"
+                                    },
+                                    {
+                                        "name": "Exon",
+                                        "parent": "NucleicAcidEntity"
+                                    },
+                                    {
+                                        "children": [
+                                            {
+                                                "children": [
+                                                    {
+                                                        "children": [
+                                                            {
+                                                                "name": "MicroRNA",
+                                                                "parent": "NoncodingRNAProduct"
+                                                            },
+                                                            {
+                                                                "name": "SiRNA",
+                                                                "parent": "NoncodingRNAProduct"
+                                                            }
+                                                        ],
+                                                        "name": "NoncodingRNAProduct",
+                                                        "parent": "RNAProduct"
+                                                    },
+                                                    {
+                                                        "name": "RNAProductIsoform",
+                                                        "parent": "RNAProduct"
+                                                    }
+                                                ],
+                                                "name": "RNAProduct",
+                                                "parent": "Transcript"
+                                            }
+                                        ],
+                                        "name": "Transcript",
+                                        "parent": "NucleicAcidEntity"
+                                    }
+                                ],
+                                "name": "NucleicAcidEntity",
+                                "parent": "MolecularEntity"
+                            },
+                            {
+                                "name": "SmallMolecule",
+                                "parent": "MolecularEntity"
+                            }
+                        ],
+                        "name": "MolecularEntity",
+                        "parent": "ChemicalEntity"
+                    },
+                    {
+                        "children": [
+                            {
+                                "name": "Macronutrient",
+                                "parent": "Nutrient"
+                            },
+                            {
+                                "children": [
+                                    {
+                                        "name": "Vitamin",
+                                        "parent": "Micronutrient"
+                                    }
+                                ],
+                                "name": "Micronutrient",
+                                "parent": "Nutrient"
+                            }
+                        ],
+                        "name": "Nutrient",
+                        "parent": "ChemicalEntity"
+                    }
+                ],
+                "name": "ChemicalEntity",
+                "parent": "NamedThing"
+            },
+            {
+                "children": [
+                    {
+                        "children": [
+                            {
+                                "name": "Hospitalization",
+                                "parent": "ClinicalIntervention"
+                            }
+                        ],
+                        "name": "ClinicalIntervention",
+                        "parent": "ClinicalEntity"
+                    },
+                    {
+                        "name": "ClinicalTrial",
+                        "parent": "ClinicalEntity"
+                    }
+                ],
+                "name": "ClinicalEntity",
+                "parent": "NamedThing"
+            },
+            {
+                "name": "Device",
+                "parent": "NamedThing"
+            },
+            {
+                "name": "Event",
+                "parent": "NamedThing"
+            },
+            {
+                "children": [
+                    {
+                        "name": "ConfidenceLevel",
+                        "parent": "InformationContentEntity"
+                    },
+                    {
+                        "name": "Dataset",
+                        "parent": "InformationContentEntity"
+                    },
+                    {
+                        "name": "DatasetDistribution",
+                        "parent": "InformationContentEntity"
+                    },
+                    {
+                        "name": "DatasetSummary",
+                        "parent": "InformationContentEntity"
+                    },
+                    {
+                        "name": "DatasetVersion",
+                        "parent": "InformationContentEntity"
+                    },
+                    {
+                        "name": "EvidenceType",
+                        "parent": "InformationContentEntity"
+                    },
+                    {
+                        "name": "InformationResource",
+                        "parent": "InformationContentEntity"
+                    },
+                    {
+                        "children": [
+                            {
+                                "name": "Article",
+                                "parent": "Publication"
+                            },
+                            {
+                                "name": "Book",
+                                "parent": "Publication"
+                            },
+                            {
+                                "name": "BookChapter",
+                                "parent": "Publication"
+                            },
+                            {
+                                "name": "Serial",
+                                "parent": "Publication"
+                            }
+                        ],
+                        "name": "Publication",
+                        "parent": "InformationContentEntity"
+                    }
+                ],
+                "name": "InformationContentEntity",
+                "parent": "NamedThing"
+            },
+            {
+                "name": "OrganismTaxon",
+                "parent": "NamedThing"
+            },
+            {
+                "name": "Phenomenon",
+                "parent": "NamedThing"
+            },
+            {
+                "children": [
+                    {
+                        "name": "MaterialSample",
+                        "parent": "PhysicalEntity"
+                    }
+                ],
+                "name": "PhysicalEntity",
+                "parent": "NamedThing"
+            },
+            {
+                "children": [
+                    {
+                        "name": "EnvironmentalFeature",
+                        "parent": "PlanetaryEntity"
+                    },
+                    {
+                        "name": "EnvironmentalProcess",
+                        "parent": "PlanetaryEntity"
+                    },
+                    {
+                        "children": [
+                            {
+                                "name": "GeographicLocationAtTime",
+                                "parent": "GeographicLocation"
+                            }
+                        ],
+                        "name": "GeographicLocation",
+                        "parent": "PlanetaryEntity"
+                    }
+                ],
+                "name": "PlanetaryEntity",
+                "parent": "NamedThing"
+            },
+            {
+                "name": "Procedure",
+                "parent": "NamedThing"
+            },
+            {
+                "name": "Treatment",
+                "parent": "NamedThing"
+            }
+        ],
+        "name": "NamedThing",
+        "parent": null
+    }
+]

@@ -37,15 +37,14 @@
                     v-on:click="getAllSynToDrugs"
                     >getAllSynToDrugs
                   </b-button>
-                  <!-- <b-button
+                  <b-button
                     style="margin-left: 20px"
                     variant="secondary"
-                    v-on:click="saveFile"
-                    :disabled="!validation"
-                    >saveFile
+                    v-on:click="getFDA"
+                    >getFDA
                   </b-button>
 
-                  <b-button
+                  <!-- <b-button
                     style="margin-left: 20px"
                     variant="primary"
                     v-on:click="testSection"
@@ -212,9 +211,9 @@
               :items="araxResultTable"
               :fields="fields"
             >
-   
+  
             </b-table>
-           
+          
           </b-card>
         </b-row>
 
@@ -243,21 +242,9 @@ import synonymService from "../synonymService";
 var parser = require("fast-xml-parser");
 import axios from "axios";
 import * as d3 from "d3";
-// import { off } from 'process';
 
-// import {
-//   breadcrumbTrail,
-//   highlightOnHover,
-//   nodeInfoDisplayer,
-//   sunburst,
-//   zoomOnClick
-// } from 'vue-d3-sunburst';
-// import "vue-d3-sunburst/dist/vue-d3-sunburst.css";
-// import got from 'got';
-// const EventEmitter = require("events");
 
-// class MyEmitter extends EventEmitter {}
-// const eventEmitter = new MyEmitter();
+
 
 export default {
   name: "Gene2Drugs",
@@ -665,6 +652,19 @@ export default {
     };
   },
   methods: {
+    async getFDA(){
+
+      for (let i = 0; i < 10; i++) {
+        // const element = array[i];
+
+        let fda = await FDAService.fdaBulk(1000,i*1000)
+        this.testSave(i,fda)
+
+        
+      }
+
+    },
+
     showModal() {
       this.$refs["my-modal"].show();
       this.show_waiting_card = false;
@@ -837,11 +837,12 @@ export default {
       })
     },
 
-    async testSave(jsonObject) {
+    async testSave(id,jsonObject) {
       console.log("testSave - testing");
       const text = JSON.stringify(jsonObject);
 
-      let filename = this.concept_search + "2hopJSON.json";
+      // let filename = this.concept_search + id + "-FDA_JSON.json";
+      let filename = id + "-FDA_JSON.json";
       let element = document.createElement("a");
       element.setAttribute(
         "href",
@@ -1080,7 +1081,7 @@ export default {
                   console.log(cleanedResults_gg)
 
                 let cleanedResults_gg_genes = cleanedResults_gg.map((row) => {
-           
+
                   if(row.predicate != "biolink:has_normalized_google_distance_with" && row.subjectName != SRI_normalizer_name){
                     // console.log(row.predicate)
                     // console.log(row.subject)

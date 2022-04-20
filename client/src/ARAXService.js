@@ -144,6 +144,36 @@ let ARAXquery_dg = {
 
 class ARAXService {
 
+  static araxQuery = (query) => {
+     
+    // console.log(ARAXquery_gg) 
+    // console.log("started getSynonyms");
+    return new Promise(async (resolve, reject) => { // eslint-disable-line
+      // ARAXquery_gg.message.query_graph.nodes.n01.ids = searchterm
+      // console.log( ARAXquery_gg)
+      console.log("START ARAXQUERY")
+      console.log(query)
+      // console.log(JSON.stringify(query))
+
+      let url = "https://arax.ncats.io/beta/api/arax/v1.2/query"
+      // let url = 'https://arax.ncats.io/api/arax/v1.2/query'
+      // console.log(ARAXquery_gg)
+      try {
+        const res = await axios.post(url, query);
+        console.log("res")
+        console.log(res)
+        const data = res.data;
+        // });
+  
+        console.log("ARAXquery ran")
+        // console.log(data)
+        resolve(data);
+      } catch (err) {
+        reject(err);
+      }
+    });
+  }
+
   static araxQuery_gg = (searchterm) => {
     console.log(searchterm) 
     // console.log(ARAXquery_gg) 

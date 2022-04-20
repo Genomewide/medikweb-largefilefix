@@ -1,6 +1,6 @@
 <template>
   <div class="container" style="padding-bottom: 20px">
-    <h1>TRAPI MEDIK CONCEPT TEXT MATCHER</h1>
+    <h1>CONCEPT CONNECT</h1>
     <div>
       <b-card no-body style="padding-bottom: 20px" :key="componentKey">
         <b-tabs card>

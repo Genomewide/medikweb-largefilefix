@@ -29,6 +29,8 @@ class TrapiResultClean {
   
             let subject = edge.subject
             let object = edge.object
+            console.log("nodes[subject]")
+            console.log(nodes[subject])
             data.edgeinfo = edge
             data.object = edge.object
             data.predicate = edge.predicate
@@ -189,6 +191,8 @@ class TrapiResultClean {
   
             let subject = edge.subject
             let object = edge.object
+            // console.log("nodes[subject]")
+            // console.log(nodes[subject])
             data.edgeinfo = edge
             data.object = edge.object
             data.predicate = edge.predicate
