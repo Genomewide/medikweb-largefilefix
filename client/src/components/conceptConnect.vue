@@ -4,7 +4,7 @@
     <div>
       <b-card no-body style="padding-bottom: 20px" :key="componentKey">
         <b-tabs card>
-          <b-tab title="Find Objects related to genes" active>
+          <b-tab title="Find Objects related to genes" >
             <b-card-text >
               <div class="create-post" >
                 <div :key="componentKey">
@@ -148,222 +148,84 @@
                   </template>
                 </b-table>
               </div>
-              <!-- <hr />
-              <h2>this.componentKey = {{this.componentKey}}</h2>  -->
-
-                <!-- <b-table
-                  bordered
-                  striped
-                  hover
-                  selectable
-                  ref="synonymTable"
-                  responsive="true"
-                  table-layout:
-                  fixed
-        
-                  :items="synonyms"
-            
-                >
-            
-                </b-table>
-
-              <hr />
-              <h2>araxsynonymTable equivalent identifiers n = {{araxSynonyms_equivalentids.length}}</h2> 
-                <b-table
-                  bordered
-                  striped
-                  hover
-                  selectable
-                  ref="araxsynonymTableEqIDs"
-                  responsive="true"
-                  table-layout:
-                  fixed
-                  :items="araxSynonyms_equivalentids"
-            
-                >
-            
-                </b-table>
-
-              <hr />
-              <h2>araxsynonymTable nodes n = {{araxSynonyms_nodes.length}}</h2> 
-                <b-table
-                  bordered
-                  striped
-                  hover
-                  selectable
-                  ref="araxsynonymTableNodes"
-                  responsive="true"
-                  table-layout:
-                  fixed
-        
-                  :items="araxSynonyms_nodes"
-            
-                >
-            
-                </b-table>
-                {{tree}} -->
+          
             
             </b-card-text>
           </b-tab>
-          <b-tab title="Selected Terms" >
+          <b-tab title="Selected Terms" active>
 
               <b-row style="padding-bottom:20px">
+                <!-- <b-button 
+                  style="margin-left: 10px"
+                  variant="danger"
+                  v-on:click="setSubjectExample"
+                  >Set as Term 1 example</b-button
+                >  -->
                 <b-button 
                   style="margin-left: 10px"
                   variant="warning"
                   v-on:click="setSubject"
-                  >Set as Subject</b-button
+                  >Set as Term 1</b-button
                 > 
                 <b-button 
                   style="margin-left: 10px"
                   variant="success"
                   v-on:click="setObject"
-                  >Set as Object</b-button
+                  >Set as Term 2</b-button
                 > 
-                <div>
-                  
-                <!-- <b-button 
-                  style="margin-left: 10px"
-                  variant="primary"
-                  v-on:click="increasePredicates"
-                  >increasePredicates</b-button
-                >  -->
-                  <b-button v-b-modal.modal-lg>Select from Predicate Tree</b-button>
-
-                  <b-modal id="modal-lg" size="lg" title="predicateTree">
-                    <p class="my-4">Select Predicates</p>
-                    <div>
-                        <b-form-input v-model="predicateText" placeholder="Enter your name"></b-form-input>
-                            <b-input-group-append>
-                              <b-button variant="info" v-on:click="selectAll">Select All</b-button>
-                            </b-input-group-append>
-                        <div class="mt-2">Value: {{ predicateText }} - {{predicateText.length}}</div>
-                        <!-- <div>{{matchingPredicate}}</div> -->
-                        <b-form-group 
-                      label="Individual stacked checkboxes (default)"
-                      v-slot="{ ariaDescribedby }"
-                    >
-                      <b-form-checkbox
-                        v-for="predicate in matchingPredicate"
-                        v-model="predicateSelected"
-                        :key="predicate"
-                        :value="predicate"
-                        :aria-describedby="ariaDescribedby"
-                        name="flavour-3a"
-                      >
-                        {{ predicate }}
-                      </b-form-checkbox>
-                    </b-form-group>
-                    </div>
-                    <!-- {{predicateTree}} -->
-                    <b-form-group
-                      label="Individual stacked checkboxes (default)"
-                      v-slot="{ ariaDescribedby }"
-                    >
-                      <b-form-checkbox
-                        v-for="branch in predicateTree"
-                        v-model="predicateSelected"
-                        :key="branch.name"
-                        :value="branch.name"
-                        :aria-describedby="ariaDescribedby"
-                        name="flavour-3a"
-                      >
-                        {{ branch.name }}
-                        
-                          
-                          <b-form-checkbox
-                            v-for="branchchild in branch.children"
-                            v-model="predicateSelected"
-                            :key="branchchild.name"
-                            :value="branchchild.name"
-                            :aria-describedby="ariaDescribedby"
-                            name="flavour-3b"
-                          >
-                            {{ branchchild.name }}
-                                <b-form-checkbox
-                                  v-for="branchchild in branchchild.children"
-                                  v-model="predicateSelected"
-                                  :key="branchchild.name"
-                                  :value="branchchild.name"
-                                  :aria-describedby="ariaDescribedby"
-                                  name="flavour-3b"
-                                >
-                                  {{ branchchild.name }}
-
-                                    <b-form-checkbox
-                                      v-for="branchchild in branchchild.children"
-                                      v-model="predicateSelected"
-                                      :key="branchchild.name"
-                                      :value="branchchild.name"
-                                      :aria-describedby="ariaDescribedby"
-                                      name="flavour-3b"
-                                    >
-                                      {{ branchchild.name }}
-
-                                    <b-form-checkbox
-                                      v-for="branchchild in branchchild.children"
-                                      v-model="predicateSelected"
-                                      :key="branchchild.name"
-                                      :value="branchchild.name"
-                                      :aria-describedby="ariaDescribedby"
-                                      name="flavour-3b"
-                                    >
-                                      {{ branchchild.name }}
-                                                              
-                                    </b-form-checkbox> 
-                                    </b-form-checkbox> 
-
-                                </b-form-checkbox>                          </b-form-checkbox>
-                      </b-form-checkbox>
-                    </b-form-group>
-                    {{predicateSelected}}
-     <!-- <b-form-checkbox-group >
-                      <b-form-checkbox
-                        v-for="branch in options"
-                        :key="branch.name"
-                        :value="branch.name"
-                        :class="options.class"
-                        v-bind="option.attrs"
-                      >{{ option.text }}</b-form-checkbox>
-                    </b-form-checkbox-group> -->
-                  </b-modal>
-                </div>
+              
                 <b-button 
                   style="margin-left: 10px"
                   variant="secondary"
-                  v-on:click="getARAX"
-                  >getARAX</b-button
+                  v-on:click="findLinks"
+                  >findLinks</b-button
+                > 
+                <b-button 
+                  style="margin-left: 10px"
+                  variant="secondary"
+                  v-on:click="findLinksTwo"
+                  >findLinksTwo</b-button
+                > 
+                <b-button 
+                  style="margin-left: 10px"
+                  variant="secondary"
+                  v-on:click="getOverlapTriples"
+                  >getOverlapTriples</b-button
+                > 
+                <b-button 
+                  style="margin-left: 10px"
+                  variant="secondary"
+                  v-on:click="findLinksThree"
+                  >findLinksThree</b-button
                 > 
                 </b-row>
                 <b-row style="margin-top:20px; min-height:200px">
                     <b-card-group deck style="width:100%">
                       <b-card >
                           <template #header>
-                            <h3 class="mb-0">Subject(s)</h3>
+                            <h3 class="mb-0">Term 1</h3>
                           </template>
                         <b-card-text>
-                          <li class="bulletFont" v-for="(item, index) in subject" :key="`item-${index}`">
-                              {{ item }}
-                          </li>
-                        </b-card-text>
-                      </b-card>
-                      <b-card >
-                        <template #header>
-                            <h3 class="mb-0">Predicate(s)</h3>
-                          </template>
-                        <b-card-text >
-                          <li class="bulletFont" v-for="(item, index) in predicateSelected" :key="`item-${index}`">
-                              {{ item }}
-                          </li>
-                        </b-card-text>
+                          <div>
 
+                          </div>
+                          <!-- <li class="bulletFont" v-for="(item, index) in subject_default" :key="`item-${index}`"> 
+                              {{ item }}
+                          </li> -->
+                          <li class="bulletFont" v-for="(item, index) in subject" :key="`item-${index}`"> 
+                              {{ item }}
+                          </li>
+                        </b-card-text>
+                        
                       </b-card>
+                    
                       <b-card>
                         <template #header>
-                            <h3 class="mb-0">Objects(s)</h3>
+                            <h3 class="mb-0">Term 2</h3>
                           </template>
                       
                         <b-card-text>
+
                           <li class="bulletFont" v-for="(item, index) in object" :key="`item-${index}`">
                               {{ item }}
                           </li>
@@ -373,7 +235,20 @@
                   </b-row>
                 <b-row>
                   <!-- resultsFields -->
-                  
+                                  <b-table
+                          id="term1Table"
+                            bordered
+                            striped
+                            hover
+                            ref="selectedTable"
+                            table-layout:
+                            fixed
+                            :sticky-header="true"
+                            
+                            :items="overlapCuries"
+                            :current-page="currentPage"
+                          >
+                          </b-table>
                 <b-card v-if="searchResults.length > 0">
 
                   <b-table
@@ -391,8 +266,6 @@
                 </b-card>
                 </b-row>
                 <b-row>
-                  <!-- resultsFields -->
-
                 <b-card v-if="selectedRows.length > 0">
 
                   <b-table
@@ -434,46 +307,35 @@
                   </b-card-text>
                 </b-card>
 
-                <!-- <b-card title="Count of Categories">
-                
-                  <b-card-text>
-                    <b-table :items="dbTable"> </b-table>
-                  </b-card-text>
-                </b-card> -->
+            
               </b-card-group>
             </div>
           </b-tab>
                     <b-tab title="All edges 2 hop">
               <hr />
               <div>
-                <!-- <b-button v-b-toggle.collapse-1 variant="primary" 
-                  >Review Selected</b-button
-                > -->
-                <!-- <b-collapse id="collapse-1" class="mt-2"> -->
-                <b-card title="catCountTable">
-                  <!-- {{ concepts_table }} -->
-                  <!-- selectable table =  {{$refs.selectableTable}} -->
-                  <b-table
-                    bordered
-                    striped
-                    hover
-                    ref="subCountTable"
-                    table-layout:
-                    fixed
-                    :sticky-header="true"
-                    :items="catCountTable"
-                    :fields="countFields"
-                  >
-                  </b-table>
+                              <b-card-group deck>
+                <b-card title="Hop 1">
+                  <b-card-text>
+                    <!-- <b-table v-if="curieCount.length > 0" :items="curieCount"> </b-table> -->
+                  </b-card-text>
                 </b-card>
-                <!-- </b-collapse> -->
+
+                <b-card title="Hop 2">
+                
+                  <b-card-text>
+                    <!-- <b-table :items="dbTable"> </b-table> -->
+                  </b-card-text>
+                </b-card>
+              </b-card-group>
+
               </div>
               <div>
                 <!-- <b-button v-b-toggle.collapse-1 variant="primary"
                   >Review Selected</b-button
                 > -->
                 <!-- <b-collapse id="collapse-1" class="mt-2"> -->
-                <b-card title="catCountTable">
+                <b-card title="catCountTable" :key="componentKey">
                   <!-- {{ concepts_table }} -->
                   <!-- selectable table =  {{$refs.selectableTable}} -->
                   <b-table
@@ -494,11 +356,11 @@
           </b-tab>
           <b-tab title="Diagram">
 <!-- <conceptExploreComponent :conceptData="tree" /> -->
- <!-- {{testjson}} -->
+<!-- {{testjson}} -->
           </b-tab>
         </b-tabs>
       </b-card>
-             <div>
+            <div>
     <!-- <svg id="vizTreeII" class="container-border" /> -->
   </div>
     </div>
@@ -507,8 +369,8 @@
 
 <script>
 // import { mapGetters, mapActions } from "vuex";
-import PostService from "../PostService";
-import synonymService from "../synonymService";
+// import PostService from "../PostService";
+// import synonymService from "../synonymService";
 import TrapiResultClean from "../TrapiResultClean";
 var parser = require("fast-xml-parser");
 import axios from "axios";
@@ -516,7 +378,10 @@ import axios from "axios";
 import NodeFinderService from "../NodeFinderService";
 import predicateTree from "../assets/predicateTree.json"
 import predicateList from "../assets/predicateList.json"
+import term1Results from "../assets/cannabidiol_results.json"
+import term2Results from "../assets/valproicacid_results.json"
 import ARAXService from "../ARAXService";
+// import searchResults2 from "../../datafiles/searchResults2.json"
 
 export default {
   name: "ConceptExplorerTextMatch",
@@ -528,43 +393,77 @@ export default {
   // },
   data() {
     return {
-      getCategories: true,
+      getCategories: false,
       predicateSelected: [],
       predicateTree: predicateTree,
       predicateList: predicateList,
       predicateText: "",
+      subject_default: ["MONDO:0005147",
+"MONDO:0005148",
+"MONDO:0005406",
+"MONDO:0006920",
+"MONDO:0008185",
+"MONDO:0008491",
+"MONDO:0008696",
+"MONDO:0008812",
+"MONDO:0009192",
+"MONDO:0009419",
+"MONDO:0009517",
+"MONDO:0009575",
+"MONDO:0009874",
+"MONDO:0010026",
+"MONDO:0010773",
+"MONDO:0010785",
+"MONDO:0010802",
+"MONDO:0012520",
+"MONDO:0012819",
+"MONDO:0013225",
+"MONDO:0013478",
+"MONDO:0014497",
+"MONDO:0014523",
+"MONDO:0015308",
+"MONDO:0015967",
+"MONDO:0016391",
+"MONDO:0016464",
+"MONDO:0017230",
+"MONDO:0018320",
+"MONDO:0018573",
+"MONDO:0018575",
+"MONDO:0018911",
+"MONDO:0019017",
+"MONDO:0019193"],
       subject: [],
       object: [],
       predicates:[],
       ARAXquery: {
-  "message": {
-    "query_graph": {
-      "edges": {
-        "e00": {
-          "constraints": [],
-          "object": "n01",
-          "subject": "n00"
+        "message": {
+          "query_graph": {
+            "edges": {
+              "e00": {
+                "constraints": [],
+                "object": "n01",
+                "subject": "n00"
+              }
+            },
+            "nodes": {
+              "n00": {
+                "constraints": [],
+                "is_set": false
+              },
+              "n01": {
+                "constraints": [],
+                "is_set": false
+              }
+            }
+          }
+        },
+        "submitter": "UI Dev ABC",
+        "stream_progress": true,
+        "query_options": {
+          "kp_timeout": "30",
+          "prune_threshold": "50"
         }
       },
-      "nodes": {
-        "n00": {
-          "constraints": [],
-          "is_set": false
-        },
-        "n01": {
-          "constraints": [],
-          "is_set": false
-        }
-      }
-    }
-  },
-  "submitter": "UI Dev ABC",
-  "stream_progress": true,
-  "query_options": {
-    "kp_timeout": "30",
-    "prune_threshold": "50"
-  }
-},
 
       // testjson: testjson,
       error: "",
@@ -758,7 +657,14 @@ export default {
       tree: {test: "test tree"},
       componentKey: 0,
       dbTable: [],
-      searchResults:[]
+      searchResults1:term1Results,
+      searchResults2:term2Results,
+      termNumber: 1,
+      searchResults:[],
+      overlapCuries: [],
+      // overlapCuriesFields:{
+
+      // }
     };
   },
   methods: {
@@ -766,367 +672,54 @@ export default {
       event.preventDefault();
       // alert(JSON.stringify(this.form))
     },
-    async getAllEdges (){
-      // this.tree = testjson
 
-      let queryForward = {"message": {"query_graph": {"nodes": {"n1": {},"n2": {"id": "HGNC:6884"}},"edges": {"e1": {"subject": "n1","object": "n2"}}}}}
-      let queryBackward = {"message": {"query_graph": {"nodes": {"n1": {},"n2": {"id": "HGNC:6884"}},"edges": {"e1": {"subject": "n2","object": "n1"}}}}}
-      // let edges = {}
-      // let nodes = {}
-
-      synonymService.allSynonyms(this.concept_search)
-      .then(async (synonymData) => {
-        // console.log(synonymData)
-        this.allSynonyms = synonymData.synonymIdArray
-        let allResults = []
-        // let allResultsForward = []
-        // let allResultsBackward = []
-        
-        for (let i = 0; i < this.allSynonyms.length; i++) {
-          const synonym = this.allSynonyms[i];
-          console.log("SYNONYM TO GET DRUG RESULTS = ", synonym)
-
-          // GET RESULTS - CURRIE AS OBJECT let allResults
-
-          queryForward.message.query_graph.nodes.n2.id = synonym
-          let queryResults = await PostService.query_raw(queryForward)
-          // console.log({queryResults})
-
-          let cleanedResultsForward = await TrapiResultClean.TrapiResultClean(queryResults);
-          // console.log("index for synonym = ", i)
-          // console.log("length = ", cleanedResultsForward.length) // allResults
-          // allResultsForward = allResultsForward.concat(cleanedResultsForward)
-          allResults = allResults.concat(cleanedResultsForward)
-
-          // GET RESULTS - CURRIE AS SUBJECT
-
-          queryBackward.message.query_graph.nodes.n2.id = synonym
-          queryResults = await PostService.query_raw(queryBackward)
-          // console.log({queryResults})
-
-          let cleanedResultsBackward = await TrapiResultClean.TrapiResultClean(queryResults);
-          // console.log("index for synonym = ", i)
-          // console.log("length = ", cleanedResultsBackward.length)
-          // allResultsBackward = allResultsBackward.concat(cleanedResultsBackward) 
-          allResults = allResults.concat(cleanedResultsBackward) 
-          
-          if(i == this.allSynonyms.length - 1){
-            // let allResults = {"allResultsBackward": allResultsBackward, "allResultsForward": allResultsForward}
-            return allResults
-          }
-        }
-      })
-      .then((allResults) => {
-        console.log("finished! => ", allResults)
-        let uniquePredArray = []
-        let predCount = {}
-        let uniqueCatArray = []
-        let catCount = {}
-        // console.log("allResults length = ", allResults.length)
-
-        for (let i = 0; i < allResults.length; i++) {
-          const result = allResults[i];
-          // console.log(i)
-          // let catFilter = {}
-
-          if(this.allSynonyms.indexOf(result.subject) > -1){
-            allResults[i].hitType = "subject"
-            if(uniqueCatArray.indexOf(result.objectCat) == -1){
-              uniqueCatArray.push(result.objectCat)
-              catCount[result.objectCat] = { "category": result.objectCat, "count": 1}
-            } else {
-              catCount[result.objectCat].count ++
-            }
-
-          } else {
-            allResults[i].hitType = "object"
-            let obCat = result.objectCat
-            if(uniqueCatArray.indexOf(result.objectCat) == -1){
-              
-              uniqueCatArray.push(result.subjectCat)
-              catCount[result.subjectCat] = { "category": result.subjectCat, "count": 1}
-            } else {
-              // console.log(catCount)
-              // console.log(uniqueCatArray)
-              // console.log(catCount[obCat])
-              // console.log(catCount[result.subjectCat][count])
-              catCount[obCat].count ++
-            }            
-          }
-          if(uniquePredArray.indexOf(result.predicate) == -1){
-              uniquePredArray.push(result.predicate)
-              predCount[result.predicate] = { "category": result.predicate, "count": 1}
-            } else {
-              predCount[result.predicate].count ++
-            }
-
-          if(i == allResults.length -1){
-            console.log(predCount)
-            console.log(catCount)
-            this.preCountTable = Object.values(predCount)
-            this.catCountTable = Object.values(catCount)
-            console.log(this.preCountTable)
-            return allResults
-
-          }
-          
-        }
-
-      })
-      .then(async (allResults)=> {
-        let groupedRes = await TrapiResultClean.TrapiResultGroup(allResults, "hitType")
-        console.log(groupedRes)
-        let subjectRes = groupedRes.subject
-        // let objectRes = groupedRes.object
-        let catGroupArray = [
-          {group: "gene", tag: "gene"}, 
-          {group: "thing", tag: "thing"},
-          {group: "process", tag: "process"},
-          {group: "phenotyp", tag: "disease"},
-          {group: "anatomic", tag: "anatomic"},
-          {group: "cell", tag: "cell"},
-          {group: "organism", tag: "gene"},
-          {group: "molecularactivity", tag: "molecularactivity"},
-          {group: "molecularentity", tag: "molecularentity"},
-          {group: "biological", tag: "biological"},
-          {group: "information", tag: "information"},
-          {group: "disease", tag: "disease"},
-          {group: "genomic", tag: "gene"},
-          {group: "protein", tag: "gene"},
-          {group: "chem", tag: "chem"},
-          {group: "sequen", tag: "seqFeature"},
-          {group: "all", tag: "all"},
-          {group: "public", tag: "publication"}
-       
-        ]        
-        
-        // "thing", "process" ,"phenotyp" , "anatomic"  , "cell", "organism",  "molecularactivity", "molecularentity", "biological,", "chem", "information", "path"]
-
-        for (let i = 0; i < subjectRes.length; i++) {
-          const res = subjectRes[i]
-          subjectRes[i].objectCatGroup = ""
-          // console.log(res)
-          let foundit = false
-          for (let n = 0; n < catGroupArray.length; n++) {
-            const groupinfo = catGroupArray[n];
-
-            if(res.objectCat.toLowerCase().includes(groupinfo.group)){
-              // console.log("result had gene in object = ", res)
-              subjectRes[i].objectCatGroup = groupinfo.tag
-              // n = catGroupArray.length
-              foundit = true
-            } 
-            if(n == catGroupArray.length - 1 && foundit == false){
-              subjectRes[i].objectCatGroup = res.objectCat
-            }
-
-          }  
-          if(i == subjectRes.length - 1){
-            groupedRes.subject = subjectRes
-            return groupedRes
-          }       
-        }        
-
-      })
-      .then( async(groupedRes)=>{
-        let objectRes = groupedRes.object
-        // let objectRes = groupedRes.object
-        let catGroupArray = [
-          {group: "gene", tag: "gene"}, 
-          {group: "thing", tag: "thing"},
-          {group: "process", tag: "process"},
-          {group: "phenotyp", tag: "disease"},
-          {group: "anatomic", tag: "anatomic"},
-          {group: "cell", tag: "cell"},
-          {group: "organism", tag: "gene"},
-          {group: "molecularactivity", tag: "molecularactivity"},
-          {group: "molecularentity", tag: "molecularentity"},
-          {group: "biological", tag: "biological"},
-          {group: "information", tag: "information"},
-          {group: "disease", tag: "disease"},
-          {group: "genomic", tag: "gene"},
-          {group: "protein", tag: "gene"},
-          {group: "chem", tag: "chem"},
-          {group: "sequen", tag: "seqFeature"},
-          {group: "all", tag: "all"},
-          {group: "public", tag: "publication"}
-       
-        ]        
-        
-        // "thing", "process" ,"phenotyp" , "anatomic"  , "cell", "organism",  "molecularactivity", "molecularentity", "biological,", "chem", "information", "path"]
-
-        for (let i = 0; i < objectRes.length; i++) {
-          const res = objectRes[i]
-          objectRes[i].subjectCatGroup = ""
-          // console.log(res)
-          let foundit = false
-          for (let n = 0; n < catGroupArray.length; n++) {
-            const groupinfo = catGroupArray[n];
-
-            if(res.objectCat.toLowerCase().includes(groupinfo.group)){
-              // console.log("result had gene in object = ", res)
-              objectRes[i].subjectCatGroup = groupinfo.tag
-              // n = catGroupArray.length
-              foundit = true
-            } 
-            if(n == catGroupArray.length - 1 && foundit == false){
-              objectRes[i].subjectCatGroup = res.objectCat
-            }
-
-          }  
-          if(i == objectRes.length - 1){
-            groupedRes.object = objectRes
-            return groupedRes
-          }       
-        }     
-      })
-      .then(async(groupedRes)=> {
-        let tree = {}
-
-
-
-        console.log("start grouping")
-        groupedRes.subject = await TrapiResultClean.TrapiResultGroup(groupedRes.subject, "objectCatGroup")
-        console.log("finished first grouping")
-
-        groupedRes.object = await TrapiResultClean.TrapiResultGroup(groupedRes.object, "subjectCatGroup")
-        console.log("groupedRes")
-        console.log(groupedRes)
-
-        let subjects = groupedRes.subject
-        let objects = groupedRes.object
-
-        let subKeys = Object.keys(subjects)
-        let objKeys = Object.keys(objects)
-
-        tree.name = this.concept_search
-        tree.children = []
-
-        let subject = {}
-        subject.name = "subject"
-        subject.children = []
-
-        let object = {}
-        object.name = "object"
-        object.children = []
-
-        for (let i = 0; i < subKeys.length; i++) {
-          const subKey = subKeys[i];
-          let child = {}
-          child.name = subKey
-          child.children = subjects[subKey]
-          subject.children.push(child)
- 
-          if(i == subKeys.length  -1) {
-
-            for (let n = 0; n < objKeys.length; n++) {
-              const objKey = objKeys[n];
-              let child = {}
-              child.name = objKey
-              child.children = subjects[objKey]
-              object.children.push(child)
-
-              if(n == objKeys.length - 1){
-
-                console.log(subject)
-                console.log(object)
-                tree.children.push(subject)
-                tree.children.push(object)
-                return tree
-
-
-              }
-
-            }
-
-          }
-
-        }
-      })
-      .then((tree) => {
-        this.tree = tree
-        this.componentKey = this.componentKey+=1
-        console.log("this.tree")
-        console.log(this.tree)
-      })
-
-  
-
+    async setSubjectExample(){
+      // this.subject = []
+      this.termNumber = 1
+      console.log("this.subject_default")
+      console.log(this.subject_default)
+      for (let i = 0; i < this.subject_default.length; i++) {
+        let curie = this.subject_default[i]
+        this.subject.push(curie)
+        console.log(curie) 
+        if(i == this.subject_default.length - 1){
+          console.log("RUNNING TERM1 SEARCH")
+          delete this.ARAXquery.message.query_graph.nodes.n01.ids
+          this.ARAXquery.message.query_graph.nodes.n00.ids = this.subject
+          this.getARAX_sbuject_object()
+        }  
+      }
 
     },
-
-    async getSynonyms (){
-      this.araxSynonyms = []
-      this.synonyms = []
-      // let array = []
-      // let test = array.filter(value => value == 2)
-      // console.log(test)
-      synonymService.allSynonyms(this.concept_search)
-      .then((results) =>{
-        this.synonyms = results.nodeNormalSyn[this.concept_search].equivalent_identifiers
-        this.araxSynonyms_equivalentids = results.araxSynonyms_equivalentids
-        this.araxSynonyms_nodes = results.araxSynonyms_nodes
-
-        return results.synonymIdArray
-
-      })
-      .then(async (synonymIdArray)=> {
-        let allDoubleCheckSyn = []
-        for (let i = 0; i < synonymIdArray.length; i++) {
-          const syn = synonymIdArray[i];
-
-          try {
-            let synSynData = await synonymService.allSynonyms(syn)
-            if(synSynData == []){
-                if(i == synonymIdArray.length - 1){
-                  return allDoubleCheckSyn
-                } 
-                  else {
-                    continue
-                  }             
-            }
-              else {
-                let newSyns = synSynData.synonymIdArray
-                allDoubleCheckSyn = allDoubleCheckSyn.concat(newSyns.filter(value => !allDoubleCheckSyn.includes(value)));
-  
-                  if(i == synonymIdArray.length - 1){
-                    return allDoubleCheckSyn
-                  }                
-              }
-
-          } 
-            catch (err) {
-              console.log(err)
-                if(i == synonymIdArray.length - 1){
-                  return allDoubleCheckSyn
-                }
-          }
-        }
-      })
-      .then((allDoubleCheckSyn) => {
-        console.log({allDoubleCheckSyn})
-      })
-    },
-
-
     async setSubject(){
+      this.subject = []
+      this.termNumber = 1
+      console.log("this.selectedRows")
+      console.log(this.selectedRows)
       for (let i = 0; i < this.selectedRows.length; i++) {
         let curie = this.selectedRows[i].curie
         this.subject.push(curie)
         console.log(curie) 
         if(i == this.selectedRows.length - 1){
+          console.log("RUNNING TERM1 SEARCH")
+          delete this.ARAXquery.message.query_graph.nodes.n01.ids
           this.ARAXquery.message.query_graph.nodes.n00.ids = this.subject
+          this.getARAX_sbuject_object()
         }  
       }
 
     },
     async setObject(){
+      this.object = []
+      this.termNumber = 2
       for (let i = 0; i < this.selectedRows.length; i++) {
         let curie = this.selectedRows[i].curie
         this.object.push(curie)
         console.log(curie)  
         if(i == this.selectedRows.length - 1){
+          delete this.ARAXquery.message.query_graph.nodes.n00.ids
           this.ARAXquery.message.query_graph.nodes.n01.ids = this.object
+          this.getARAX_sbuject_object()
         }        
       }
     },
@@ -1135,27 +728,6 @@ export default {
       this.predicates = this.predicateSelected
     },
 
-//     increasePredicates(){
-//       this.predicateSelected = [
-//       "biolink:increases_abundance_of",
-//       "biolink:increases_activity_of",
-//       "biolink:increases_expression_of",
-//       "biolink:increases_response_to",
-//       "biolink:increases_secretion_of",
-//       "biolink:increases_stability_of",
-//       "biolink:increases_synthesis_of",
-//       "biolink:has_increased_amount",
-//       "biolink:increased_amount_of",
-//       "biolink:increases_amount_or_activity_of",
-//       entity_positively_regulated_by_entity
-// entity_positively_regulates_entity
-// entity_regulated_by_entity
-// positively_regulated_by
-// positively_regulates
-// process_positively_regulated_by_process
-// process_positively_regulates_process
-//       ]
-//     },
     async getConcept_service() {
       console.log("********* getconcept");
       this.concepts_table = [];
@@ -1166,10 +738,7 @@ export default {
       this.drugs_selected = [];
       this.totalRows = 1;
       this.filter = null;
-      // console.log("NodeFinderService")
-      // console.log(NodeFinderService)
-
-      // let i = 0;
+  
       try {
         NodeFinderService.textMatch(this.concept_search)
         .then(async (data) => {
@@ -1266,83 +835,308 @@ export default {
       
     },
 
-    async getARAX() {
+    async getARAX_sbuject_object() {
       // predicateSelected
       this.searchResults = []
       // SET PREDICATES BEFORE RUNNING QUERY
-      if(this.predicateSelected.length > 0){
-      this.ARAXquery.message.query_graph.edges.e00.predicates = this.predicateSelected
+      // if(this.predicateSelected.length > 0){
+      // this.ARAXquery.message.query_graph.edges.e00.predicates = this.predicateSelected
 
+      // return new Promise(async (resolve, reject) => { // eslint-disable-line
+
+      try{
+          ARAXService.araxQuery(this.ARAXquery)
+          .then(async (ARAXQueryData)=> {
+            // console.log("ARAXQueryData")
+            // console.log(ARAXQueryData)
+          
+            let ARAXResultsArray = ARAXQueryData.split("\n")
+
+            let ARAXResults = ARAXResultsArray[ARAXResultsArray.length - 2]
+            let ARAXResultsJSON = JSON.parse(ARAXResults)
+
+            let cleanedResults = await TrapiResultClean.ARAXResultClean(ARAXResultsJSON);
+            // console.log("cleanedResults")
+            // console.log(cleanedResults)
+            return cleanedResults
+          })
+          .then(async(cleanedResults)=>{
+            // GET SUBJECT CATEGORY AND DESCRIPTION
+            for (let i = 0; i < cleanedResults.length; i++) {
+              // let result = cleanedResults[i];
+              
+              let subjectAtt = cleanedResults[i].subjectAtt
+              cleanedResults[i].subjectDes = ""
+              for (let n = 0; n < subjectAtt.length; n++) {
+                let subAtt = subjectAtt[n];
+                if(subAtt.attribute_type_id == "biolink:category"){
+                  cleanedResults[i].subjectCats = subAtt.value
+                  cleanedResults[i].subjectCat = subAtt.value[0]
+                }
+                if(subAtt.attribute_type_id == "biolink:description"){
+                  cleanedResults[i].subjectDes = subAtt.value
+                }   
+                if(n == subjectAtt.length - 1 && i == cleanedResults.length - 1){
+                  return cleanedResults
+                }
+              }          
+            }
+          })
+          .then(async(cleanedResults)=>{
+            // GET OBJECT CATEGORY AND DESCRIPTION
+            for (let i = 0; i < cleanedResults.length; i++) {
+              
+              let objectAtt = cleanedResults[i].objectAtt
+              cleanedResults[i].objectDes = ""
+              for (let n = 0; n < objectAtt.length; n++) {
+                let objAtt = objectAtt[n];
+                if(objAtt.attribute_type_id == "biolink:category"){
+                  cleanedResults[i].objectCats = objAtt.value
+                  cleanedResults[i].objectCat = objAtt.value[0]
+                }
+                if(objAtt.attribute_type_id == "biolink:description"){
+                  cleanedResults[i].objectDes = objAtt.value
+                }   
+                if(n == objectAtt.length - 1 && i == cleanedResults.length - 1){
+                  return cleanedResults
+                }
+              }
+
+              
+            }
+
+          })
+          .then(async(cleanedResults)=>{
+            console.log("DONE - cleanedResults FROM ARAX")
+            console.log(cleanedResults)
+            if(this.termNumber == 1){
+              this.searchResults1 = cleanedResults
+              // resolve()
+            }
+            else if(this.termNumber == 2){
+              this.searchResults2 = cleanedResults
+              // resolve()
+            }
+            // else{
+            //   resolve()
+            // }
+          })
+
+      } catch (err) {
+        console.log(err)
+        // reject(err)
       }
-   
-      ARAXService.araxQuery(this.ARAXquery)
-      .then(async (ARAXQueryData)=> {
-        // console.log("ARAXQueryData")
-        // console.log(ARAXQueryData)
-      
-        let ARAXResultsArray = ARAXQueryData.split("\n")
-
-        let ARAXResults = ARAXResultsArray[ARAXResultsArray.length - 2]
-        let ARAXResultsJSON = JSON.parse(ARAXResults)
-
-        let cleanedResults = await TrapiResultClean.ARAXResultClean(ARAXResultsJSON);
-        // console.log("cleanedResults")
-        // console.log(cleanedResults)
-        return cleanedResults
-      })
-      .then(async(cleanedResults)=>{
-        // GET SUBJECT CATEGORY AND DESCRIPTION
-        for (let i = 0; i < cleanedResults.length; i++) {
-          // let result = cleanedResults[i];
+    // })
+},
+    findLinksTwo(){
+      // let term1ResultCuries = []
+      // let term2ResultCuries = []
+      let matches = []
+      console.log(this.searchResults1.length)
+      console.log(this.searchResults2.length)
+      // for (let i = 0; i < 10; i++) {
+      for (let i = 0; i < this.searchResults1.length; i++) {
+        let triple1 = this.searchResults1[i];
+        // console.log("i = ", i)
+        for (let n = 0; n < this.searchResults2.length; n++) {
+        // for (let n = 0; n < 10; n++) {
           
-          let subjectAtt = cleanedResults[i].subjectAtt
-          cleanedResults[i].subjectDes = ""
-          for (let n = 0; n < subjectAtt.length; n++) {
-            let subAtt = subjectAtt[n];
-            if(subAtt.attribute_type_id == "biolink:category"){
-              cleanedResults[i].subjectCats = subAtt.value
-              cleanedResults[i].subjectCat = subAtt.value[0]
-            }
-            if(subAtt.attribute_type_id == "biolink:description"){
-              cleanedResults[i].subjectDes = subAtt.value
-            }   
-            if(n == subjectAtt.length - 1 && i == cleanedResults.length - 1){
-              return cleanedResults
-            }
-          }          
-        }
-      })
-      .then(async(cleanedResults)=>{
-        // GET OBJECT CATEGORY AND DESCRIPTION
-        for (let i = 0; i < cleanedResults.length; i++) {
-          
-          let objectAtt = cleanedResults[i].objectAtt
-          cleanedResults[i].objectDes = ""
-          for (let n = 0; n < objectAtt.length; n++) {
-            let objAtt = objectAtt[n];
-            if(objAtt.attribute_type_id == "biolink:category"){
-              cleanedResults[i].objectCats = objAtt.value
-              cleanedResults[i].objectCat = objAtt.value[0]
-            }
-            if(objAtt.attribute_type_id == "biolink:description"){
-              cleanedResults[i].objectDes = objAtt.value
-            }   
-            if(n == objectAtt.length - 1 && i == cleanedResults.length - 1){
-              return cleanedResults
+          let match = {}
+          let triple2 = this.searchResults2[n];
+            console.log(triple2.subject == triple1.object)
+
+          if(triple2.subject == triple1.object){
+        
+            // match.subject1 = triple1.subject
+            // match.object1 = triple1.object
+            // match.subject2 = triple2.subject
+            // match.object2 = triple2.object
+            console.log(triple1.subjectName)
+            console.log("triple1")
+            console.log(triple1)
+            console.log("triple2")
+            console.log(triple2)
+            match.subject1Name = triple1.subjectName
+            match.predicate1 = triple1.predicate
+            match.object1Name = triple1.objectName
+            match.subject2Name = triple2.subjectName
+            match.predicate2 = triple2.predicate
+            match.object2Name= triple2.objectName
+            matches.push(match)
+            // console.log(match)
+            if( i == this.searchResults1.length - 1 && n == this.searchResults2.length - 1){
+            // if( i < 9 && n < 9){
+              console.log("ALL matches")
+              console.log(matches)
+              this.overlapCuries = matches
             }
           }
+            if( i == this.searchResults1.length - 1 && n == this.searchResults2.length - 1){
+            // if( i < 9 && n < 9){
+              console.log("ALL matches")
+              console.log(matches)
+              this.overlapCuries = matches
+            }
 
           
         }
-
-      })
-      .then(async(cleanedResults)=>{
-        console.log("DONE - cleanedResults FROM ARAX")
-        console.log(cleanedResults)
-        this.searchResults = cleanedResults
-      })
+        
+      }
 
     },
+    findLinksThree(){
+      function onlyUnique(value, index, self) {
+        return self.indexOf(value) === index;
+      }
+
+      // let term1ResultCuries = []
+      // let term2ResultCuries = []  
+
+      let term1Subjects =  this.searchResults1.map(x => x.subject)  
+      let term1objects =  this.searchResults1.map(x => x.object)  
+      console.log(term1Subjects.length)
+      console.log(term1objects.length)
+      let term1Curies = term1Subjects.concat(term1objects)
+      console.log(term1Curies)
+      let term1CuriesUnique = term1Curies.filter(onlyUnique)
+      console.log("term1CuriesUnique")
+      console.log(term1CuriesUnique)
+
+      let term2Subjects =  this.searchResults2.map(x => x.subject)  
+      let term2objects =  this.searchResults2.map(x => x.object)  
+      console.log(term2Subjects.length)
+      console.log(term2objects.length)
+      let term2Curies = term2Subjects.concat(term2objects)
+      console.log(term2Curies)
+      let term2CuriesUnique = term2Curies.filter(onlyUnique)
+      console.log("term2CuriesUnique")
+      console.log(term2CuriesUnique)
+
+      let overlap = term2CuriesUnique.filter(x => term1CuriesUnique.indexOf(x) !== -1)
+      // let overlap21_sub_sub = term2Subjects.filter(x => term1Subjects.indexOf(x) !== -1)
+      // let overlap21_sub_obj = term2Subjects.filter(x => term1objects.indexOf(x) !== -1)
+      // let overlap21_obj_sub = term2objects.filter(x => term1Subjects.indexOf(x) !== -1)
+      // let overlap21_obj_obj = term2objects.filter(x => term1objects.indexOf(x) !== -1)
+      // console.log("overlap21_sub_sub")
+      // console.log(overlap21_sub_sub)
+      // console.log("overlap21_sub_obj")
+      // console.log(overlap21_sub_obj)
+      // console.log("overlap21_obj_sub")
+      // console.log(overlap21_obj_sub)
+      // console.log("overlap21_obj_obj")
+      // console.log(overlap21_obj_obj)
+      // let overlap = term2CuriesUnique.filter(x => term1CuriesUnique.indexOf(x) !== -1)
+      // let overlap = term2CuriesUnique.filter(x => term1CuriesUnique.indexOf(x) !== -1)
+      
+      console.log("overlap")
+      console.log(overlap)
+      // let term1match = this.searchResults1.filter(x => (x.subject == "MONDO:0005090" || x.object == "MONDO:0008062"))
+      // let term2match = this.searchResults2.filter(x => (x.subject == "MONDO:0005090" || x.object == "MONDO:0008062"))
+      // console.log("term1match")
+      // console.log(term1match)
+      // console.log("term2match")
+      // console.log(term2match)
+
+      let matchResults1 = this.searchResults1.filter(x => overlap.indexOf(x.subject) !== -1 || overlap.indexOf(x.object) !== -1)
+      let matchResults2 = this.searchResults2.filter(x => overlap.indexOf(x.subject) !== -1 || overlap.indexOf(x.object) !== -1)
+      console.log("matchResults1")
+      console.log(matchResults1)
+      console.log("matchResults2")
+      console.log(matchResults2)
+
+// "MONDO:0005090" "MONDO:0008062"
+    // var filteredArray = term1CuriesUnique.filter(function(n) {
+    //   return term2CuriesUnique.indexOf(n) !== -1;
+    // });
+    // console.log("filteredArray")
+    // console.log(filteredArray)
+
+
+    },
+
+    findLinks(){
+      let term1ResultCuries = []
+      let term2ResultCuries = []
+      console.log(this.searchResults1.length)
+      console.log(this.searchResults2.length)
+      for (let i = 0; i < this.searchResults1.length; i++) {
+        const triple1 = this.searchResults1[i];
+        term1ResultCuries.push(triple1.subject)
+        term1ResultCuries.push(triple1.object)
+        console.log(i)
+        console.log(triple1.subject)
+        console.log(triple1.object)
+        if(i == this.searchResults1.length - 1){
+          console.log("term1ResultCuries - DONE")
+          // console.log(term1ResultCuries)
+          for (let n = 0; n < this.searchResults2.length; n++) {
+            const triple2 = this.searchResults2[n];
+            term2ResultCuries.push(triple2.subject)
+            term2ResultCuries.push(triple2.object)
+            console.log(n)
+            console.log(triple1.subject)
+            console.log(triple1.object)
+
+            if(n == this.searchResults2.length - 1){
+              console.log("term2ResultCuries")
+              console.log(term2ResultCuries)              
+              this.overlapCuries = term1ResultCuries.filter(curie => term2ResultCuries.includes(curie))
+              // this.overlapCuries = term1ResultCuries.filter(curie => term2ResultCuries.includes(curie))
+              console.log("this.overlapCuries")
+              console.log(this.overlapCuries)
+              console.log(this.overlapCuries.length)
+              // console.log(this.searchResults2.length)
+            }
+
+          }
+        }
+
+        
+      }
+
+    },
+    getOverlapTriples(){
+      let matches = []
+      console.log("this.searchResults1")
+      console.log(this.searchResults1)
+      console.log("this.searchResults2")
+      console.log(this.searchResults2)
+      console.log(this.searchResults1.length)
+      console.log(this.searchResults2.length)
+      // this.overlapCuries
+      // let matches = []
+      for (let i = 0; i < this.searchResults1.length; i++) {
+        const res1 = this.searchResults1[i];
+        for (let n = 0; n < this.searchResults2.length; n++) {
+          const res2 = this.searchResults2[n];
+          let match = {}
+          this.componentKey++
+          let test = (res1.subject ==res2.subject || res1.subject == res2.Object || res1.Object == res2.subject || res1.Object == res2.object)
+          console.log(test)
+          if(res1.subject ==res2.subject || res1.subject == res2.Object || res1.Object == res2.subject || res1.Object == res2.object){
+            match.subject1Name = res1.subjectName
+            match.object1Name = res1.objectName
+            match.subject2Name = res2.subjectName
+            match.object2Name= res2.objectName
+            this.overlapCuries.push(match)
+            matches.push(match)
+            this.componentKey++
+            if(n == this.searchResults2.length - 1 && i == this.searchResults1.length - 1){
+              this.overlapCuries = matches
+            }
+
+          }
+            if(n == this.searchResults2.length - 1 && i == this.searchResults1.length - 1){
+              this.overlapCuries = matches
+            }
+          
+        }
+        
+      }
+
+
+    },
+  
     myRowClickHandler(item) {
       // this.select_concepts = this.concepts_table.filter(row => row.selected == true)
       console.log("myRowClickHandler");
@@ -1417,6 +1211,9 @@ export default {
     // ...mapActions(["fetchUserData"]),
   },
   computed: {
+    totalRows1: function(){
+      return this.searchResults1.length
+    },
     // ...mapGetters(["getuserdata"]),
     matchingPredicate: function (){
       // console.log("matchingPredicate")

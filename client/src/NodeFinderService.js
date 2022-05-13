@@ -8,7 +8,7 @@ class NodeFinderService {
     console.log("NodeFinderService started")
     // https://name-resolution-sri.renci.org/lookup?string=covid&offset=0&limit=1000
 
-    let url = "https://name-resolution-sri.renci.org/lookup?offset=0&limit=100&string=" + searchterm
+    let url = "https://name-resolution-sri.renci.org/lookup?offset=0&limit=1000&string=" + searchterm
     console.log(searchterm) 
     console.log(url) 
 
@@ -34,6 +34,24 @@ class NodeFinderService {
       let url = "https://nodenormalization-sri.renci.org/1.2/get_normalized_nodes?curie=" + searchterm + "&conflate=true" 
       try {
         const res = await axios.get(url);
+
+        const data = res.data;
+        // });
+
+        // console.log(" nodeNormalizer ***2")
+        // console.log(data)
+        resolve(data);
+      } catch (err) {
+        reject(err);
+      }
+    });
+  }
+  static nodeNormalizerBulk = (searchterms) => {
+    // console.log("started getSynonyms");
+    return new Promise(async (resolve, reject) => { // eslint-disable-line
+      let url = "https://nodenormalization-sri.renci.org/1.2/get_normalized_nodes?&conflate=true" 
+      try {
+        const res = await axios.post(url, searchterms);
 
         const data = res.data;
         // });

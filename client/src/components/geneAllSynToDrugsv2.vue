@@ -43,8 +43,13 @@
                     v-on:click="getFDA"
                     >getFDA
                   </b-button>
-
-                  <!-- <b-button
+                  <b-button
+                    style="margin-left: 20px"
+                    variant="secondary"
+                    v-on:click="getChemblMOA"
+                    >getChemblMOA
+                  </b-button>
+                  <!-- <b-button 
                     style="margin-left: 20px"
                     variant="primary"
                     v-on:click="testSection"
@@ -238,12 +243,57 @@ import FDAService from "../FDAService";
 import importResultWithDrugs from "/Users/andycrouse/Downloads/HGNC_68842hopJSON.json";
 import synonymService from "../synonymService";
 // import twohopdata from "../../../datafiles/twohopggd.json"
+// NodeFinderService
+// import NodeFinderService from "../NodeFinderService";
+
 
 var parser = require("fast-xml-parser");
 import axios from "axios";
 import * as d3 from "d3";
 
+// import FDAAll from "../../../datafiles/FDA/FDAAll"
 
+
+import FDAAll from "../../../datafiles/FDA/FDAnormalized.json"
+// import FDA11 from "../../../datafiles/FDA/FDA11"
+// import FDA12 from "../../../datafiles/FDA/FDA12"
+// import FDA13 from "../../../datafiles/FDA/FDA13"
+// import FDA14 from "../../../datafiles/FDA/FDA14"
+// import FDA15 from "../../../datafiles/FDA/FDA15"
+// import FDA16 from "../../../datafiles/FDA/FDA16"
+// import FDA17 from "../../../datafiles/FDA/FDA17"
+// import FDA18 from "../../../datafiles/FDA/FDA18"
+// import FDA19 from "../../../datafiles/FDA/FDA19"
+// import FDA20 from "../../../datafiles/FDA/FDA20"
+// import FDA21 from "../../../datafiles/FDA/FDA21"
+// import FDA22 from "../../../datafiles/FDA/FDA22"
+// import FDA23 from "../../../datafiles/FDA/FDA23"
+// import FDA24 from "../../../datafiles/FDA/FDA24"
+// import FDA25 from "../../../datafiles/FDA/FDA25"
+// import FDA26 from "../../../datafiles/FDA/FDA26"
+// import FDA27 from "../../../datafiles/FDA/FDA27"
+// import FDA28 from "../../../datafiles/FDA/FDA28"
+// import FDA29 from "../../../datafiles/FDA/FDA29"
+// import FDA30 from "../../../datafiles/FDA/FDA30"
+// import FDA31 from "../../../datafiles/FDA/FDA31"
+// import FDA32 from "../../../datafiles/FDA/FDA32"
+// import FDA33 from "../../../datafiles/FDA/FDA33"
+// import FDA34 from "../../../datafiles/FDA/FDA34"
+// import FDA35 from "../../../datafiles/FDA/FDA35"
+// import FDA36 from "../../../datafiles/FDA/FDA36"
+// import FDA37 from "../../../datafiles/FDA/FDA37"
+// import FDA38 from "../../../datafiles/FDA/FDA38"
+// import FDA39 from "../../../datafiles/FDA/FDA39"
+// import FDA40 from "../../../datafiles/FDA/FDA40"
+// import FDA41 from "../../../datafiles/FDA/FDA41"
+// import FDA42 from "../../../datafiles/FDA/FDA42"
+// import FDA43 from "../../../datafiles/FDA/FDA43"
+// import FDA44 from "../../../datafiles/FDA/FDA44"
+// import FDA45 from "../../../datafiles/FDA/FDA45"
+// import FDA46 from "../../../datafiles/FDA/FDA46"
+// import FDA47 from "../../../datafiles/FDA/FDA47"
+// import FDA48 from "../../../datafiles/FDA/FDA48"
+// import FDA49 from "../../../datafiles/FDA/FDA49"
 
 
 export default {
@@ -646,19 +696,91 @@ export default {
       hopTwo: [],
       hopOne: [],
       cleanedResults_dg: [],
-      cleanedResults_gg: []
+      cleanedResults_gg: [],
+      FDAAll: FDAAll
       // nodeGeneName
       //FAILED "HGNC:2348", "HGNC:13723", "HGNC:2514", "HGNC:2961", "HGNC:3373", reasoner_id
     };
   },
   methods: {
+    async getFDAsyn() {
+      console.log(this.FDAAll)
+    },
+    async getChemblMOA() {
+      console.log(this.FDAAll)
+      for (let i = 0; i < this.FDAAll.length; i++) {
+      // for (let i = 0; i < 10; i++) {
+        const chembID = this.FDAAll[i].molecule_chembl_id
+        console.log("chembID")
+        console.log(chembID)
+        let MOA = await FDAService.MOA(chembID)
+        this.FDAAll[i].mech_action = MOA
+        console.log(this.FDAAll[i])
+        if(i == this.FDAAll.length - 1){
+          this.saveByName("FDA_MOA.json", this.FDAAll)
+        }
+      }
+
+    },
+    // async getFDAFiles(){
+    //   // console.log(FDA11)
+    //   let FDAAll = [FDA10,	FDA11,	FDA12,	FDA13,	FDA14,	FDA15,	FDA16,	FDA17,	FDA18,	FDA19,	FDA20,	FDA21,	FDA22,	FDA23,	FDA24,	FDA25,	FDA26,	FDA27,	FDA28,	FDA29,	FDA30,	FDA31,	FDA32,	FDA33,	FDA34,	FDA35,	FDA36,	FDA37,	FDA38,	FDA39,	FDA40,	FDA41,	FDA42,	FDA43,	FDA44,	FDA45,	FDA46,	FDA47,	FDA48,	FDA49]
+  
+    //   let Fda= FDAAll.filter(x => x.molecules.length > 0)
+    //   console.log(Fda.length)
+    //   let molLength = 0
+    //   this.saveByName("FDAAll", Fda)
+    //   let testArray = []
+    //   for (let i = 0; i < Fda.length; i++) {
+    //     const element = Fda[i];
+    //     let molecules = element.molecules
+    //     molLength = molLength + molecules.length
+    //     console.log(i)
+    //     console.log("molecules.length")
+    //     console.log(molecules.length)
+    //     console.log("molLength")
+    //     console.log(molLength)
+    //     // if(molecules.length > 0){
+    //       for (let n = 0; n < molecules.length; n++) {
+    //       // for (let n = 0; n < 2; n++) {
+    //         const molecule = molecules[n];
+    //         console.log("molecule.molecule_chembl_id")
+    //         // console.log(molecule.molecule_chembl_id)
+    //         let chembl = "CHEMBL.COMPOUND:" + molecule.molecule_chembl_id
+    //         // CHEMBL.COMPOUND:CHEMBL221186
+    //         let synonyms = await NodeFinderService.nodeNormalizer(chembl)
+    //         molecule.normalize = synonyms
+    //         testArray.push(molecule)
+    //         // console.log("synonyms")
+    //         // console.log(synonyms)
+    //         // console.log("testArray")
+    //         // console.log(testArray)
+            
+    //         if(n == molecules.length - 1){
+    //           // console.log(testArray)
+    //           let name = "set = " + i
+    //           this.saveByName(name, testArray)
+    //         }
+            
+    //       }          
+    //     if(i == i == Fda.length - 1){
+    //       console.log("testArray")
+    //       console.log(testArray)
+    //       let name = "fdaNormalized"
+    //       this.saveByName(name, testArray)
+    //     }     
+
+    //   }
+
+    // },
     async getFDA(){
 
       for (let i = 0; i < 10; i++) {
         // const element = array[i];
 
         let fda = await FDAService.fdaBulk(1000,i*1000)
-        this.testSave(i,fda)
+        let fileName = "FDA4" + i
+        this.saveByName(fileName,fda)
 
         
       }
@@ -843,6 +965,26 @@ export default {
 
       // let filename = this.concept_search + id + "-FDA_JSON.json";
       let filename = id + "-FDA_JSON.json";
+      let element = document.createElement("a");
+      element.setAttribute(
+        "href",
+        "data:application/json;charset=utf-8," + encodeURIComponent(text)
+      );
+      element.setAttribute("download", filename);
+
+      element.style.display = "none";
+      document.body.appendChild(element);
+
+      element.click();
+      document.body.removeChild(element);
+    },
+
+    async saveByName(name,jsonObject) {
+      console.log("testSave - testing");
+      const text = JSON.stringify(jsonObject);
+
+      let filename = name + ".json";
+      // let filename = id + "-FDA_JSON.json";
       let element = document.createElement("a");
       element.setAttribute(
         "href",

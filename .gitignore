@@ -8,6 +8,7 @@ lerna-debug.log*
 
 # cliient folder
 /client/node_modules/
+/client/src/assets
 # /client/
 # DON'T PUBLISH THE BUILD
 /sever/public/

@@ -1,6 +1,5 @@
 import axios from 'axios';
 
-
 class FDAService {
 
   static fdaBulk = (limit, offset) => {
@@ -10,13 +9,34 @@ class FDAService {
     return new Promise(async (resolve, reject) => { // eslint-disable-line
       // https://www.ebi.ac.uk/chembl/api/data/molecule.json?max_phase=4&limit=20
 
-      let url = "https://www.ebi.ac.uk/chembl/api/data/molecule.json?max_phase=0" + append
+      let url = "https://www.ebi.ac.uk/chembl/api/data/molecule.json?max_phase=4" + append
 
       try {
         const res = await axios.get(url);
         const data = res.data;
   
         console.log("fdaBulk ran")
+        console.log(data)
+        resolve(data);
+      } catch (err) {
+        reject(err);
+      }
+    });
+  }
+
+  static MOA = (id) => {
+    console.log("started MOA")
+
+    return new Promise(async (resolve, reject) => { // eslint-disable-line
+// https://www.ebi.ac.uk/chembl/api/data/mechanism?molecule_chembl_id=CHEMBL998
+
+      let url = "https://www.ebi.ac.uk/chembl/api/data/mechanism.json?molecule_chembl_id=" + id
+
+      try {
+        const res = await axios.get(url);
+        const data = res.data;
+  
+        console.log("MOA ran")
         console.log(data)
         resolve(data);
       } catch (err) {
