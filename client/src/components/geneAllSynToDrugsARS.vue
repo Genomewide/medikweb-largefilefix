@@ -34,23 +34,23 @@
                   <b-button
                     style="margin-left: 20px"
                     variant="primary"
-                    v-on:click="getAllSynToDrugs"
-                    >getAllSynToDrugs
+                    v-on:click="tryDelay"
+                    >tryDelay
                   </b-button>
                   <b-button
                     style="margin-left: 20px"
                     variant="secondary"
-                    v-on:click="saveFile"
+                    v-on:click="eventLoop2"
                     :disabled="!validation"
-                    >saveFile
+                    >eventLoop2
                   </b-button>
 
-                  <b-button
+                  <!-- <b-button
                     style="margin-left: 20px"
                     variant="primary"
                     v-on:click="testSection"
                     >testSection
-                  </b-button>
+                  </b-button> -->
                   
                   <b-button
                     style="margin-left: 20px"
@@ -58,13 +58,13 @@
                     v-on:click="tryARS"
                     >tryARS
                   </b-button>
-                  <b-button
+                  <!-- <b-button
                     style="margin-left: 20px"
                     variant="primary"
                     v-on:click="metagraph"
                     >metagraph
-                  </b-button>
-                  <b-form-checkbox
+                  </b-button> -->
+                  <!-- <b-form-checkbox
                     style="margin-left: 20px"
                     id="checkbox-1"
                     v-model="status"
@@ -74,11 +74,11 @@
                   >
                     Check to include all results {{ status == "false" }} :
                     {{ status == false }}
-                  </b-form-checkbox>
+                  </b-form-checkbox> -->
 
-                  <div>
+                  <!-- <div>
                     State: <strong>{{ status }}</strong>
-                  </div>
+                  </div> -->
 
                   <b-icon
                     v-if="show_waiting_card"
@@ -99,7 +99,7 @@
                 </b-form>
               </b-form-group>
               Example: {{ARSrequestID}} 
-                               <b-button
+                              <b-button
                     style="margin-left: 20px"
                     variant="primary"
                     v-on:click="ARScheckResults"
@@ -166,7 +166,7 @@
                   <!-- {{synonymsArray}} -->
                 </b-card>
         </b-row>
-        <b-row>
+        <!-- <b-row>
           <b-col>
             <div>
               <b-card-group deck>
@@ -180,7 +180,6 @@
                 >
                   <template #header>
                     <h6 class="mb-0">Gene info:</h6>
-                    <!-- concept_search -->
                   </template>
                   <h4 class="mb-0">Symbol: {{ concept_search }}</h4>
 
@@ -189,22 +188,21 @@
                     <b>{{ syn.identifier }}: &nbsp;</b>{{ syn.name }} &nbsp;
                     (Hits = {{ syn.hitCount }})
                   </b-card-text>
-                  <!-- {{synonymsArray}} -->
                 </b-card>
               </b-card-group>
             </div>
           </b-col>
-        </b-row>
-        <b-row>
+        </b-row> -->
+        <!-- <b-row>
           <b-col> this is a test </b-col>
-        </b-row>
+        </b-row> -->
 
         <b-row style="margin-top: 20px">
           <b-col>
             <b-card :key="componentKey + 1000">
               <template #header>
                 <h6 class="mb-0">
-                  Gene Gene Start: {{ startTime }} - Stop: {{ stopTime }}
+                  Subject Object Predicate length = {{ARSResultsSPO.length}}
                 </h6>
               </template>
               <b-table
@@ -214,7 +212,8 @@
                 ref="timepersteptable"
                 table-layout:
                 fixed
-                :items="timeArray"
+                :items="ARSResultsSPO"
+                :fields="resultFields"
               >
               </b-table>
             </b-card>
@@ -339,8 +338,8 @@ import PubCleanService from "../PubCleanService";
 import TrapiResultClean from "../TrapiResultClean";
 import ARSService from "../ARSService";
 import ARAXService from "../ARAXService";
-import NodeService from "../NodeService";
-import metagraph from "/Users/andycrouse/Documents/GitHub/medikweb-largefilefix/datafiles/metaknowledgegraph.json"
+// import NodeService from "../NodeService";
+// import metagraph from "/Users/andycrouse/Documents/GitHub/medikweb-largefilefix/datafiles/metaknowledgegraph.json"
 // 
 // import svgtest from "./svgtest.vue"
 // import importResultWithDrugs from "/Users/andycrouse/Downloads/resultWithDrugsWithFDA.json"
@@ -393,7 +392,7 @@ export default {
       edges: [],
       subject: "chemical",
       predicate: "UMLS:C0004096",
-      concept_search: "mapk8ip3",
+      concept_search: "HGNC:6884",
       // HGNC:18481
       // HGNC:6884" MAPK8IP3
       // "HGNC:2625" CYP2D6
@@ -410,33 +409,11 @@ export default {
           "edges": {
               "e00": {
                   "constraints": [],
+                  
                   "object": "gene1",
-                  "predicates": [
-                      "biolink:decreases_degradation_of",
-                      "biolink:increases_activity_of",
-                      "biolink:increases_expression_of",
-                      "biolink:increases_stability_of",
-                      "biolink:increases_synthesis_of",
-                      "biolink:activator",
-                      "biolink:agonist",
-                      "biolink:inducer",
-                      "biolink:inverse_agonist",
-                      "biolink:partial_agonist",
-                      "biolink:positive_allosteric_modulator",
-                      "biolink:stimulates",
-                      "biolink:stimulator",
-                      "biolink:positively_regulates",
-                      "biolink:regulates",
-                      "biolink:negatively_regulates",
-                      "biolink:positively_regulates",
-                      "biolink:entity_positively_regulates_entity",
-                      "biolink:entity_negatively_regulates_entity",
-                      "biolink:entity_regulates_entity",
-                      "biolink:correlated_with",
-                      "biolink:affects"
-
-                  ],
+                  "predicates": ["biolink:affects"],
                   "subject": "gene0"
+                  
               }
  
           },
@@ -449,19 +426,45 @@ export default {
                   ],
                   "constraints": [],
                   "ids": [
-      "HGNC:6884",
-        "NCBIGene:23162",
-        "UMLS:C1417026",
-        "RGD:1563691",
-        "NCBIGene:302983",
-        "MGI:1353598",
-        "NCBIGene:30957",
-        "PR:Q9UPT6",
-        "UniProtKB:Q9UPT6",
-        "PR:000010162",
-        "NCBIGene:176349", "UMLS:C1432412", "wb:WBGene00006755", "WormBase:WBGene00006755",
-        "MESH:C581624", "UMLS:C3657327", "RGD:1563691", "MESH:C554781", "UMLS:C2974800"
+      "HGNC:6884"
                   ],
+                  "is_set": false
+              },
+              "gene1": {
+                "categories": [
+                    "biolink:Protein",
+                    "biolink:Gene"
+                ],
+                "constraints": [],
+          
+                "is_set": false
+            }
+          }
+      }
+  },
+  "submitter": "UI Team ABC",
+  "stream_progress": true
+},
+      query_hop2: {
+  "message": {
+      "query_graph": {
+          "edges": {
+              "e00": {
+                  "constraints": [],
+                  
+                  "object": "gene1",
+                  "predicates": ["biolink:affects"],
+                  "subject": "gene0"
+                  
+              }
+ 
+          },
+          "nodes": {
+      
+              "gene0": {
+                  "categories": ["biolink:ChemicalMixture"],
+                  "constraints": [],
+               
                   "is_set": false
               },
               "gene1": {
@@ -655,7 +658,34 @@ export default {
       ],
       badChemResults: ["UMLS:C0066772"],
       rawresultstosave: null,
-
+      resultFields: [
+        {
+          key: "object",
+          label: "Object",
+          sortable: true,
+          tdClass: "colwidth",
+        },
+        {
+          key: "objectID",
+          label: "object ID",
+        },
+        {
+          key: "predicate",
+          label: "Predicate",
+        },
+        {
+          key: "subject",
+          label: "Subject",
+          sortable: true,
+        },
+        {
+          key: "subjectID",
+          label: "Subject ID",
+          sortable: true,
+          tdClass: "colwidth",
+        }
+   
+      ],
       fields: [
         {
           key: "agent",
@@ -728,100 +758,29 @@ export default {
       resultSetIDs: [],
       ARSResultStatus: {},
       ARSJobId: "bc32c185-6a97-4aff-b467-aa2fac22e275",
-      // 0c2bff46-f20a-4761-859b-50b4d0b0ce83  Object from aragorn
+      ARSResults: [],
+      ARSResultsSPO: [],
 
-// nodeGeneName
-      //FAILED "HGNC:2348", "HGNC:13723", "HGNC:2514", "HGNC:2961", "HGNC:3373", reasoner_id
-        //       {
-        //     "subject": "ClinicalFinding",
-        //     "object": "ClinicalFinding",
-        //     "predicate": "correlated_with",
-        //     "api": {
-        //         "name": "Multiomics Wellness KP API",
-        //         "smartapi": {
-        //             "metadata": "https://raw.githubusercontent.com/Hadlock-Lab/multiomics_wellness_kp/main/multiomics_wellness.yaml",
-        //             "id": "02af7d098ab304e80d6f4806c3527027",
-        //             "ui": "https://smart-api.info/ui/02af7d098ab304e80d6f4806c3527027"
-        //         },
-        //         "x-translator": {
-        //             "component": "KP",
-        //             "team": [
-        //                 "Multiomics Provider",
-        //                 "Service Provider"
-        //             ],
-        //             "infores": "infores:biothings-multiomics-wellness"
-        //         }
-        //     }
-        // },
     };
   },
   methods: {
-    metagraph(){
-      let example = metagraph.associations[0]
-      let associations = metagraph.associations
-      console.log("example")
-      console.log(example)
-      let metaTable =[]
-      for (let i = 0; i < associations.length; i++) {
-      // for (let i = 0; i < 10; i++) {
-        let el = associations[i];
-        let meta = {}
-        meta.subject = el.subject
-        meta.object = el.object
-        meta.predicate = el.predicate
-        meta.name = el.api.name
-        meta.component = el.api["x-translator"].component
-        meta.team = el.api["x-translator"].team
-        meta.infores = el.api["x-translator"].infores
-        metaTable.push(meta)
-        console.log("meta")
-        // console.log(meta)
-        // console.log("el")
-        // console.log(el)
-        if(i == associations.length - 1){
-        // if(i == 9){
-          this.saveThisFile(metaTable, " metaTable")
-        }
+    async tryDelay(){
+      for (let index = 0; index < 10; index++) {
+        // const element = array[index];
+        console.log( new Date())
+        await new Promise(resolve => setTimeout(resolve, 1000))
 
         
       }
       
-
-    },
-    showModal() {
-      this.$refs["my-modal"].show();
-      this.show_waiting_card = false;
-    },
-    async getAllSynOrtho (){
-      let symbol = this.concept_search
-      symbol = "mapk8ip3"
-      let ensembleIDData = await NodeService.getAllSynOrtho(symbol)
-      console.log(ensembleIDData)
-      let ensemblIDs = ensembleIDData.data[0].homologies
-      console.log("ensemblIDs")
-      console.log(ensemblIDs)
-
-      for (let i = 0; i < ensemblIDs.length; i++) {
-        const ensemblID = ensemblIDs[i].id
-        console.log("ensemblIDs[i].species")
-        console.log(ensemblIDs[i].species)
-
-        let orthoXREF = await NodeService.getXrefs(ensemblID)
-        console.log("orthoXREF")
-        console.log(orthoXREF)  
-
-      }
-
-    },
-    openPubmed: function (pmid) {
-      window.open("https://pubmed.ncbi.nlm.nih.gov/" + pmid, "_blank");
     },
     async tryARS() {
+      this.ARSResultsSPO = []
 
-    // SET QUERY WITH SEARCH TERM
-    // this.query.message.query_graph.nodes.n00.ids = [this.concept_search]
+      // SET QUERY WITH SEARCH TERM
+      // this.query.message.query_graph.nodes.n00.ids = [this.concept_search]
 
-    // GET GENES REGULATING TARGET
+      // GET GENES REGULATING TARGET
       console.log("------ ARSService REQUEST STARTED")
       // console.log(ARSService)
       let ARSRequest = await ARSService.ARSQuery(this.query)
@@ -834,12 +793,134 @@ export default {
 
     },
 
+    async ARS_hoptwo() {
+      this.ARSResultsSPO = []
+
+        // SET QUERY WITH SEARCH TERM
+        // this.query.message.query_graph.nodes.n00.ids = [this.concept_search]
+
+        // GET GENES REGULATING TARGET
+        console.log("------ ARSService REQUEST STARTED")
+        // console.log(ARSService)
+        let ARSRequest = await ARSService.ARSQuery(this.query)
+        console.log("ARSRequest")
+        console.log(ARSRequest)
+        // ARSStatus
+        let ARSrequestID = ARSRequest.pk
+        this.ARSrequestID = ARSrequestID
+        // this.ARScheckResults()
+
+    },
+
+      async eventLoop2() {
+      // concept_search
+      console.log("------ eventLoop2 REQUEST STARTED")
+      // console.log(ARSService)
+      let ARSRequest = await ARSService.ARSQuery(this.query)
+      console.log("ARSRequest")
+      console.log(ARSRequest)
+      // ARSStatus
+      let ARSrequestID = ARSRequest.pk
+      this.ARSrequestID = ARSrequestID
+      
+      // this.progressTable = []
+      // this.progressObject= {}
+      // this.geneIDList = []
+      // let length = this.hgncAll.length;
+      // let i = 0;
+
+      const EventEmitter = require("events");
+      class Emitter extends EventEmitter {}
+      const eventEmitter = new Emitter();
+      eventEmitter.on("event", async () => {
+
+      ARSService.ARSStatus(this.ARSrequestID)
+        .then(async (ARSStatus) => {
+
+        console.log("ARSStatus")
+        console.log(ARSStatus)
+        let resultList  = ARSStatus.children
+
+        if(resultList.length< 15){
+          console.log("less than 15")
+          
+          await new Promise(resolve => setTimeout(resolve, 3000));
+          console.log(new Date())
+          eventEmitter.emit("event")
+        } else {
+          console.log("*** resultList = ", resultList)
+          for (let i = 0; i < resultList.length; i++) {
+            console.log("----- ----- ----- ----- -----")
+
+
+            const resInfo = resultList[i];
+            console.log(resInfo)
+            // console.log(resInfo.actor.agent)
+            // console.log(resInfo.code)
+            // console.log(resInfo.status)        
+            let result = await ARSService.ARSStatus(resInfo.message)
+            console.log("result = ", result)
+
+            let agent = resInfo.actor.agent
+            this.ARSResultStatus[agent] = {}
+            this.ARSResultStatus[agent]["agent"] = agent
+            this.ARSResultStatus[agent]["code"] = resInfo.code
+            this.ARSResultStatus[agent]["status"] = resInfo.status
+            this.ARSResultStatus[agent]["id"] = resInfo.message
+            this.ARSResultStatus[agent]["resultCount"] = null
+            this.ARSResultStatus[agent]["results"] = result
+
+            // CHECK IF THERE IS A KNOWLEDGE GRAPH
+            if(Object.prototype.hasOwnProperty.call(result, "message")){
+              console.log("FOUND MESSAGE")
+              if(Object.prototype.hasOwnProperty.call(result.message, "knowledge_graph")){
+                console.log("FOUND KNOWLEDGE GRAPH")
+                // if(result.message.results.length > 0){
+                  // console.log("HAS MORE THAN 0 RESULTS")
+                  this.ARSResultStatus[agent].resultCount = result.message.results.length
+
+                
+              }
+            }
+            this.resultSetIDs.push(this.ARSResultStatus[agent])
+
+            
+          // NOTE WHEN FINISHED
+            if(i == resultList.length - 1 ){
+              console.log("FINISHED GETTING ALL THE RESULTS")
+              console.log(this.resultSetIDs)
+              console.log("this.ARSResultStatus")
+              console.log(this.ARSResultStatus)
+              let checkRerun = this.resultSetIDs.filter(x => x.resultCount == null && x.status != "Error")
+              console.log("checkRerun = ", checkRerun)
+              if(checkRerun.length > 0){
+                console.log("WE HAVE TO CHECK AGAIN - NOT DONE")
+                await new Promise(resolve => setTimeout(resolve, 3000));
+                eventEmitter.emit("event");
+                
+              } else {
+                return
+              }
+              
+            }    
+          }
+        }
+
+        })
+
+      });
+
+      eventEmitter.emit("event");
+    },
+
     async ARScheckResults () {
+      this.ARSResultsSPO = []
       // let ARSStatus = await ARSService.ARSStatus(this.ARSrequestID)
       console.log("##### ##### ##### ##### ##### ##### ##### ")
       console.log("##### ARSStatus checked by rerunning")
       // console.log(ARSStatus)
       this.resultSetIDs = []
+      // let continue = true
 
       ARSService.ARSStatus(this.ARSrequestID)
       .then(async (ARSStatus) => {
@@ -852,10 +933,12 @@ export default {
 
 
           const resInfo = resultList[i];
-          console.log(resInfo.actor.agent)
-          console.log(resInfo.code)
-          console.log(resInfo.status)        
+            console.log(resInfo)
+            // console.log(resInfo.actor.agent)
+            // console.log(resInfo.code)
+            // console.log(resInfo.status)        
           let result = await ARSService.ARSStatus(resInfo.message)
+          console.log("result = ", result)
 
           let agent = resInfo.actor.agent
           this.ARSResultStatus[agent] = {}
@@ -888,18 +971,18 @@ export default {
                 
                 let resultObj = {"agent": resInfo.actor.agent,"status": resInfo.status, "code": resInfo.code, "id": resInfo.message, "resultCount":  result.message.results.length}
                 this.resultSetIDs.push(resultObj)
-                // let cleanedResults = await TrapiResultClean.TrapiResultClean(result)
-                // console.log("cleanedResults")
-                // console.log(cleanedResults)
-              // }
+              
             }
           }
 
           
         // NOTE WHEN FINISHED
-          if(i == resultList.length - 1){
+          if(i == resultList.length - 1 ){
             console.log("FINISHED GETTING ALL THE RESULTS")
-            return
+            console.log(this.resultSetIDs)
+            console.log("this.ARSResultStatus")
+            console.log(this.ARSResultStatus)
+            // return
           }    
         }
 
@@ -910,6 +993,7 @@ export default {
         console.log(this.ARSResultStatus)
         this.resultSetIDs = []
         console.log(keys)
+
         for (let i = 0; i < keys.length; i++) {
           const id = keys[i];
           console.log("id")
@@ -921,28 +1005,95 @@ export default {
           if(Object.prototype.hasOwnProperty.call(this.ARSResultStatus[id].results, "message")){
             if(Object.prototype.hasOwnProperty.call(this.ARSResultStatus[id].results.message, "knowledge_graph")){
               console.log("CLEANING RESULTS")
+              console.log(this.ARSResultStatus[id].results)
               let cleanedResults = await TrapiResultClean.TrapiResultClean(this.ARSResultStatus[id].results)
               console.log(cleanedResults)
 
-            }
+              this.ARSResults = this.ARSResults.concat(cleanedResults) 
 
+              if (i == keys.length - 1){
+                return
+              }     
+
+            }
+          }    
+          else if (i == keys.length - 1){
+            return
+
+          }      
+        }
+      }) 
+      .then(async () => {
+
+        // this.synonyms 
+        let synData = await synonymService.normalizedSynonyms(this.concept_search)
+
+        this.synonyms = synData[this.concept_search].equivalent_identifiers.map(x => x.identifier)
+        console.log("this.synonyms")
+        console.log(this.synonyms)
+        return
+
+      })
+      .then(async () => {
+        console.log("this.ARSResults")
+        console.log(this.ARSResults)
+        // let tempResults = []
+
+        for (let i = 0; i < this.ARSResults.length; i++) {
+          
+          const res = this.ARSResults[i];
+          let resSPO = {}
+          // console.log("this.synonyms.indexOf(res.subject)")
+          // console.log(this.synonyms.indexOf(res.subject))
+          if(this.synonyms.indexOf(res.subject) != -1){
+          resSPO.object = res.objectName
+          resSPO.objectID = res.object
+          resSPO.predicate = res.predicate
+          resSPO.subject = res.subjectName
+          resSPO.subjectID = res.subject
+
+
+          this.ARSResultsSPO.push(resSPO)
+            if(i == this.ARSResults.length - 1){
+              console.log("this.ARSResultsSPO")
+              console.log(this.ARSResultsSPO)
+            }
           }
 
-
-
-
-
-          // if( this.ARSResultStatus[id].agent == "ara-aragorn"){
-          //   console.log("TESTING INFO FROM ARAGORM")
-          //   // console.log(this.ARSResultStatus[id].message.knowledge_graph.edges["0c2bff46-f20a-4761-859b-50b4d0b0ce83"])
-          //   let test = this.ARSResultStatus[id].results.message.knowledge_graph.edges["0c2bff46-f20a-4761-859b-50b4d0b0ce83"]
-          //   console.log(JSON.stringify(test))
-          //   console.log(this.ARSResultStatus[id].results.message.knowledge_graph.edges["0c2bff46-f20a-4761-859b-50b4d0b0ce83"])
-          //   // console.log(this.ARSResultStatus[id].message.knowledge_graph)
+          // if(res.subject == "PR:000010162"){
+          //   console.log("PR:000010162")
+          //   console.log(res)
           // }
+
           
         }
-      })    
+      })   
+      .then(async ()=> {
+        let resultObjects = []
+        for (let i = 0; i < this.ARSResultsSPO.length; i++) {
+          const el = this.ARSResultsSPO[i];
+          // console.log("objectID")
+          // console.log(el.objectID)
+          if(resultObjects.indexOf(el.objectID) == -1){
+            resultObjects.push(el.objectID)
+          }
+          if(i == this.ARSResultsSPO.length -1){
+            return resultObjects
+          }
+          
+        }
+
+      })
+      .then(async(resultObjects)=>{
+        console.log("resultObjects")
+        console.log(resultObjects)
+        this.query.message.query_graph.nodes.gene0.ids = resultObjects
+        this.query.message.query_graph.nodes.gene1.categories = ["biolink:ChemicalMixture"]
+        console.log(this.query)
+        // this.tryARS()
+        console.log("####### END #######")
+        
+      })
 
 
     },

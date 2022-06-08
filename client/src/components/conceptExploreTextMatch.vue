@@ -528,7 +528,7 @@ export default {
   // },
   data() {
     return {
-      getCategories: true,
+      getCategories: false,
       predicateSelected: [],
       predicateTree: predicateTree,
       predicateList: predicateList,

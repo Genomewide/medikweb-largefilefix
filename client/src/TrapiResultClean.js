@@ -28,18 +28,24 @@ class TrapiResultClean {
             let edge = edges[key]
   
             let subject = edge.subject
+            // if(subject == "PR:000010162"){
+            //   console.log("nodes[subject]")
+            //   console.log(nodes[subject])
+            // }
             let object = edge.object
-            console.log("nodes[subject]")
-            console.log(nodes[subject])
+            // console.log("nodes[subject]") 
+            // console.log(nodes[subject])
             data.edgeinfo = edge
             data.object = edge.object
             data.predicate = edge.predicate
-            data.relation = edge.relation
+            // data.relation = edge.relation
             data.subject = edge.subject
             data.subjectName = nodes[subject].name
-            data.subjectCat = nodes[subject].category
+            data.subjectCats = nodes[subject].categories
+            data.subjectCat = nodes[subject].categories[0]
             data.objectName = nodes[object].name
-            data.objectCat = nodes[object].category
+            data.objectCats = nodes[object].categories
+            data.objectCat = nodes[object].categories[0]
             data.objectAtt = nodes[object].attributes
             data.subjectAtt = nodes[subject].attributes
             //

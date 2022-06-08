@@ -46,6 +46,27 @@ let getSynonyms = (searchterm) => {
 
 class synonymService {
 
+  static normalizedSynonyms = (searchterm) => {
+    // console.log("#### started getSynonyms  - seatrchterm = ", searchterm)
+    return new Promise(async (resolve, reject) => { // eslint-disable-line
+      let url = "https://nodenormalization-sri.renci.org/1.2/get_normalized_nodes?curie=" + searchterm + "&conflate=true" 
+      console.log("url")
+      console.log(url)
+      try {
+        const res = await axios.get(url);
+  
+        const data = res.data;
+        // });
+  
+        console.log(" normalizedSynonyms data = ")
+        console.log(data)
+        resolve(data);
+      } catch (err) {
+        reject(err);
+      }
+    });
+  }
+
   static chemSynonyms = (searchterm) => {
     console.log("started allSynonyms - seatrchterm ");
     return new Promise(async (resolve, reject) => { // eslint-disable-line
