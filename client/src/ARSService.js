@@ -39,7 +39,7 @@ class ARSService {
         const data = res.data;
         // });
   
-        console.log("ARSStatus ran")
+        // console.log("ARSStatus ran")
         // console.log(data)
         resolve(data);
       } catch (err) {

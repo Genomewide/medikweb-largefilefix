@@ -760,6 +760,7 @@ export default {
       ARSJobId: "bc32c185-6a97-4aff-b467-aa2fac22e275",
       ARSResults: [],
       ARSResultsSPO: [],
+      count: 0
 
     };
   },
@@ -832,11 +833,12 @@ export default {
       const EventEmitter = require("events");
       class Emitter extends EventEmitter {}
       const eventEmitter = new Emitter();
+      this.count = 0
       eventEmitter.on("event", async () => {
 
       ARSService.ARSStatus(this.ARSrequestID)
-        .then(async (ARSStatus) => {
-
+      .then(async (ARSStatus) => {
+        // let count = 1
         console.log("ARSStatus")
         console.log(ARSStatus)
         let resultList  = ARSStatus.children
@@ -848,6 +850,7 @@ export default {
           console.log(new Date())
           eventEmitter.emit("event")
         } else {
+          
           console.log("*** resultList = ", resultList)
           for (let i = 0; i < resultList.length; i++) {
             console.log("----- ----- ----- ----- -----")
@@ -872,9 +875,9 @@ export default {
 
             // CHECK IF THERE IS A KNOWLEDGE GRAPH
             if(Object.prototype.hasOwnProperty.call(result, "message")){
-              console.log("FOUND MESSAGE")
+              // console.log("FOUND MESSAGE")
               if(Object.prototype.hasOwnProperty.call(result.message, "knowledge_graph")){
-                console.log("FOUND KNOWLEDGE GRAPH")
+                // console.log("FOUND KNOWLEDGE GRAPH")
                 // if(result.message.results.length > 0){
                   // console.log("HAS MORE THAN 0 RESULTS")
                   this.ARSResultStatus[agent].resultCount = result.message.results.length
@@ -888,14 +891,18 @@ export default {
           // NOTE WHEN FINISHED
             if(i == resultList.length - 1 ){
               console.log("FINISHED GETTING ALL THE RESULTS")
-              console.log(this.resultSetIDs)
-              console.log("this.ARSResultStatus")
-              console.log(this.ARSResultStatus)
+              // console.log(this.resultSetIDs)
+              // console.log("this.ARSResultStatus")
+              // console.log(this.ARSResultStatus)
               let checkRerun = this.resultSetIDs.filter(x => x.resultCount == null && x.status != "Error")
-              console.log("checkRerun = ", checkRerun)
-              if(checkRerun.length > 0){
+              // console.log("checkRerun = ", checkRerun)
+              if(checkRerun.length > 0 && this.count < 3){
                 console.log("WE HAVE TO CHECK AGAIN - NOT DONE")
-                await new Promise(resolve => setTimeout(resolve, 3000));
+                console.log("count = ", this.count)
+                await new Promise(resolve => setTimeout(resolve, 5000));
+                this.resultSetIDs = []
+                this.ARSResultStatus = {}
+                this.count++
                 eventEmitter.emit("event");
                 
               } else {
@@ -907,8 +914,50 @@ export default {
         }
 
         })
+        .then(async () => {
+          console.log("WENT TO NEXT STEP TO CLEAN RESULTS")
 
-      });
+          let keys = Object.keys(this.ARSResultStatus)
+          console.log(this.ARSResultStatus)
+          this.resultSetIDs = []
+          console.log(keys)
+
+          for (let i = 0; i < keys.length; i++) {
+            const id = keys[i];
+            console.log("id")
+            console.log(id)
+            this.resultSetIDs.push(this.ARSResultStatus[id])
+            console.log("this.ARSResultStatus[id]")
+            console.log(this.ARSResultStatus[id])
+            
+            if(Object.prototype.hasOwnProperty.call(this.ARSResultStatus[id].results, "message")){
+              if(Object.prototype.hasOwnProperty.call(this.ARSResultStatus[id].results.message, "knowledge_graph")){
+                console.log("CLEANING RESULTS")
+                console.log(this.ARSResultStatus[id].results)
+                let cleanedResults = await TrapiResultClean.TrapiResultClean(this.ARSResultStatus[id].results)
+                console.log(cleanedResults)
+
+                this.ARSResults = this.ARSResults.concat(cleanedResults) 
+
+                if (i == keys.length - 1){
+                  console.log("this.ARSResults")
+                  console.log(this.ARSResults)
+                  return
+                }     
+
+              }
+            }    
+            else if (i == keys.length - 1){
+                  console.log("this.ARSResults")
+                  console.log(this.ARSResults)
+              return
+
+            }      
+          }
+        }) 
+
+      })
+
 
       eventEmitter.emit("event");
     },
