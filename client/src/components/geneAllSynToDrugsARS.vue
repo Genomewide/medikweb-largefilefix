@@ -1,6 +1,6 @@
 <template>
   <div class="container" style="margin-bottom: 100px">
-    <h1 class="text-center">ARS GENE TO GENE TO DRUG QUERY NEXT</h1>
+    <h1 class="text-center">ARS DRUG TO GENE QUERY NEXT</h1>
 
     <div style="margin-top: 20px">
       <b-modal
