@@ -17,7 +17,8 @@ import geneAllSynToDrugsv2 from './components/geneAllSynToDrugsv2.vue';
 import geneAllSynToDrugsARS from './components/geneAllSynToDrugsARS.vue';
 import conceptExploreTextMatch from './components/conceptExploreTextMatch.vue';
 import conceptConnect from './components/conceptConnect.vue';
-
+// import xml from './components/XDM-220618-012821/IHE_XDM/CE001/DOC00001.XML';
+// /Users/andycrouse/Documents/GitHub/medikweb_dev/client/src/components/XDM-220618-012821/IHE_XDM/CE001/DOC00001.XML
 // client/src/components/conceptExplorePlus.vue geneAllSynToDrugs geneAllSynToDrugsv2 conceptExploreTextMatch conceptConnect
 
 Vue.use(Router)
@@ -37,6 +38,7 @@ Vue.use(Router)
         name: 'home', 
         component: home 
       },
+
       { 
         path: '/arsexplorer', 
         name: 'arsexplorer', 

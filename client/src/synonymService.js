@@ -33,10 +33,7 @@ let getSynonyms = (searchterm) => {
       const res = await axios.get(url);
 
       const data = res.data;
-      // });
 
-      // console.log(" ARAX***2")
-      // console.log(data)
       resolve(data);
     } catch (err) {
       reject(err);
@@ -47,19 +44,20 @@ let getSynonyms = (searchterm) => {
 class synonymService {
 
   static normalizedSynonyms = (searchterm) => {
-    // console.log("#### started getSynonyms  - seatrchterm = ", searchterm)
+    console.log("#### started getSynonyms  - seatrchterm = ", searchterm)
     return new Promise(async (resolve, reject) => { // eslint-disable-line
-      let url = "https://nodenormalization-sri.renci.org/1.2/get_normalized_nodes?curie=" + searchterm + "&conflate=true" 
+      let url = "https://arax.ncats.io/api/arax/v1.2/entity"
+
+      // let url = "https://nodenormalization-sri.renci.org/1.2/get_normalized_nodes?curie=" + searchterm + "&conflate=true" 
       console.log("url")
       console.log(url)
       try {
-        const res = await axios.get(url);
-  
-        const data = res.data;
-        // });
-  
-        console.log(" normalizedSynonyms data = ")
-        console.log(data)
+        // const res = await axios.get(url);
+        // const res = await axios.post(url, {"terms":["HGNC:6884", "HGNC:1388"]});
+        const res = await axios.post(url, {"terms":[searchterm]});
+        const data = res.data;  
+        // console.log(" normalizedSynonyms data = ")
+        // console.log(data)
         resolve(data);
       } catch (err) {
         reject(err);

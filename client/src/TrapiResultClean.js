@@ -16,7 +16,7 @@ class TrapiResultClean {
         let edges = TrapiResults.message.knowledge_graph.edges 
         let edgeKeys = Object.keys(edges)
 
-        // console.log("length = ", edgeKeys.length)
+        console.log("length = ", edgeKeys.length)
 
         if(edgeKeys.length > 0){
 
@@ -54,6 +54,11 @@ class TrapiResultClean {
             data.edgeprovider = ""
             data.edgepublicationsText = {}
             data.edgepublications= []
+
+            if(index < 10){
+              console.log("edge")
+              console.log(edge)
+            }
 
             for (let index = 0; index < data.edgeinfo.attributes.length; index++) {
               const att = data.edgeinfo.attributes[index];

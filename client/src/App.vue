@@ -62,6 +62,7 @@
     <b-nav-item ><router-link to="/geneAllSynToDrugsv2">geneAllSynToDrugsv2</router-link></b-nav-item>
     <b-nav-item ><router-link to="/conceptExploreTextMatch">conceptExploreTextMatch</router-link></b-nav-item>
     <b-nav-item ><router-link to="/conceptConnect">conceptConnect</router-link></b-nav-item>
+    <b-nav-item ><router-link to="/xml">xml</router-link></b-nav-item>
     <!-- <div>svgtest conceptExplorePlus geneAllSynToDrugs geneAllSynToDrugsARS conceptConnect
       <svg width = "100" height = "100">
         <circle cx = "50" cy = "50" r= "40" stroke = "deeppink" stroke-width="2" fill = "#ffe6ee" />
