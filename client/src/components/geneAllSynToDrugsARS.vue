@@ -57,24 +57,24 @@
                     v-on:click="tryARS2"
                     >tryARS2
                   </b-button>                  
-                  <b-button
+                  <!-- <b-button
                     style="margin-left: 20px"
                     variant="primary"
                     v-on:click="tryARS"
                     >tryARS
-                  </b-button>
-                  <b-button
+                  </b-button> -->
+                  <!-- <b-button
                     style="margin-left: 20px"
                     variant="success"
                     v-on:click="getAllOrthSyns"
                     >getAllOrthSyns
-                  </b-button>
-                  <b-button
+                  </b-button> -->
+                  <!-- <b-button
                     style="margin-left: 20px"
                     variant="success"
                     v-on:click="trans2R"
                     >trans2R
-                  </b-button>
+                  </b-button> -->
                   <!-- <b-form-checkbox
                     style="margin-left: 20px"
                     id="checkbox-1"
@@ -156,7 +156,39 @@
                     <!-- concept_search -->
                   </template>
                   <!-- <h4 class="mb-0">Symbol: {{ concept_search }}</h4> -->
-
+                  <br />
+                      <div v-if = "showARS">
+        <!-- <h3 class="p-3 text-center">Vue.js - Display a list of items with v-for</h3> -->
+        <table class="table table-striped table-bordered" >
+            <thead>
+                <tr>
+                    <th>Name</th>
+                    <th>Code</th>
+                    <th>Status</th>
+                    <th>ID</th>
+                    <th>Count</th>
+                    <th>Icon</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr v-for="result in ARSResultStatus" :key="result.id">
+                    <td>{{result.agent}} </td>
+                    <td>{{result.code}}</td>
+                    <td>{{result.status}}</td>
+                    <!-- <td>{{result.status}}</td> -->
+                    <td>{{result.id}}</td>
+                    <td>{{result.resultCount}}</td>
+                    <td><b-icon
+                    v-if="result.status == 'Running'"
+                    style="margin-left: 5px"
+                    icon="circle-fill"
+                    animation="throb"
+                    font-scale="2"
+                  ></b-icon></td>
+                </tr>
+            </tbody>
+        </table>
+    </div> 
                   <br />
                 <b-table
                   bordered
@@ -360,7 +392,7 @@ import synonymService from "../synonymService";
 
 var parser = require("fast-xml-parser");
 import axios from "axios";
-import * as d3 from "d3";
+// import * as d3 from "d3";
 
 // import {
 //   breadcrumbTrail,
@@ -415,58 +447,100 @@ export default {
 
       // KEEP THIS AS TEMPLATE FOR QUERIES
       query2: {
-  "message": {
-      "query_graph": {
-          "edges": {
-              "e00": {
-                  "constraints": [],
-                  "subject": "drug",
-                  
-                  "predicates": ["biolink:affects"],
-                  "object": "gene",
-                  
-                  
-              }
- 
-          },
-          "nodes": {
+        "message": {
+            "query_graph": {
+                "edges": {
+                    "e00": {
+                        "constraints": [],
+                        "subject": "drug",
+                        
+                        "predicates": ["biolink:affects"],
+                        "object": "gene",
+                        
+                        
+                    }
       
-              "gene": {
-                  "categories": [
-                      "biolink:Protein",
-                      "biolink:Gene"
-                  ],
-                  "constraints": [],
-                  "ids": [
-                    "HGNC:6884"
-                  ],
-                  "is_set": false
-              },
-              "drug": {
-                  "categories": [
-                      "biolink:Protein",
-                      "biolink:Gene"
-                  ],
-                "constraints": [],
-          
-                "is_set": false
+                },
+                "nodes": {
+            
+                    "gene": {
+                        "categories": [
+                            "biolink:Protein",
+                            "biolink:Gene"
+                        ],
+                        "constraints": [],
+                        "ids": [
+                          "HGNC:6884"
+                        ],
+                        "is_set": false
+                    },
+                    "drug": {
+                        "categories": [
+                            "biolink:Protein",
+                            "biolink:Gene"
+                        ],
+                      "constraints": [],
+                
+                      "is_set": false
+                  }
+                }
             }
-          }
-      }
-  },
-  "submitter": "UI Team ABC",
-  "stream_progress": true
-},
+        },
+        "submitter": "UI Team ABC",
+        "stream_progress": true
+      },
       query: {
+        "message": {
+            "query_graph": {
+                "edges": {
+                    "e00": {
+                        "constraints": [],
+                        "subject": "drug",
+                        
+                        "predicates": ["biolink:affects"],
+                        "object": "gene",
+                        
+                        
+                    }
+      
+                },
+                "nodes": {
+            
+                    "gene": {
+                        "categories": [
+                            "biolink:Protein",
+                            "biolink:Gene"
+                        ],
+                        "constraints": [],
+                        "ids": [
+                          "HGNC:6884"
+                        ],
+                        "is_set": false
+                    },
+                    "drug": {
+                      "categories": [
+                          "biolink:ChemicalMixture"
+                      ],
+                      "constraints": [],
+                
+                      "is_set": false
+                  }
+                }
+            }
+        },
+        "submitter": "UI Team ABC",
+        "stream_progress": true
+      },
+query_gg: {
   "message": {
       "query_graph": {
           "edges": {
               "e00": {
                   "constraints": [],
-                  "subject": "drug",
+                  "subject": "regGene",
                   
                   "predicates": ["biolink:affects"],
-                  "object": "gene",
+                  "object": "targetGene"
                   
                   
               }
@@ -474,7 +548,7 @@ export default {
           },
           "nodes": {
       
-              "gene": {
+              "targetGene": {
                   "categories": [
                       "biolink:Protein",
                       "biolink:Gene"
@@ -485,10 +559,11 @@ export default {
                   ],
                   "is_set": false
               },
-              "drug": {
+              "regGene": {
                 "categories": [
-                    "biolink:ChemicalMixture"
-                ],
+                      "biolink:Protein",
+                      "biolink:Gene"
+                  ],
                 "constraints": [],
           
                 "is_set": false
@@ -817,7 +892,9 @@ export default {
       ARSJobId: "bc32c185-6a97-4aff-b467-aa2fac22e275",
       ARSResults: [],
       ARSResultsSPO: [],
-      count: 0
+      count: 0,
+      statusTable: [],
+      showARS: false
 
     };
   },
@@ -878,24 +955,7 @@ export default {
       }
       
     },
-    async tryARS() {
-      this.ARSResultsSPO = []
 
-      // SET QUERY WITH SEARCH TERM
-      // this.query.message.query_graph.nodes.n00.ids = [this.concept_search]
-
-      // GET GENES REGULATING TARGET
-      console.log("------ ARSService REQUEST STARTED")
-      // console.log(ARSService)
-      let ARSRequest = await ARSService.ARSQuery(this.query)
-      console.log("ARSRequest")
-      console.log(ARSRequest)
-      // ARSStatus
-      let ARSrequestID = ARSRequest.pk
-      this.ARSrequestID = ARSrequestID
-      this.ARScheckResults()
-
-    },
 
     async tryARS2() {
       this.ARSResults = []
@@ -907,23 +967,17 @@ export default {
         console.log("this.synonyms")
         console.log(this.synonyms)
         console.log(synData)
-        // this.query = this.query2
-        this.query.message.query_graph.nodes.gene.ids = this.synonyms
+        console.log("synData[this.concept_search].id.name")
+        console.log(synData[this.concept_search].id.name)
+        // this.query = this.query2 
+        this.query_gg.message.query_graph.nodes.targetGene.ids = this.synonyms
 
-      let query = this.query
+      let query = this.query_gg
       this.ARSResultsLoop(query)
       .then(async(results)=>{
         console.log("COMPLETED THE PROMISE for first results")
         console.log(results)
       })
-      // .then(async () => { /Users/andycrouse/Documents/GitHub/medikweb_dev/datafiles/twohopdatat.json
-
-
-      //   // console.log("this.synonyms")
-      //   // console.log(this.synonyms)
-      //   return
-
-      // })
       .then(async () => {
         // BUILD THE this.ARSResultsSPO TABLE
         console.log("this.ARSResults")
@@ -953,37 +1007,6 @@ export default {
           }
         }
       })   
-      // .then(async ()=> {
-      //   // GET ALL OF THE OBJECTS FOR THE SECOND HOP QUERY
-      //   let resultObjects = []
-      //   for (let i = 0; i < this.ARSResultsSPO.length; i++) {
-      //     const el = this.ARSResultsSPO[i];
-      //     // console.log("objectID")
-      //     // console.log(el.objectID)
-      //     if(resultObjects.indexOf(el.objectID) == -1){
-      //       resultObjects.push(el.objectID)
-      //     }
-      //     if(i == this.ARSResultsSPO.length -1){
-      //       return resultObjects
-      //     }
-          
-      //   }
-
-      // })
-      // .then(async(resultObjects)=>{
-      //   console.log("resultObjects")
-      //   console.log(resultObjects)
-      //   // let query = this.query
-      //   // query.message.query_graph.nodes.gene1.ids = resultObjects
-      //   // query.message.query_graph.nodes.gene0.categories = ["biolink:ChemicalMixture"]
-      //   // console.log(this.query)
-      //   // // this.tryARS()
-      //   // console.log("####### END #######")
-      //   // this.ARSResultsLoop(query)
-      // })
-
-
-      
 
     },
 
@@ -1020,11 +1043,15 @@ export default {
       return new Promise(async (resolve, reject) => { // eslint-disable-line
 
       console.log("------ eventLoop2 REQUEST STARTED")
-      // console.log(ARSService)
+
+      // ################
+      // SEND TO ARS
+      // ################
+
       let ARSRequest = await ARSService.ARSQuery(query)
-      console.log("ARSRequest")
-      console.log(ARSRequest)
-      // ARSStatus
+      console.log("query")
+      console.log(query)
+      // ARSStatus - GET PK FROM ARS TO LOOP AND CHECK 
       let ARSrequestID = ARSRequest.pk
       this.ARSrequestID = ARSrequestID
       
@@ -1044,9 +1071,11 @@ export default {
       .then(async (ARSStatus) => {
         // let count = 1
         let resultList = []
-        console.log("ARSStatus")
-        console.log(ARSStatus)
+        // console.log("ARSStatus")
+        // console.log(ARSStatus)
         resultList  = ARSStatus.children
+
+        let recheck = []
 
         if(resultList.length< 15){
           console.log("less than 15")
@@ -1057,9 +1086,9 @@ export default {
         } else {
           
           console.log("*** resultList = ", resultList)
+          
+          // let recheckStat = ["Running"]
           for (let i = 0; i < resultList.length; i++) {
-            // console.log("----- ----- ----- ----- -----")
-
 
             const resInfo = resultList[i];
             // console.log(resInfo)
@@ -1067,46 +1096,55 @@ export default {
             // console.log(resInfo.code)
             // console.log(resInfo.status)        
             let result = await ARSService.ARSStatus(resInfo.message)
-            // console.log("result = ", result)
 
             let agent = resInfo.actor.agent
-            this.ARSResultStatus[agent] = {}
-            this.ARSResultStatus[agent]["agent"] = agent
-            this.ARSResultStatus[agent]["code"] = resInfo.code
-            this.ARSResultStatus[agent]["status"] = resInfo.status
-            this.ARSResultStatus[agent]["id"] = resInfo.message
-            this.ARSResultStatus[agent]["resultCount"] = null
-            this.ARSResultStatus[agent]["results"] = result
+            // if(recheck.indexOf(agent) == -1){
+              console.log("agent")
+              console.log(agent)
+              console.log({resInfo})
 
-            // CHECK IF THERE IS A KNOWLEDGE GRAPH
-            if(Object.prototype.hasOwnProperty.call(result, "message")){
-              // console.log("FOUND MESSAGE")
-              if(Object.prototype.hasOwnProperty.call(result.message, "knowledge_graph")){
-                // console.log("FOUND KNOWLEDGE GRAPH")
-                // if(result.message.results.length > 0){
-                  // console.log("HAS MORE THAN 0 RESULTS")
-                  this.ARSResultStatus[agent].resultCount = result.message.results.length
+              this.ARSResultStatus[agent] = {}
+              this.ARSResultStatus[agent]["agent"] = agent
+              this.ARSResultStatus[agent]["code"] = resInfo.code
+              this.ARSResultStatus[agent]["status"] = resInfo.status
+              this.ARSResultStatus[agent]["id"] = resInfo.message
+              this.ARSResultStatus[agent]["resultCount"] = null
+              this.ARSResultStatus[agent]["results"] = result
 
-                
+              this.showARS = true
+
+              if(resInfo.status == "Running"){
+                recheck.push(agent)
               }
-            }
+
+              // CHECK IF THERE IS A KNOWLEDGE GRAPH
+              if(Object.prototype.hasOwnProperty.call(result, "message")){
+                // console.log("FOUND MESSAGE")
+                if(Object.prototype.hasOwnProperty.call(result.message, "knowledge_graph")){
+                  // console.log("FOUND KNOWLEDGE GRAPH")
+                  // if(result.message.results.length > 0){
+                    // console.log("HAS MORE THAN 0 RESULTS")
+                    this.ARSResultStatus[agent].resultCount = result.message.results.length
+
+                  
+                }
+              }
+            // }
+
             this.resultSetIDs.push(this.ARSResultStatus[agent])
 
-            
-          // NOTE WHEN FINISHED
             if(i == resultList.length - 1 ){
+      
               console.log("FINISHED GETTING ALL THE RESULTS")
-              // console.log(this.resultSetIDs)
-              // console.log("this.ARSResultStatus")
-              // console.log(this.ARSResultStatus)
+
               let checkRerun = this.resultSetIDs.filter(x => x.resultCount == null && x.status != "Error")
               // console.log("checkRerun = ", checkRerun)
               if(checkRerun.length > 0 && this.count < 10){
-                console.log("WE HAVE TO CHECK AGAIN - NOT DONE")
-                console.log("count = ", this.count)
+                // console.log("WE HAVE TO CHECK AGAIN - NOT DONE")
+                // console.log("count = ", this.count)
                 await new Promise(resolve => setTimeout(resolve, 10000));
                 this.resultSetIDs = []
-                this.ARSResultStatus = {}
+                // this.ARSResultStatus = {}
                 this.count++
                 eventEmitter.emit("event");
                 
@@ -1130,16 +1168,16 @@ export default {
 
           for (let i = 0; i < keys.length; i++) {
             const id = keys[i];
-            console.log("id")
-            console.log(id)
+            // console.log("id")
+            // console.log(id)
             this.resultSetIDs.push(this.ARSResultStatus[id])
             // console.log("this.ARSResultStatus[id]")
             // console.log(this.ARSResultStatus[id])
             
             if(Object.prototype.hasOwnProperty.call(this.ARSResultStatus[id].results, "message")){
               if(Object.prototype.hasOwnProperty.call(this.ARSResultStatus[id].results.message, "knowledge_graph")){
-                console.log("CLEANING RESULTS")
-                console.log(this.ARSResultStatus[id].results)
+                // console.log("CLEANING RESULTS")
+                // console.log(this.ARSResultStatus[id].results)
                 let cleanedResults = await TrapiResultClean.TrapiResultClean(this.ARSResultStatus[id].results)
                 // console.log(cleanedResults)
 
@@ -1262,7 +1300,7 @@ export default {
                 console.log("count = ", this.count)
                 await new Promise(resolve => setTimeout(resolve, 5000));
                 this.resultSetIDs = []
-                this.ARSResultStatus = {}
+                // this.ARSResultStatus = {}
                 this.count++
                 eventEmitter.emit("event");
                 
@@ -4117,34 +4155,35 @@ export default {
     },
   },
   computed: {
-    lineGenerator() {
-      return d3
-        .line()
-        .x((v) => v[0])
-        .y((v) => v[1]);
-    },
-    d() {
-      return this.lineGenerator(this.dataset);
-    },
-    //     divwidth(){
-    //       // console.log(this.$refs["svgnetwork"])
-    //       let divElement = this.$refs["svgnetwork"]
-    //       console.log("divElement")
-    //       console.log(divElement)
-    //       // let width = divElement.getAttribute('width');
-    // // let height = divElement.getAttribute('height');
-    // return divElement
-    //     },
+    // lineGenerator() {
+    //   return d3
+    //     .line()
+    //     .x((v) => v[0])
+    //     .y((v) => v[1]);
+    // },
+    // d() {
+    //   return this.lineGenerator(this.dataset);
+    // },
+    // statusTable: function () {
+    //   let keys = Object.key(this.ARSResultStatus)
+    //   console.log(keys)
+    //   let statusTable = []
+    //   // if(keys.length == 0){
+    //   //   return []
+    //   // } else {
+    //     for (let i = 0; i < keys.length; i++) {
+    //       const key = keys[i];
+    //       statusTable.push(this.ARSResultStatus[key]) 
+    //       // return statusTable
+    //       if(i == keys.length - 1) {
+    //         return statusTable
 
-    // relationFilters: function() {
-    //   let uniqueRelations = [];
+    //       } else {
+    //         return []
+    //       }      
+    //     // }
+    //   }
 
-    //   return this.synonym_tabledata.filter(drug => {
-    //     if (uniqueRelations.indexOf(drug.predicate_cleaned) == -1) {
-    //       uniqueRelations.push(drug.predicate_cleaned);
-    //       return drug.predicate_cleaned;
-    //     }
-    //   });
     // },
     synonym_tabledata_filtered: function () {
       // synonym_tabledata

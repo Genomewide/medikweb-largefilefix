@@ -49,13 +49,13 @@
                     v-on:click="getChemblMOA"
                     >getChemblMOA
                   </b-button>
-                  <!-- <b-button 
+                  <b-button 
                     style="margin-left: 20px"
                     variant="primary"
-                    v-on:click="testSection"
-                    >testSection
+                    v-on:click="fixForBloom"
+                    >fixForBloom
                   </b-button>
-
+<!-- 
                   <b-button
                     style="margin-left: 20px"
                     variant="primary"
@@ -242,7 +242,7 @@ import FDAService from "../FDAService";
 // import svgtest from "./svgtest.vue" FDAService
 import importResultWithDrugs from "/Users/andycrouse/Downloads/HGNC_68842hopJSON.json";
 import synonymService from "../synonymService";
-// import twohopdata from "../../../datafiles/twohopggd.json"
+import fixData from "/Users/andycrouse/Library/Application Support/Neo4j Desktop/Application/relate-data/dbmss/dbms-ef186265-0b03-4959-9472-ab280327bb0f/import/Alzheimer_disease_MONDO-0004975.json"
 // NodeFinderService
 // import NodeFinderService from "../NodeFinderService";
 
@@ -703,6 +703,238 @@ export default {
     };
   },
   methods: {
+    async fixForBloom(){
+      let disease = [    "biolink:DiseaseOrPhenotypicFeature", "biolink:Disease", "biolink:PhenotypicFeature"]
+      let gene = [    "biolink:Gene", "biolink:Protein",    "biolink:Polypeptide"]
+      let drug = [     "biolink:SmallMolecule","biolink:MolecularEntity", "biolink:Drug"]
+      let bioEnttity = ["biolink:ChemicalEntity"]
+
+     
+     
+     
+//      let all = [
+//     // "biolink:Disease",
+//     "biolink:NamedThing",
+//     "biolink:Pathway", // like disease in examples
+//     // "biolink:PhenotypicFeature",
+//     "biolink:InformationContentEntity",
+//     //     "biolink:Gene",
+//     // "biolink:Protein",
+
+//     // "biolink:ChemicalEntity",
+//     // "biolink:SmallMolecule",
+//     // "biolink:MolecularEntity", 
+//     // "biolink:Drug",
+//     // "biolink:Polypeptide",
+//     "biolink:BiologicalProcess", // 
+//     "biolink:Device",
+//     "biolink:Procedure",
+//     "biolink:GeneFamily",
+//     "biolink:GeographicLocation",
+//     // "biolink:DiseaseOrPhenotypicFeature",
+//     "biolink:OrganismTaxon",
+//     "biolink:ChemicalMixture",
+//     "biolink:PhysicalEntity",
+//     "biolink:Phenomenon",
+//     "biolink:NucleicAcidEntity",
+//     "biolink:Food",
+//     "biolink:Vitamin",
+//     "biolink:PathologicalProcess",
+//     "biolink:MaterialSample",
+//     "biolink:CellularComponent",
+//     "biolink:Publication",
+//     "biolink:ClinicalIntervention",
+//     "biolink:AnatomicalEntity",
+//     "biolink:Activity"
+// ]
+// REMOVED "biolink:BiologicalEntity",
+      console.log(fixData)
+      // "biolink:ChemicalEntity"
+      let nodes = fixData.message.knowledge_graph.nodes
+      let keys = Object.keys(nodes)
+      let uniqueCats = []
+      for (let i = 0; i < keys.length; i++) {
+      
+      // for (let i = 0; i < 10; i++) {
+        const key = keys[i];
+        // console.log(key)
+        // console.log("nodes[key].categories")
+        // console.log(nodes[key].categories)
+        // console.log(nodes[key].name)
+
+        fixData.message.knowledge_graph.nodes[key].nodeType = "unknown"
+        let atts = nodes[key].attributes
+        // console.log("atts")
+        // console.log(atts)
+
+        let foundIt = false
+        for (let n = 0; n < atts.length; n++) {
+          const att = atts[n];
+          if(att.attribute_type_id == "biolink:category"){
+            foundIt = true
+
+            // console.log("foundIt")
+            // console.log(foundIt)
+
+            let cats = att.value
+            // console.log("cats")
+            // console.log(cats)
+            cats = cats.concat(fixData.message.knowledge_graph.nodes[key].categories)
+            
+            //   let Fda= FDAAll.filter(x => x.molecules.length > 0)
+            let drugPos = cats.filter(x => drug.indexOf(x) > -1).length
+            let diseasePos = cats.filter(x => disease.indexOf(x) > -1).length
+            let genePos = cats.filter(x => gene.indexOf(x) > -1).length
+            let bioEnttityPos = cats.filter(x => bioEnttity.indexOf(x) > -1).length
+            
+            // console.log("drugPos = ", drugPos)
+            // console.log("diseasePos = ", diseasePos)
+            // console.log("genePos = ", genePos)
+            // console.log("bioEnttityPos = ", bioEnttityPos)
+
+            if(drugPos > 0){
+              fixData.message.knowledge_graph.nodes[key].nodeType = "drug"
+            } else if (genePos > 0){
+              fixData.message.knowledge_graph.nodes[key].nodeType = "gene"
+            } else if (diseasePos > 0){
+              fixData.message.knowledge_graph.nodes[key].nodeType = "disease"
+            } else if (bioEnttityPos > 0){
+              fixData.message.knowledge_graph.nodes[key].nodeType = "bioentity"
+            }
+
+            
+          }
+
+          if(n == atts.length -1 && i == keys.length -1){
+            console.log("uniqueCats")
+            console.log(uniqueCats)
+          }
+          
+        }
+        if(foundIt == false){
+
+            let nodeCategories = fixData.message.knowledge_graph.nodes[key].categories
+
+            let drugPosCat = nodeCategories.filter(x => drug.indexOf(x) > -1).length
+            let diseasePosCat = nodeCategories.filter(x => disease.indexOf(x) > -1).length
+            let genePosCat = nodeCategories.filter(x => gene.indexOf(x) > -1).length
+            let bioEnttityPosCat = nodeCategories.filter(x => bioEnttity.indexOf(x) > -1).length
+
+            if(drugPosCat > 0){
+              fixData.message.knowledge_graph.nodes[key].nodeType = "drug"
+            } else if (genePosCat > 0){
+              fixData.message.knowledge_graph.nodes[key].nodeType = "gene"
+            } else if (diseasePosCat > 0){
+              fixData.message.knowledge_graph.nodes[key].nodeType = "disease"
+            } else if (bioEnttityPosCat > 0){
+              fixData.message.knowledge_graph.nodes[key].nodeType = "bioentity"
+            }
+
+
+          // fixData.message.knowledge_graph.nodes[key].nodeType = fixData.message.knowledge_graph.nodes[key].categories[0]
+        }
+        if(i == keys.length - 1){
+          console.log("fixData")
+          console.log(fixData)
+          this.breakoutResults(fixData)
+        }
+        
+      }
+    },
+    async breakoutResults(StartingResults) {
+      console.log("breakoutResults() start")
+      console.log(StartingResults)
+      console.log(StartingResults.message)
+      console.log(StartingResults.message.knowledge_graph)
+      console.log(StartingResults.message.knowledge_graph.results)
+      let results = StartingResults.message.results
+      console.log("results")
+      console.log(results)
+      let fixResults = {}
+      fixResults.resNodes = []
+      fixResults.resEdges = []
+      for (let n = 0; n < results.length; n++) {
+        const res = results[n];
+        console.log("res")
+        // console.log(res)
+        let edgeBindings = res.edge_bindings
+        let ebKeys = Object.keys(edgeBindings)
+        for (let i = 0; i < ebKeys.length; i++) {
+
+          const eb = {...edgeBindings[ebKeys[i]]}
+          // console.log("eb")
+          // console.log(eb)
+          let resEdge = {}
+          let edgeId = eb[0].id //MAY NEED TO USE 'toString()'
+          let edge = {...fixData.message.knowledge_graph.edges[edgeId]}
+
+          // ADAPT IDS FOR GROUPING EDGES AND NODES // const edgeInfoCopy = {...edgeInfo}
+
+
+          let resObjectId = edge.object + '_' + n
+          let resSubjectId = edge.subject + '_' + n
+
+          // BUILD RESEDGE
+          resEdge.group = n
+          resEdge.id = edgeId
+          resEdge.resEdgeId = edgeId + '_' + n
+          resEdge.object = edge.object
+          resEdge.subject = edge.subject
+          resEdge.predicate = edge.predicate
+          resEdge.resObject = resObjectId
+          resEdge.resSubject = resSubjectId
+          // console.log("resEdge")
+          // console.log(resEdge)
+          fixResults.resEdges.push(resEdge)
+
+          // GET AND MAKE NODES
+          let subject = {...fixData.message.knowledge_graph.nodes[edge.subject]}
+          let object = {...fixData.message.knowledge_graph.nodes[edge.object]}
+
+          subject.group = n
+          // subject.name = n
+          subject.id = edge.subject
+          subject.resId = resSubjectId
+          fixResults.resNodes.push(subject)
+
+          object.group = n
+          object.id = edge.object
+          object.resId = resObjectId
+          fixResults.resNodes.push(object)
+         
+        }
+        if(n == results.length - 1){
+          console.log("neo4j fixResults")
+          console.log(fixResults)
+          this.cleanFixResults(fixResults)
+          // console.log(results.resEdges)
+        }
+        
+      }
+    },
+    async cleanFixResults(fixResults) {
+      let nodes = fixResults.resNodes
+      fixResults.filterNodes = []
+      let nodeCheck = []
+      for (let n = 0; n < nodes.length; n++) {
+        const node = nodes[n];
+        if( nodeCheck.indexOf(node.resId) == -1 ){
+          nodeCheck.push(node.resId)
+          fixResults.filterNodes.push(node)
+        } 
+        if(n == nodes.length - 1){
+          console.log("cleanFixResults")
+          // console.log(fixResults)
+          let cleanFixResults = {}
+          cleanFixResults.nodes = fixResults.filterNodes
+          cleanFixResults.edges = fixResults.resEdges
+          console.log(cleanFixResults)
+        }
+
+      }
+
+
+    },
     async getFDAsyn() {
       console.log(this.FDAAll)
     },
