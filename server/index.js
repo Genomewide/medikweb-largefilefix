@@ -22,6 +22,7 @@ const query_raw = require('./routes/api/query_raw')
 const mongoumls = require('./routes/api/mongoUMLS')
 const synonymService = require('./routes/api/synonymService')
 const araxService = require('./routes/api/araxService')
+const arsService = require('./routes/api/arsService')
 // const mediposts = require('./routes/api/medikPosts')
 
 // any route that goes to api/post will be directed to posts
@@ -35,7 +36,8 @@ app.use('/api/posts/query_raw', query_raw);
 app.use('/api/posts/mongoumls', mongoumls);
 app.use('/api/posts/synonymservice', synonymService);
 app.use('/api/posts/araxservice', araxService);
-// app.use('/api/medikposts', mediposts);
+app.use('/api/posts/arsService', arsService);
+// app.use('/api/medikposts', mediposts);arsService
 
 
 // HANDLE PRODUCTIOIN
