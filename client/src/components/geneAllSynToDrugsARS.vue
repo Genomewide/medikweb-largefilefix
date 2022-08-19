@@ -31,19 +31,19 @@
                     placeholder="Object"
                     :state="validation"
                   ></b-form-input>
-                  <b-button
+                  <!-- <b-button
                     style="margin-left: 20px"
                     variant="primary"
                     v-on:click="tryDelay"
                     >tryDelay
-                  </b-button>
-                  <b-button
+                  </b-button> -->
+                  <!-- <b-button
                     style="margin-left: 20px"
                     variant="secondary"
                     v-on:click="eventLoop2"
                     :disabled="!validation"
                     >eventLoop2
-                  </b-button>
+                  </b-button> -->
 
                   <!-- <b-button
                     style="margin-left: 20px"
@@ -263,6 +263,29 @@
             </b-card>
           </b-col>
         </b-row>
+
+        <b-row style="margin-top: 20px">
+          <b-col>
+            <b-card :key="componentKey + 1000">
+              <template #header>
+                <h6 class="mb-0">
+                  Subject Object Predicate length = {{geneResults.length}}
+                </h6>
+              </template>
+              <b-table
+                bordered
+                striped
+                hover
+                ref="timepersteptable"
+                table-layout:
+                fixed
+                :items="geneResults"
+                :fields="resultFields"
+              >
+              </b-table>
+            </b-card>
+          </b-col>
+        </b-row>
         <!-- <b-row style="margin-top: 20px"> -->
 
         <b-row>
@@ -349,23 +372,21 @@
             <b-card style="margin-top: 20px; width: 100%" :key=" gene.id + componentKey">
               <template #header>
                 <h4 class="mb-0">{{ progressObject[gene].groupName }}</h4> (all drugs with any predicate: {{progressObject[gene].chemCountTotal}})
-
               </template>
-             
 
               <b-card-text>
-        Drugs with clear predicate ({{progressObject[gene].chemCount}})
-        <div>
-          <h5>Getting and filtering synonyms: </h5>
-              <b-progress :value="progressObject[gene].synCurrentCount" :max="progressObject[gene].chemCount" show-progress animated></b-progress>
-                {{progressObject[gene]}}
-        </div>        
-        <div>
-          <h5>Checking FDA status: </h5>
-              <b-progress :value="progressObject[gene].FDACurrentCount" :max="progressObject[gene].chemCount" show-progress animated></b-progress>
-                {{progressObject[gene]}}
-        </div>
-      </b-card-text> 
+                Drugs with clear predicate ({{progressObject[gene].chemCount}})
+                <div>
+                  <h5>Getting and filtering synonyms: </h5>
+                      <b-progress :value="progressObject[gene].synCurrentCount" :max="progressObject[gene].chemCount" show-progress animated></b-progress>
+                        {{progressObject[gene]}}
+                </div>        
+                <div>
+                  <h5>Checking FDA status: </h5>
+                    <b-progress :value="progressObject[gene].FDACurrentCount" :max="progressObject[gene].chemCount" show-progress animated></b-progress>
+                      {{progressObject[gene]}}
+                </div>
+              </b-card-text> 
               <b-card-body> </b-card-body>
             </b-card>
             <!-- <b-col> </b-col> -->
@@ -895,106 +916,56 @@ export default {
       ARSResultsSPO: [],
       count: 0,
       statusTable: [],
-      showARS: false
+      showARS: false,
+      resultGroup: "gene",
+      geneResults:[],
+      drugResults:[],
+      term2Synonyms: []
 
     };
   },
   methods: {
   
-
-    async tryDelay(){
-      for (let index = 0; index < 10; index++) {
-        // const element = array[index];
-        console.log( new Date())
-        await new Promise(resolve => setTimeout(resolve, 1000))
-
-        
-      }
-      
-    },
-
-
     async tryARS2() {
+
+
+      // #######################
+      // RESET THE TABLES TO CLEAR FOR NEW RUN
+      // #######################
+      if(this.resultGroup == "gene"){
+        this.geneResults = []
+        this.drugResults = []
+        this.term2Synonyms = [this.concept_search]
+      }
       this.ARSResults = []
       this.ARSResultsSPO = []
+      
 
-        // PREPARE TO REMOVE NODES THAT DON'T HAVE TARGET GENE AS OBJECT - GET SYNONYMS
-        let synData = await synonymService.normalizedSynonyms(this.concept_search)
-        this.synonyms = synData[this.concept_search].equivalent_identifiers.map(x => x.identifier)
-        console.log("this.synonyms")
-        console.log(this.synonyms)
-        console.log(synData)
-        console.log("synData[this.concept_search].id.name")
-        console.log(synData[this.concept_search].id.name)
-        // this.query = this.query2 
-        this.query_gg.message.query_graph.nodes.targetGene.ids = this.synonyms
+      // #######################
+      // PREPARE TO REMOVE NODES THAT DON'T HAVE TARGET GENE AS OBJECT - GET SYNONYMS
+      // CAN SEARCH WITH SINGLE TERM THOUGH - ARAS ARE NORMALISZING
+      // #######################
 
+      
+
+      let synData = await synonymService.normalizedSynonyms(this.concept_search)
+      this.synonyms = synData[this.concept_search].equivalent_identifiers.map(x => x.identifier)
+      console.log("this.synonyms")
+      console.log(this.synonyms)
+      console.log(synData)
+      console.log("synData[this.concept_search].id.name")
+      console.log(synData[this.concept_search].id.name)
+      // this.query = this.query2 
+      // this.query_gg.message.query_graph.nodes.targetGene.ids = this.synonyms
+      this.query_gg.message.query_graph.nodes.targetGene.ids = [this.concept_search]
+      // #######################
+      // SEND TO LOOP THE QUERY TO ARS - USE EVENT LOOPING
+      // #######################
       let query = this.query_gg
-      this.ARSResultsLoop(query)
-      .then(async(results)=>{
-        console.log("COMPLETED THE PROMISE for first results")
-        console.log(results)
-        return
-      })
-      .then(async () => {
-        // BUILD THE this.ARSResultsSPO TABLE
-        console.log(" done loopin - this.ARSResults")
-        console.log(this.ARSResults)
-        // let tempResults = []
-
-        for (let i = 0; i < this.ARSResults.length; i++) {
-          console.log("ABOUT TO MAKE SPO TABLE")
-          const res = this.ARSResults[i];
-          let resSPO = {}
-          // console.log("this.synonyms.indexOf(res.subject)")
-          // console.log(this.synonyms.indexOf(res.subject))
-          if(this.synonyms.indexOf(res.object) != -1){
-          resSPO.hop = "Hop"
-          resSPO.object = res.objectName
-          resSPO.objectID = res.object
-          resSPO.predicate = res.predicate
-          resSPO.subject = res.subjectName
-          resSPO.subjectID = res.subject
-
-          this.ARSResultsSPO.push(resSPO)
-            if(i == this.ARSResults.length - 1){
-              console.log("this.ARSResultsSPO")
-              console.log(this.ARSResultsSPO)
-              return
-            }
-          }
-        }
-      })   
+      this.ARSResultsLoop(query) 
 
     },
 
-    async resultTableBuil (){
-      return new Promise(async (resolve, reject) => { // eslint-disable-line
-
-        for (let i = 0; i < this.ARSResults.length; i++) {
-          
-          const res = this.ARSResults[i];
-          let resSPO = {}
-          // console.log("this.synonyms.indexOf(res.subject)")
-          // console.log(this.synonyms.indexOf(res.subject))
-          if(this.synonyms.indexOf(res.subject) != -1){
-          resSPO.hop = "Hope"
-          resSPO.object = res.objectName
-          resSPO.objectID = res.object
-          resSPO.predicate = res.predicate
-          resSPO.subject = res.subjectName
-          resSPO.subjectID = res.subject
-
-          this.ARSResultsSPO.push(resSPO)
-            if(i == this.ARSResults.length - 1){
-              console.log("this.ARSResultsSPO")
-              console.log(this.ARSResultsSPO)
-              resolve(this.ARSResultsSPO)
-            }
-          }
-        }
-      })
-    },
 
     async ARSResultsLoop(query) {
       this.ARSResults = []
@@ -1014,12 +985,10 @@ export default {
       // ARSStatus - GET PK FROM ARS TO LOOP AND CHECK 
       let ARSrequestID = ARSRequest.pk
       this.ARSrequestID = ARSrequestID
-      
-      // this.progressTable = []
-      // this.progressObject= {}
-      // this.geneIDList = []
-      // let length = this.hgncAll.length;
-      // let i = 0;
+
+      // ################
+      // START LOOP VIA EVENTS
+      // ################
 
       const EventEmitter = require("events");
       class Emitter extends EventEmitter {}
@@ -1098,12 +1067,13 @@ export default {
       
               console.log("FINISHED GETTING ALL THE RESULTS")
 
-              let checkRerun = this.resultSetIDs.filter(x => x.resultCount == null && x.status != "Error")
+              // let checkRerun = this.resultSetIDs.filter(x => x.resultCount == null && x.status != "Error")
+              let checkRerun = this.resultSetIDs.filter(x => x.status == "Running" && x.name != "ara-unsecret")
               // console.log("checkRerun = ", checkRerun)
               if(checkRerun.length > 0 && this.count < 10){
                 // console.log("WE HAVE TO CHECK AGAIN - NOT DONE")
                 // console.log("count = ", this.count)
-                await new Promise(resolve => setTimeout(resolve, 10000));
+                await new Promise(resolve => setTimeout(resolve, 3000));
                 this.resultSetIDs = []
                 // this.ARSResultStatus = {}
                 this.count++
@@ -1132,8 +1102,8 @@ export default {
             // console.log("id")
             // console.log(id)
             this.resultSetIDs.push(this.ARSResultStatus[id])
-            console.log("this.ARSResultStatus[id]")
-            console.log(this.ARSResultStatus[id])
+            // console.log("this.ARSResultStatus[id]")
+            // console.log(this.ARSResultStatus[id])
 
             if(this.ARSResultStatus[id].results.fields.data != null){
               if(Object.prototype.hasOwnProperty.call(this.ARSResultStatus[id].results.fields.data, "message")){
@@ -1162,8 +1132,13 @@ export default {
                         return accumulator;
                       }, {});
                       this.ARSResultStatus = sorted
-
-// resolve(this.ARSResults);
+                      if(this.resultGroup == "gene"){
+                        this.geneResults = this.ARSResults
+                        return
+                      }
+                      if(this.resultGroup == "drug"){
+                        this.drugResults = this.ARSResults
+                      }
                     // return
                   }     
 
@@ -1173,6 +1148,7 @@ export default {
             // else if (i == keys.length - 1){
             if (i == keys.length - 1){
               console.log("this.ARSResults - OUTSIDE IF CLAUSE")
+
               this.ARSResults = this.ARSResults.filter(x => this.synonyms.indexOf(x.subject) != -1)
 
               let obj = this.ARSResultStatus
@@ -1187,12 +1163,28 @@ export default {
               // this.ARSResultStatus =  this.ARSResultStatus.sort((a, b) => a.name.localeCompare(b.name));
 
               console.log(this.ARSResults)
-
+              if(this.resultGroup == "gene"){
+                this.geneResults = this.ARSResults
+                return
+              }
+              if(this.resultGroup == "drug"){
+                this.drugResults = this.ARSResults
+              }
               // resolve(this.ARSResults);
-              // return
+              
 
             }      
           }
+        })
+        .then(async () => {
+          // ################################################
+          // DONE WITH GENE - GENE NOW UPDATE QUERY AND RUN AGAIN FOR 
+          // ################################################
+          // GET THE CURIES FOR GENES TO TARGET WITH DRUGS
+          // GET THEIR SYNONYMS TO FILTER OUT THE EXTRANEOUS 
+          // THEN RUN THE PROGRAM AGAIN
+          console.log("made it through!")
+          
         }) 
 
       })
@@ -1202,154 +1194,154 @@ export default {
       // }) // FROM PROMISE
     },
 
-      async eventLoop2() {
-      // concept_search
-      console.log("------ eventLoop2 REQUEST STARTED")
-      console.log(this.query)
-      let ARSRequest = await ARSService.ARSQuery(this.query)
-      console.log("ARSRequest")
-      console.log(ARSRequest)
-      // ARSStatus
-      let ARSrequestID = ARSRequest.pk
-      this.ARSrequestID = ARSrequestID
+    //   async eventLoop2() {
+    //   // concept_search
+    //   console.log("------ eventLoop2 REQUEST STARTED")
+    //   console.log(this.query)
+    //   let ARSRequest = await ARSService.ARSQuery(this.query)
+    //   console.log("ARSRequest")
+    //   console.log(ARSRequest)
+    //   // ARSStatus
+    //   let ARSrequestID = ARSRequest.pk
+    //   this.ARSrequestID = ARSrequestID
       
-      // this.progressTable = []
-      // this.progressObject= {}
-      // this.geneIDList = []
-      // let length = this.hgncAll.length;
-      // let i = 0;
+    //   // this.progressTable = []
+    //   // this.progressObject= {}
+    //   // this.geneIDList = []
+    //   // let length = this.hgncAll.length;
+    //   // let i = 0;
 
-      const EventEmitter = require("events");
-      class Emitter extends EventEmitter {}
-      const eventEmitter = new Emitter();
-      this.count = 0
-      eventEmitter.on("event", async () => {
+    //   const EventEmitter = require("events");
+    //   class Emitter extends EventEmitter {}
+    //   const eventEmitter = new Emitter();
+    //   this.count = 0
+    //   eventEmitter.on("event", async () => {
 
-      ARSService.ARSStatus(this.ARSrequestID)
-      .then(async (ARSStatus) => {
-        // let count = 1
-        console.log("ARSStatus")
-        console.log(ARSStatus)
-        let resultList  = ARSStatus.children
+    //   ARSService.ARSStatus(this.ARSrequestID)
+    //   .then(async (ARSStatus) => {
+    //     // let count = 1
+    //     console.log("ARSStatus")
+    //     console.log(ARSStatus)
+    //     let resultList  = ARSStatus.children
 
-        if(resultList.length< 14){
-          console.log("less than 14")
+    //     if(resultList.length< 14){
+    //       console.log("less than 14")
           
-          await new Promise(resolve => setTimeout(resolve, 3000));
-          console.log(new Date())
-          eventEmitter.emit("event")
-        } else {
+    //       await new Promise(resolve => setTimeout(resolve, 3000));
+    //       console.log(new Date())
+    //       eventEmitter.emit("event")
+    //     } else {
           
-          console.log("*** resultList = ", resultList)
-          for (let i = 0; i < resultList.length; i++) {
-            console.log("----- ----- ----- ----- -----")
+    //       console.log("*** resultList = ", resultList)
+    //       for (let i = 0; i < resultList.length; i++) {
+    //         console.log("----- ----- ----- ----- -----")
 
 
-            const resInfo = resultList[i];
-            console.log(resInfo)
-            // console.log(resInfo.actor.agent)
-            // console.log(resInfo.code)
-            // console.log(resInfo.status)        
-            let result = await ARSService.ARSStatus(resInfo.message)
-            console.log("result = ", result)
+    //         const resInfo = resultList[i];
+    //         console.log(resInfo)
+    //         // console.log(resInfo.actor.agent)
+    //         // console.log(resInfo.code)
+    //         // console.log(resInfo.status)        
+    //         let result = await ARSService.ARSStatus(resInfo.message)
+    //         console.log("result = ", result)
 
-            let agent = resInfo.actor.agent
-            this.ARSResultStatus[agent] = {}
-            this.ARSResultStatus[agent]["agent"] = agent
-            this.ARSResultStatus[agent]["code"] = resInfo.code
-            this.ARSResultStatus[agent]["status"] = resInfo.status
-            this.ARSResultStatus[agent]["id"] = resInfo.message
-            this.ARSResultStatus[agent]["resultCount"] = null
-            this.ARSResultStatus[agent]["results"] = result
+    //         let agent = resInfo.actor.agent
+    //         this.ARSResultStatus[agent] = {}
+    //         this.ARSResultStatus[agent]["agent"] = agent
+    //         this.ARSResultStatus[agent]["code"] = resInfo.code
+    //         this.ARSResultStatus[agent]["status"] = resInfo.status
+    //         this.ARSResultStatus[agent]["id"] = resInfo.message
+    //         this.ARSResultStatus[agent]["resultCount"] = null
+    //         this.ARSResultStatus[agent]["results"] = result
 
-            // CHECK IF THERE IS A KNOWLEDGE GRAPH
-            if(Object.prototype.hasOwnProperty.call(result, "message")){
-              // console.log("FOUND MESSAGE")
-              if(Object.prototype.hasOwnProperty.call(result.message, "knowledge_graph")){
-                // console.log("FOUND KNOWLEDGE GRAPH")
-                // if(result.message.results.length > 0){
-                  // console.log("HAS MORE THAN 0 RESULTS")
-                  this.ARSResultStatus[agent].resultCount = result.message.results.length
+    //         // CHECK IF THERE IS A KNOWLEDGE GRAPH
+    //         if(Object.prototype.hasOwnProperty.call(result, "message")){
+    //           // console.log("FOUND MESSAGE")
+    //           if(Object.prototype.hasOwnProperty.call(result.message, "knowledge_graph")){
+    //             // console.log("FOUND KNOWLEDGE GRAPH")
+    //             // if(result.message.results.length > 0){
+    //               // console.log("HAS MORE THAN 0 RESULTS")
+    //               this.ARSResultStatus[agent].resultCount = result.message.results.length
 
                 
-              }
-            }
-            this.resultSetIDs.push(this.ARSResultStatus[agent])
+    //           }
+    //         }
+    //         this.resultSetIDs.push(this.ARSResultStatus[agent])
 
             
-          // NOTE WHEN FINISHED
-            if(i == resultList.length - 1 ){
-              console.log("FINISHED GETTING ALL THE RESULTS")
-              // console.log(this.resultSetIDs)
-              // console.log("this.ARSResultStatus")
-              // console.log(this.ARSResultStatus)
-              let checkRerun = this.resultSetIDs.filter(x => x.resultCount == null && x.status != "Error")
-              // console.log("checkRerun = ", checkRerun)
-              if(checkRerun.length > 0 && this.count < 3){
-                console.log("WE HAVE TO CHECK AGAIN - NOT DONE")
-                console.log("count = ", this.count)
-                await new Promise(resolve => setTimeout(resolve, 5000));
-                this.resultSetIDs = []
-                // this.ARSResultStatus = {}
-                this.count++
-                eventEmitter.emit("event");
+    //       // NOTE WHEN FINISHED
+    //         if(i == resultList.length - 1 ){
+    //           console.log("FINISHED GETTING ALL THE RESULTS")
+    //           // console.log(this.resultSetIDs)
+    //           // console.log("this.ARSResultStatus")
+    //           // console.log(this.ARSResultStatus)
+    //           let checkRerun = this.resultSetIDs.filter(x => x.resultCount == null && x.status != "Error")
+    //           // console.log("checkRerun = ", checkRerun)
+    //           if(checkRerun.length > 0 && this.count < 3){
+    //             console.log("WE HAVE TO CHECK AGAIN - NOT DONE")
+    //             console.log("count = ", this.count)
+    //             await new Promise(resolve => setTimeout(resolve, 5000));
+    //             this.resultSetIDs = []
+    //             // this.ARSResultStatus = {}
+    //             this.count++
+    //             eventEmitter.emit("event");
                 
-              } else {
-                return
-              }
+    //           } else {
+    //             return
+    //           }
               
-            }    
-          }
-        }
+    //         }    
+    //       }
+    //     }
 
-        })
-        .then(async () => {
-          console.log("WENT TO NEXT STEP TO CLEAN RESULTS")
+    //     })
+    //     .then(async () => {
+    //       console.log("WENT TO NEXT STEP TO CLEAN RESULTS")
 
-          let keys = Object.keys(this.ARSResultStatus)
-          console.log(this.ARSResultStatus)
-          this.resultSetIDs = []
-          console.log(keys)
+    //       let keys = Object.keys(this.ARSResultStatus)
+    //       console.log(this.ARSResultStatus)
+    //       this.resultSetIDs = []
+    //       console.log(keys)
 
-          for (let i = 0; i < keys.length; i++) {
-            const id = keys[i];
-            console.log("id")
-            console.log(id)
-            this.resultSetIDs.push(this.ARSResultStatus[id])
-            console.log("this.ARSResultStatus[id]")
-            console.log(this.ARSResultStatus[id])
+    //       for (let i = 0; i < keys.length; i++) {
+    //         const id = keys[i];
+    //         console.log("id")
+    //         console.log(id)
+    //         this.resultSetIDs.push(this.ARSResultStatus[id])
+    //         console.log("this.ARSResultStatus[id]")
+    //         console.log(this.ARSResultStatus[id])
             
-            if(Object.prototype.hasOwnProperty.call(this.ARSResultStatus[id].results, "message")){
-              if(Object.prototype.hasOwnProperty.call(this.ARSResultStatus[id].results.message, "knowledge_graph")){
-                console.log("CLEANING RESULTS")
-                console.log(this.ARSResultStatus[id].results)
-                let cleanedResults = await TrapiResultClean.TrapiResultClean(this.ARSResultStatus[id].results)
-                console.log(cleanedResults)
+    //         if(Object.prototype.hasOwnProperty.call(this.ARSResultStatus[id].results, "message")){
+    //           if(Object.prototype.hasOwnProperty.call(this.ARSResultStatus[id].results.message, "knowledge_graph")){
+    //             console.log("CLEANING RESULTS")
+    //             console.log(this.ARSResultStatus[id].results)
+    //             let cleanedResults = await TrapiResultClean.TrapiResultClean(this.ARSResultStatus[id].results)
+    //             console.log(cleanedResults)
 
-                this.ARSResults = this.ARSResults.concat(cleanedResults) 
+    //             this.ARSResults = this.ARSResults.concat(cleanedResults) 
 
-                if (i == keys.length - 1){
-                  console.log("this.ARSResults")
-                  console.log(this.ARSResults)
-                  return
-                }     
+    //             if (i == keys.length - 1){
+    //               console.log("this.ARSResults")
+    //               console.log(this.ARSResults)
+    //               return
+    //             }     
 
-              }
-            }    
-            else if (i == keys.length - 1){
-                  console.log("this.ARSResults")
-                  console.log(this.ARSResults)
-              return
+    //           }
+    //         }    
+    //         else if (i == keys.length - 1){
+    //               console.log("this.ARSResults")
+    //               console.log(this.ARSResults)
+    //           return
 
-            }      
-          }
-        }) 
+    //         }      
+    //       }
+    //     }) 
 
-      })
+    //   })
 
 
-      eventEmitter.emit("event");
-    },
+    //   eventEmitter.emit("event");
+    // },
 
     async ARScheckResults () {
       this.ARSResultsSPO = []
