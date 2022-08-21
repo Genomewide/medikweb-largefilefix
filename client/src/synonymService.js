@@ -65,6 +65,38 @@ class synonymService {
     });
   }
 
+  static nodeNormalizationPost = (idArray) => {
+
+    return new Promise(async (resolve, reject) => { // eslint-disable-line
+      // let symbol = this.concept_search
+      // symbol = "mapk8ip3"
+      console.log(idArray)
+      let postPacket = {
+        "curies": [
+          "ENSEMBL:ENSG00000132153"
+        ],
+        "conflate": true
+      }
+      
+      postPacket.curies = idArray
+  
+    // POST TO NODENORMALIZER
+    // "https://rest.ensembl.org/xrefs/id/" + ensemblid + "?content-type=application/json"
+      let normalURL = "https://nodenorm.transltr.io/1.2/get_normalized_nodes"
+  
+      console.log(normalURL)
+      try {
+        const res = await axios.post(normalURL, postPacket);
+          const data = res.data;
+          console.log("nodeNormalizationPost RAN")
+          console.log(data)
+          resolve(data);
+      } catch (err) {
+        reject(err);
+      }
+    });
+  }
+
   static chemSynonyms = (searchterm) => {
     console.log("started allSynonyms - seatrchterm ");
     return new Promise(async (resolve, reject) => { // eslint-disable-line
