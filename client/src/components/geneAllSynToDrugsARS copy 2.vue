@@ -159,9 +159,9 @@
                   </template>
                   <!-- <h4 class="mb-0">Symbol: {{ concept_search }}</h4> -->
                   <br />
-                      <!-- <div v-if = "showARS"> -->
+                      <div v-if = "showARS">
         <!-- <h3 class="p-3 text-center">Vue.js - Display a list of items with v-for</h3> -->
-        <table class="table table-striped table-bordered" :key="componentKey">
+        <table class="table table-striped table-bordered" >
             <thead>
                 <tr>
                     <th>Name</th>
@@ -190,7 +190,8 @@
                 </tr>
             </tbody>
         </table>
-    <!-- </div>  -->
+        {{ARSResultStatus}}
+    </div> 
                   <br />
                 <!-- <b-table
                   bordered
@@ -482,7 +483,7 @@ export default {
       subject: "chemical",
       predicate: "UMLS:C0004096",
       concept_search: "HGNC:16716",
-      testNormalizationArray: ["HGNC:18481", "HGNC:6884" , "HGNC:2625", "HGNC:11998", "HGNC:3236", "HGNC:1100", "HGNC:9588", "HGNC:16716"],
+      testNormalizationArray: ["HGNC:18481", "HGNC:6884" , "HGNC:2625", "HGNC:11998", "HGNC:3236", "HGNC:1100", "HGNC:9588"],
       // HGNC:18481
       // HGNC:6884" MAPK8IP3
       // "HGNC:2625" CYP2D6
@@ -903,7 +904,7 @@ export default {
       // #######################
       // LOOP THROUGH ALL TERMS TO GET ALL SYNONYMS
       // #######################
-      synonymService.nodeNormalizationPost(this.queryTerms)
+      synonymService.nodeNormalizationPost(this.testNormalizationArray)
       .then(async (normalizedTerms) => {
         let normalKeys = Object.keys(normalizedTerms)
 
@@ -911,8 +912,6 @@ export default {
         for (let i = 0; i < normalKeys.length; i++) {
           const key = normalKeys[i];
           let termData = normalizedTerms[key]
-          // console.log("normalizedTerms[key]")
-          // console.log(normalizedTerms[key])
           let normTerms = termData.equivalent_identifiers.map(x => x.identifier)
           this.synonyms = this.synonyms.concat(normTerms)
 
@@ -928,103 +927,37 @@ export default {
       .then(async () => {
 
           if(this.resultGroup == "gene"){
+            // #######################
+            // SEND QUERY WITH CORRECT NODES AND CATEGORIES
+            // #######################
+
             this.query_gg.message.query_graph.nodes.targetGene.ids = this.queryTerms
             // #######################
             // SEND TO LOOP THE QUERY TO ARS - USE EVENT LOOPING
             // #######################
             let query = this.query_gg
-            // this.ARSResultsLoop(query)
-            return query
+            this.ARSResultsLoop(query) 
         }   
           else if(this.resultGroup == "drug"){
+            // #######################
+            // SEND QUERY WITH CORRECT NODES AND CATEGORIES
+            // #######################
+
             this.query_dg.message.query_graph.nodes.genes.ids = this.queryTerms
             // #######################
             // SEND TO LOOP THE QUERY TO ARS - USE EVENT LOOPING
             // #######################
             let query = this.query_dg
-            // this.ARSResultsLoop(query)
-            return query
+            this.ARSResultsLoop(query) 
         }         
-      })
-      .then(async (query) => {
-        // #######################
-        // GET PK FOR QUERY
-        // #######################
-        let pk = await this.setPK(query)
-        return pk
-      })
-      .then(async () => {
-        // #######################
-        // LOOP TO GET FULL ARS STATUS TABLE BUILT
-        // #######################
-        for (let i = 0; i < 10; i++) {
-          let ARSStatusCheck = await this.ARSStatusTable()
-            // ################
-            // SORT THE STATUS TABLE ALPHABETICALLY
-            // ################
-            let obj = this.ARSResultStatus
-            let sorted = Object.keys(obj)
-              .sort()
-              .reduce((accumulator, key) => {
-                accumulator[key] = obj[key];
-                return accumulator;
-              }, {});
-              this.ARSResultStatus = sorted
-
-              
-              console.log("SORTED THE STATUS TABLE")
-          this.componentKey++
-          console.log("I LOOP NUMBER = ", i)
-          // console.log("ARSStatusCheck")
-          // console.log(ARSStatusCheck)
-          // ################
-          // CHECK STATUS OF RESULTS
-          // ################          
-          if(ARSStatusCheck.agentFinished == 0 && ARSStatusCheck.agentCount >13){
-            i = 10
-            // console.log("finish before looping to 10!")
-            // console.log("this.ARSResultStatus")
-            // console.log(this.ARSResultStatus)
-
-            this.componentKey++
-            return
-          } else {
-            await new Promise(resolve => setTimeout(resolve, 3000));
-          }
-
-
-        }
-
-      }) //ARSCleanResults
-      .then(async () => {
-        await this.ARSCleanResults()
-        return
-      })
-      .then(async () => {
-        if(this.resultGroup == "gene"){
-          this.resultGroup = "drug"
-          console.log("DONE!")
-          let genesForDrug = this.ARSResults.map(x => x.object)
-          genesForDrug.push(this.concept_search)
-          this.queryTerms = genesForDrug
-          console.log("this.queryTerms")
-          console.log(this.queryTerms)
-          let fileName = this.concept_search + "_gene_gene"
-          this.saveThisFile2(this.geneResults, fileName)
-          this.tryARS2()
-        } else{
-          console.log("THIS IS THE END")
-        }
-
-        // if()
       })
 
     },
 
-    async setPK(query) {
+    async ARSResultsLoopPromise(query) {
       return new Promise(async (resolve, reject) => { // eslint-disable-line
 
-      // this.ARSResults = []
+      this.ARSResults = []
       console.log("------ eventLoop2 REQUEST STARTED")
 
       // ################
@@ -1041,198 +974,151 @@ export default {
       // ARSStatus - GET PK FROM ARS TO LOOP AND CHECK 
       let ARSrequestID = ARSRequest.pk
       this.ARSrequestID = ARSrequestID
-      resolve(ARSrequestID)
-      })
-    },
- 
 
-    
+      // ################
+      // START LOOP VIA EVENTS
+      // ################
 
-    async ARSStatusTable () {
-      return new Promise(async (resolve, reject) => { // eslint-disable-line
-
-      // this.ARSResults = []
-   
-      let ARSStatus =  await ARSService.ARSStatus(this.ARSrequestID)
-
+      const EventEmitter = require("events");
+      class Emitter extends EventEmitter {}
+      const eventEmitter = new Emitter();
+      this.count = 0
+      eventEmitter.on("event", async () => {
+      console.log("************************************************")
+      console.log("EVENT EMMITTED")
+      console.log("************************************************")
+      ARSService.ARSStatus(this.ARSrequestID)
+      .then(async (ARSStatus) => {
+        // let count = 1
         let resultList = []
         console.log("ARSStatus")
         console.log(ARSStatus)
         resultList  = ARSStatus.children
         console.log("# of sets of results = ", resultList.length)
 
+        // let recheck = []
+
         // ################
         // WAIT FOR 14 RESULTS SO THAT YOU DON'T PROCESS UNTIL THEY ARE ALL RESPONDING WITH SOMETHING - EVEN IF NOT COMLPLETED
         // ################
+
+        if(resultList.length< 14){
+          console.log("less than 14")
+          
+          await new Promise(resolve => setTimeout(resolve, 3000));
+          console.log(new Date())
+          eventEmitter.emit("event")
+        } else {
           
           console.log("*** resultList = ", resultList)
           
           // let recheckStat = ["Running"]
-          if(resultList.length == 0){
-            resolve({agentFinished: 0, agentCount: 0})
-          } else {
-            for (let i = 0; i < resultList.length; i++) {
-              // this.resultSetIDs = []
-              // ################
-              // LOOPING THROUGH EACH OF THE RESULTS FROM THE ARS STATUS TO COLLECT ALL OF THE INFORATION
-              // ################
+          for (let i = 0; i < resultList.length; i++) {
 
-              const resInfo = resultList[i];       
-              let result = await ARSService.ARSResult(resInfo.message)
+            // ################
+            // LOOPING THROUGH EACH OF THE RESULTS FROM THE ARS STATUS TO COLLECT ALL OF THE INFORATION
+            // ################
 
-              let agent = resInfo.actor.agent
-              // if(recheck.indexOf(agent) == -1){
-                console.log("agent")
-                console.log(agent)
-                console.log({result})
+            const resInfo = resultList[i];       
+            let result = await ARSService.ARSResult(resInfo.message)
 
-                this.ARSResultStatus[agent] = {}
-                this.ARSResultStatus[agent]["agent"] = agent
-                this.ARSResultStatus[agent]["code"] = resInfo.code
-                this.ARSResultStatus[agent]["status"] = resInfo.status
-                this.ARSResultStatus[agent]["id"] = resInfo.message
-                this.ARSResultStatus[agent]["resultCount"] = null
-                this.ARSResultStatus[agent]["results"] = result
+            let agent = resInfo.actor.agent
+            // if(recheck.indexOf(agent) == -1){
+              console.log("agent")
+              console.log(agent)
+              console.log({result})
 
-                // this.showARS = true
+              this.ARSResultStatus[agent] = {}
+              this.ARSResultStatus[agent]["agent"] = agent
+              this.ARSResultStatus[agent]["code"] = resInfo.code
+              this.ARSResultStatus[agent]["status"] = resInfo.status
+              this.ARSResultStatus[agent]["id"] = resInfo.message
+              this.ARSResultStatus[agent]["resultCount"] = null
+              this.ARSResultStatus[agent]["results"] = result
 
-                // if(resInfo.status == "Running" && resInfo.agent != "ara-unsecret"){
-                //   recheck.push(agent)
-                // }
+              // this.showARS = true
 
-                // CHECK IF THERE IS A KNOWLEDGE GRAPH
-                if(result.fields.data != null){
-                    if(Object.prototype.hasOwnProperty.call(result.fields.data, "message")){
-                      // console.log("FOUND MESSAGE")
-                      if(Object.prototype.hasOwnProperty.call(result.fields.data.message, "knowledge_graph")){
-                        // console.log("FOUND KNOWLEDGE GRAPH")
-                        // if(result.message.results.length > 0){
-                          // console.log("HAS MORE THAN 0 RESULTS")
-                          this.ARSResultStatus[agent].resultCount = result.fields.data.message.results.length
-                        
-                      }
-                    }
-                }
-
+              // if(resInfo.status == "Running" && resInfo.agent != "ara-unsecret"){
+              //   recheck.push(agent)
               // }
 
-              this.resultSetIDs.push(this.ARSResultStatus[agent])
+              // CHECK IF THERE IS A KNOWLEDGE GRAPH
+              if(result.fields.data != null){
+                  if(Object.prototype.hasOwnProperty.call(result.fields.data, "message")){
+                    // console.log("FOUND MESSAGE")
+                    if(Object.prototype.hasOwnProperty.call(result.fields.data.message, "knowledge_graph")){
+                      // console.log("FOUND KNOWLEDGE GRAPH")
+                      // if(result.message.results.length > 0){
+                        // console.log("HAS MORE THAN 0 RESULTS")
+                        this.ARSResultStatus[agent].resultCount = result.fields.data.message.results.length
+                      
+                    }
+                  }
+              }
 
-              if(i == resultList.length - 1 ){
+            // }
+
+            this.resultSetIDs.push(this.ARSResultStatus[agent])
+
+            // ################
+            // SORT THE STATUS TABLE ALPHABETICALLY
+            // ################
+            // let obj = this.ARSResultStatus
+            // let sorted = Object.keys(obj)
+            //   .sort()
+            //   .reduce((accumulator, key) => {
+            //     accumulator[key] = obj[key];
+
+            //     return accumulator;
+            //   }, {});
+            //   this.ARSResultStatus = sorted
+            //   this.componentKey++
+            //   console.log("SORTED THE STATUS TABLE")
+
+            if(i == resultList.length - 1 ){
+              // ################
+              // CHECK IF DATA WAS GOTTEN FOR ALL AGENTS
+              // ################      
+              console.log("FINISHED GETTING ALL THE RESULTS")
+
+              // let checkRerun = this.resultSetIDs.filter(x => x.resultCount == null && x.status != "Error")
+
+              // ################
+              // CHECK THE STATUS TO SEE IF ANY ARE STILL RUNNING - EXCLUDE UNSECRET FOR NOW
+              // ################ 
+              let checkRerun = this.resultSetIDs.filter(x => x.status == "Running" && x.name != "ara-unsecret")
+
+              console.log("ARSResultStatus = ", this.ARSResultStatus)
+              console.log("checkRerun = ", checkRerun)
+              if(checkRerun.length > 0 && this.count < 10){
+
                 // ################
-                // CHECK IF DATA WAS GOTTEN FOR ALL AGENTS
-                // ################      
-                console.log("FINISHED GETTING ALL THE RESULTS")
-                // ################
-                // CHECK THE STATUS TO SEE IF ANY ARE STILL RUNNING - EXCLUDE UNSECRET FOR NOW
+                // IF THERE ARE THINGS STILL RUNNING THEN WAIT FOR SECONDS 
+                // THEN THROUGH A NEW EVENT TO START LOOP OVER
+                // ELSE RETURN
                 // ################ 
-                // this.resultSetIDs = []
-                let checkRerun = this.resultSetIDs.filter(x => x.status == "Running" && x.name != "ara-unsecret")
 
-                console.log("ARSResultStatus = ", this.ARSResultStatus)
-                // console.log("i = ", i)
-                console.log("this.resultSetIDs = ")
-                console.log( this.resultSetIDs)
-                console.log("checkRerun = ", checkRerun)
-                // if (checkRerun.length > 0) {
-                  let res = {agentFinished: checkRerun.length, agentCount: resultList.length}
-                  this.resultSetIDs = []
-                  this.componentKey++
-                  resolve(res)
+                // console.log("WE HAVE TO CHECK AGAIN - NOT DONE")
+                console.log("COUNT OF TIMES CHECKED STATUS OF ALL = ", this.count)
+                await new Promise(resolve => setTimeout(resolve, 3000));
+                this.resultSetIDs = []
+                // this.ARSResultStatus = {}
+                this.count++
+                eventEmitter.emit("event");
                 
-              }    
-            }            
+              } else {
+                console.log("return")
+                // return
+              }
+              
+            }    
           }
+        }
 
+        })
+      })
       }) //Promise ending 
     },
-
-    async ARSCleanResults(){
-          return new Promise(async (resolve, reject) => { // eslint-disable-line
-
-          console.log("WENT TO NEXT STEP TO CLEAN RESULTS")
-          this.ARSResults = []
-          let keys = Object.keys(this.ARSResultStatus)
-          console.log(this.ARSResultStatus)
-          this.resultSetIDs = []
-          // console.log(keys)
-          // let tempResults = []
-
-          for (let i = 0; i < keys.length; i++) {
-            const id = keys[i];
-            console.log("id")
-            console.log(id)
-            this.resultSetIDs.push(this.ARSResultStatus[id])
-            // console.log("this.ARSResultStatus[id]")
-            // console.log(this.ARSResultStatus[id])
-
-            if(this.ARSResultStatus[id].results.fields.data != null){
-              if(Object.prototype.hasOwnProperty.call(this.ARSResultStatus[id].results.fields.data, "message")){
-                if(Object.prototype.hasOwnProperty.call(this.ARSResultStatus[id].results.fields.data.message, "knowledge_graph")){
-                  // console.log("CLEANING RESULTS")
-                  // console.log(this.ARSResultStatus[id].results)
-                  let cleanedResults = await TrapiResultClean.TrapiResultClean(this.ARSResultStatus[id].results.fields.data)
-                  console.log(cleanedResults)
-
-                  this.ARSResults = this.ARSResults.concat(cleanedResults) 
-
-                  if (i == keys.length - 1){
-                    // console.log("this.ARSResults INSIDE IF CLAUSE")
-                    // console.log("this.ARSResults before")
-                    // console.log(this.ARSResults)                    
-                    this.ARSResults = this.ARSResults.filter(x => this.synonyms.indexOf(x.subject) != -1)
-                    // console.log("this.synonyms")
-                    // console.log(this.synonyms)
-                    // console.log("this.ARSResults before")
-                    // console.log(this.ARSResults)                    
-
-
-                      if(this.resultGroup == "gene"){
-                        console.log("GENE run done - return")
-                        this.geneResults = this.ARSResults
-                        this.componentKey++
-                        resolve()
-                        return
-                      }
-                      if(this.resultGroup == "drug"){
-                        console.log("DRUG run done - return")
-                        this.drugResults = this.ARSResults
-                        this.componentKey++
-                      }
-                      
-                    // return
-                  }     
-
-                }
-              }   
-            } 
-            // else if (i == keys.length - 1){
-            if (i == keys.length - 1){
-              console.log("this.ARSResults - OUTSIDE IF CLAUSE")
-
-              this.ARSResults = this.ARSResults.filter(x => this.synonyms.indexOf(x.subject) != -1)
-              this.componentKey++
-
-                if(this.resultGroup == "gene"){
-                  console.log("GENE run done - return")
-                  this.geneResults = this.ARSResults
-                  this.componentKey++
-                  resolve()
-                  return
-                }
-                if(this.resultGroup == "drug"){
-                  console.log("DRUG run done - return")
-                  this.drugResults = this.ARSResults
-                  this.componentKey++
-                }
-                
-              
-
-            }      
-          }
-        })
-  },
-
 
     async ARSResultsLoop(query) {
       
@@ -1453,6 +1339,17 @@ export default {
 
               this.ARSResults = this.ARSResults.filter(x => this.synonyms.indexOf(x.subject) != -1)
 
+              let obj = this.ARSResultStatus
+              let sorted = Object.keys(obj)
+                .sort()
+                .reduce((accumulator, key) => {
+                  accumulator[key] = obj[key];
+
+                  return accumulator;
+                }, {});
+                this.ARSResultStatus = sorted
+              // this.ARSResultStatus =  this.ARSResultStatus.sort((a, b) => a.name.localeCompare(b.name));
+
               console.log(this.ARSResults)
               if(this.resultGroup == "gene"){
                 this.geneResults = this.ARSResults
@@ -1498,166 +1395,605 @@ export default {
       // }) // FROM PROMISE
     },
 
+    //   async eventLoop2() {
+    //   // concept_search
+    //   console.log("------ eventLoop2 REQUEST STARTED")
+    //   console.log(this.query)
+    //   let ARSRequest = await ARSService.ARSQuery(this.query)
+    //   console.log("ARSRequest")
+    //   console.log(ARSRequest)
+    //   // ARSStatus
+    //   let ARSrequestID = ARSRequest.pk
+    //   this.ARSrequestID = ARSrequestID
+      
+    //   // this.progressTable = []
+    //   // this.progressObject= {}
+    //   // this.geneIDList = []
+    //   // let length = this.hgncAll.length;
+    //   // let i = 0;
 
-    saveThisFile2(file, nametag) {
-      let text = "";
-      console.log("save result");
+    //   const EventEmitter = require("events");
+    //   class Emitter extends EventEmitter {}
+    //   const eventEmitter = new Emitter();
+    //   this.count = 0
+    //   eventEmitter.on("event", async () => {
 
-      let attributeInfo = ["value","value_url","attributes","description","value_type_id","attribute_source","attribute_type_id","original_attribute_name"]
-      for (let index = 0; index < file.length; index++) {
-        // const result = this.groupedResultsTable[index];
-        const result = file[index];
-        // console.log("result");
-        // console.log(result);
+    //   ARSService.ARSStatus(this.ARSrequestID)
+    //   .then(async (ARSStatus) => {
+    //     // let count = 1
+    //     console.log("ARSStatus")
+    //     console.log(ARSStatus)
+    //     let resultList  = ARSStatus.children
 
-        let headers = Object.keys(result);
-        let allHeaders = headers.concat(attributeInfo) 
-        // allHeaders = allHeaders 
-        console.log({headers})
+    //     if(resultList.length< 14){
+    //       console.log("less than 14")
+          
+    //       await new Promise(resolve => setTimeout(resolve, 3000));
+    //       console.log(new Date())
+    //       eventEmitter.emit("event")
+    //     } else {
+          
+    //       console.log("*** resultList = ", resultList)
+    //       for (let i = 0; i < resultList.length; i++) {
+    //         console.log("----- ----- ----- ----- -----")
 
-        if (index == 0) {
-          // #################
-          // HEADER ROW
-          // #################
 
-          for (let i = 0; i < allHeaders.length; i++) {
-            const header = allHeaders[i];
-          // IGNORE EDGEINFO BECAUSE IT WILL BE USED TO BREAK OUT EACH LINE OF EVIDENCE AS AN ATTRIBUTE objectAtt
-          // if(header != "edgeinfo" && header != "objectAtt" && header != "subjectAtt"){
+    //         const resInfo = resultList[i];
+    //         console.log(resInfo)
+    //         // console.log(resInfo.actor.agent)
+    //         // console.log(resInfo.code)
+    //         // console.log(resInfo.status)        
+    //         let result = await ARSService.ARSStatus(resInfo.message)
+    //         console.log("result = ", result)
 
-            if (i == allHeaders.length - 1) {
-              text = text + header + "\r\n"
+    //         let agent = resInfo.actor.agent
+    //         this.ARSResultStatus[agent] = {}
+    //         this.ARSResultStatus[agent]["agent"] = agent
+    //         this.ARSResultStatus[agent]["code"] = resInfo.code
+    //         this.ARSResultStatus[agent]["status"] = resInfo.status
+    //         this.ARSResultStatus[agent]["id"] = resInfo.message
+    //         this.ARSResultStatus[agent]["resultCount"] = null
+    //         this.ARSResultStatus[agent]["results"] = result
+
+    //         // CHECK IF THERE IS A KNOWLEDGE GRAPH
+    //         if(Object.prototype.hasOwnProperty.call(result, "message")){
+    //           // console.log("FOUND MESSAGE")
+    //           if(Object.prototype.hasOwnProperty.call(result.message, "knowledge_graph")){
+    //             // console.log("FOUND KNOWLEDGE GRAPH")
+    //             // if(result.message.results.length > 0){
+    //               // console.log("HAS MORE THAN 0 RESULTS")
+    //               this.ARSResultStatus[agent].resultCount = result.message.results.length
+
+                
+    //           }
+    //         }
+    //         this.resultSetIDs.push(this.ARSResultStatus[agent])
+
+            
+    //       // NOTE WHEN FINISHED
+    //         if(i == resultList.length - 1 ){
+    //           console.log("FINISHED GETTING ALL THE RESULTS")
+    //           // console.log(this.resultSetIDs)
+    //           // console.log("this.ARSResultStatus")
+    //           // console.log(this.ARSResultStatus)
+    //           let checkRerun = this.resultSetIDs.filter(x => x.resultCount == null && x.status != "Error")
+    //           // console.log("checkRerun = ", checkRerun)
+    //           if(checkRerun.length > 0 && this.count < 3){
+    //             console.log("WE HAVE TO CHECK AGAIN - NOT DONE")
+    //             console.log("count = ", this.count)
+    //             await new Promise(resolve => setTimeout(resolve, 5000));
+    //             this.resultSetIDs = []
+    //             // this.ARSResultStatus = {}
+    //             this.count++
+    //             eventEmitter.emit("event");
+                
+    //           } else {
+    //             return
+    //           }
               
-            } else {
-              text = text + header + ",";
-            }
-          // }
+    //         }    
+    //       }
+    //     }
 
-          }
-        }
-        // ADD REMAINING ROWS IN SAME ORDER BASED ON KEYS FROM HEADER ROW
-        // START ROW THEN REPEAT FOR EACH ATTRIBUTE
+    //     })
+    //     .then(async () => {
+    //       console.log("WENT TO NEXT STEP TO CLEAN RESULTS")
 
-        // #################
-        // START ROW
-        // #################
-        let rowData = ""
-        // #################
-        // GRAB EACH COMMON ELEMENT PER ROW - THEN APPEND EACH ATTRIBUTE OF EVIDENCE TO IT AND CREATE A NEW ROW
-        // #################
-        for (let n = 0; n < headers.length; n++) {
-          let header = headers[n]
-        // #################
-        // SKIP EDGGEINFO BC TOO MUCH PER ROW
-        // #################
-          // console.log("header")
-          // console.log(header)
-          // if(header != "edgeinfo" && header != "objectAtt" && header != "subjectAtt"){
-              //GET EVERY VALUE TO PUT IN A CELL
-              let cell = JSON.stringify(result[header]);
+    //       let keys = Object.keys(this.ARSResultStatus)
+    //       console.log(this.ARSResultStatus)
+    //       this.resultSetIDs = []
+    //       console.log(keys)
 
-              console.log("cell")
-              console.log(cell)
-              try {
-                cell = cell.replace(/,/gi, ";");
-                cell = cell.replace(/\n/gi, ";")
-              } catch (err) {
-                console.error(err);
-              }
-              rowData = rowData + cell + ","
-              // if(n == headers.length - 1){
-              //   text = rowData + "\r\n"
-              // }
+    //       for (let i = 0; i < keys.length; i++) {
+    //         const id = keys[i];
+    //         console.log("id")
+    //         console.log(id)
+    //         this.resultSetIDs.push(this.ARSResultStatus[id])
+    //         console.log("this.ARSResultStatus[id]")
+    //         console.log(this.ARSResultStatus[id])
+            
+    //         if(Object.prototype.hasOwnProperty.call(this.ARSResultStatus[id].results, "message")){
+    //           if(Object.prototype.hasOwnProperty.call(this.ARSResultStatus[id].results.message, "knowledge_graph")){
+    //             console.log("CLEANING RESULTS")
+    //             console.log(this.ARSResultStatus[id].results)
+    //             let cleanedResults = await TrapiResultClean.TrapiResultClean(this.ARSResultStatus[id].results)
+    //             console.log(cleanedResults)
+
+    //             this.ARSResults = this.ARSResults.concat(cleanedResults) 
+
+    //             if (i == keys.length - 1){
+    //               console.log("this.ARSResults")
+    //               console.log(this.ARSResults)
+    //               return
+    //             }     
+
+    //           }
+    //         }    
+    //         else if (i == keys.length - 1){
+    //               console.log("this.ARSResults")
+    //               console.log(this.ARSResults)
+    //           return
+
+    //         }      
+    //       }
+    //     }) 
+
+    //   })
+
+
+    //   eventEmitter.emit("event");
+    // },
+
+    // async ARScheckResults () {
+    //   this.ARSResultsSPO = []
+    //   // let ARSStatus = await ARSService.ARSStatus(this.ARSrequestID)
+    //   console.log("##### ##### ##### ##### ##### ##### ##### ")
+    //   console.log("##### ARSStatus checked by rerunning")
+    //   // console.log(ARSStatus)
+    //   this.resultSetIDs = []
+    //   // let continue = true
+
+    //   ARSService.ARSStatus(this.ARSrequestID)
+    //   .then(async (ARSStatus) => {
+    //     console.log("ARSStatus")
+    //     console.log(ARSStatus)
+    //     let resultList  = ARSStatus.children
+
+    //     for (let i = 0; i < resultList.length; i++) {
+    //       console.log("----- ----- ----- ----- -----")
+
+
+    //       const resInfo = resultList[i];
+    //         console.log(resInfo)
+    //         // console.log(resInfo.actor.agent)
+    //         // console.log(resInfo.code)
+    //         // console.log(resInfo.status)        
+    //       let result = await ARSService.ARSStatus(resInfo.message)
+    //       console.log("result = ", result)
+
+    //       let agent = resInfo.actor.agent
+    //       this.ARSResultStatus[agent] = {}
+    //       this.ARSResultStatus[agent]["agent"] = agent
+    //       this.ARSResultStatus[agent]["code"] = resInfo.code
+    //       this.ARSResultStatus[agent]["status"] = resInfo.status
+    //       this.ARSResultStatus[agent]["id"] = resInfo.message
+    //       this.ARSResultStatus[agent]["resultCount"] = null
+    //       this.ARSResultStatus[agent]["results"] = result
+
+    //       // CHECK IF THERE IS A KNOWLEDGE GRAPH
+    //       console.log(Object.prototype.hasOwnProperty.call(result, "message"))
+    //       if(Object.prototype.hasOwnProperty.call(result, "message")){
+    //         console.log("Has Knowledge Graph = ", (Object.prototype.hasOwnProperty.call(result.message, "knowledge_graph")))
+    //       }else {
+    //         console.log("Has Knowledge Graph = ", false)
+    //       }
+
+    //       // SHOW RESULTS
+    //       console.log(result)  
+
+    //       // IF THERE ARE  RESULTS SEND THEM TO BE CLEANED
+    //       if(Object.prototype.hasOwnProperty.call(result, "message")){
+    //         console.log("FOUND MESSAGE")
+    //         if(Object.prototype.hasOwnProperty.call(result.message, "knowledge_graph")){
+    //           console.log("FOUND KNOWLEDGE GRAPH")
+    //           // if(result.message.results.length > 0){
+    //             // console.log("HAS MORE THAN 0 RESULTS")
+    //             this.ARSResultStatus[agent].resultCount = result.message.results.length
+                
+    //             let resultObj = {"agent": resInfo.actor.agent,"status": resInfo.status, "code": resInfo.code, "id": resInfo.message, "resultCount":  result.message.results.length}
+    //             this.resultSetIDs.push(resultObj)
               
-              if(n == headers.length - 1){
-                // console.log("rowData")
-                // console.log(rowData)
-                // #################
-                // APPEND ROW DATA WITH ATTRIBUTE DATA FOR EACH ATTRIBUTE
-                // #################
-                let atts = result["edgeinfo"]["attributes"]
-                console.log("atts")
-                console.log(atts)
-                for (let m = 0; m < atts.length; m++) {
-                  const attGroup = atts[m];
-                  console.log("attGroup = ", attGroup)
-                  let attTextArray = []
-                    for (let x = 0; x < attributeInfo.length; x++) {
-                      const att = attributeInfo[x];
-                      // CREATE EMPTY DATA VALUE INCASE IT DOES NOT EXIST
-                      let attCell = ""
-                        // CHECK TO SEE IF THE PART OF THE ATTRIBUTE EXISTS - IF SO THEN SET VALUE TO THAT
-                        if(Object.prototype.hasOwnProperty.call(attGroup, att)){
-                          // console.log("FOUND ATTGROUP[ATT]")
-                          attCell = attGroup[att]
-                            // REPLACE COMMAS WITH SEMICOLONS SO THAT IT DOES NOT MESS UP CSV
-                            try {
-                              attCell = attCell.toString()
-                              attCell = attCell.replace(/,/gi, ";");
-                              attCell = attCell.replace(/\n/gi, ";")
-                            } catch (err) {
-                              console.error(err);
-                            }  
-                        }else {
-                          // console.log(" ---- DID NOT FIND ATTGROUP[ATT]")
-                        }
-                        // INSERT VALUE OR BLANK IN ARRAY AT SPECIFIC LOCATION SO IT WILL END UP IN THE RIGHT COLUMN
-                        attTextArray.splice(x, 0, attCell)
+    //         }
+    //       }
 
-                        if(x == attributeInfo.length - 1){
-                          console.log("GOT TO END OF ROW AND ADDED ALL ATTRIBUTES!")
-                          console.log("rowData")
-                          console.log(rowData)
-                          console.log("attTextArray")
-                          console.log(attTextArray)
-                          // REPEAT THE LINE TEXT AND ADD THE ATTRIBUTE TEXT AND ADD LINE BREAK
-                          // SHOULD GET ONE LINE FOR EACH ATTRIBUTE GROUP
-                          text = text + rowData + attTextArray.toString()   + "\r\n"
-                        }
-                      
-                    }                  
-                }
+          
+    //     // NOTE WHEN FINISHED
+    //       if(i == resultList.length - 1 ){
+    //         console.log("FINISHED GETTING ALL THE RESULTS")
+    //         console.log(this.resultSetIDs)
+    //         console.log("this.ARSResultStatus")
+    //         console.log(this.ARSResultStatus)
+    //         // return
+    //       }    
+    //     }
 
-              }
+    //   })
+    //   .then(async () => {
 
+    //     let keys = Object.keys(this.ARSResultStatus)
+    //     console.log(this.ARSResultStatus)
+    //     this.resultSetIDs = []
+    //     console.log(keys)
+
+    //     for (let i = 0; i < keys.length; i++) {
+    //       const id = keys[i];
+    //       console.log("id")
+    //       console.log(id)
+    //       this.resultSetIDs.push(this.ARSResultStatus[id])
+    //       console.log("this.ARSResultStatus[id]")
+    //       console.log(this.ARSResultStatus[id])
+          
+    //       if(Object.prototype.hasOwnProperty.call(this.ARSResultStatus[id].results, "message")){
+    //         if(Object.prototype.hasOwnProperty.call(this.ARSResultStatus[id].results.message, "knowledge_graph")){
+    //           console.log("CLEANING RESULTS")
+    //           console.log(this.ARSResultStatus[id].results)
+    //           let cleanedResults = await TrapiResultClean.TrapiResultClean(this.ARSResultStatus[id].results)
+    //           console.log(cleanedResults)
+
+    //           this.ARSResults = this.ARSResults.concat(cleanedResults) 
+
+    //           if (i == keys.length - 1){
+    //             return
+    //           }     
+
+    //         }
+    //       }    
+    //       else if (i == keys.length - 1){
+    //         return
+
+    //       }      
+    //     }
+    //   }) 
+    //   .then(async () => {
+
+    //     // this.synonyms 
+    //     let synData = await synonymService.normalizedSynonyms(this.concept_search)
+
+    //     this.synonyms = synData[this.concept_search].equivalent_identifiers.map(x => x.identifier)
+    //     console.log("this.synonyms")
+    //     console.log(this.synonyms)
+    //     return
+
+    //   })
+    //   .then(async () => {
+    //     console.log("this.ARSResults")
+    //     console.log(this.ARSResults)
+    //     // let tempResults = []
+
+    //     for (let i = 0; i < this.ARSResults.length; i++) {
+          
+    //       const res = this.ARSResults[i];
+    //       let resSPO = {}
+    //       // console.log("this.synonyms.indexOf(res.subject)")
+    //       // console.log(this.synonyms.indexOf(res.subject))
+    //       if(this.synonyms.indexOf(res.subject) != -1){
+    //       resSPO.object = res.objectName
+    //       resSPO.objectID = res.object
+    //       resSPO.predicate = res.predicate
+    //       resSPO.subject = res.subjectName
+    //       resSPO.subjectID = res.subject
+
+
+    //       this.ARSResultsSPO.push(resSPO)
+    //         if(i == this.ARSResults.length - 1){
+    //           console.log("this.ARSResultsSPO")
+    //           console.log(this.ARSResultsSPO)
+    //         }
+    //       }
+
+    //       // if(res.subject == "PR:000010162"){
+    //       //   console.log("PR:000010162")
+    //       //   console.log(res)
+    //       // }
+
+          
+    //     }
+    //   })   
+    //   .then(async ()=> {
+    //     let resultObjects = []
+    //     for (let i = 0; i < this.ARSResultsSPO.length; i++) {
+    //       const el = this.ARSResultsSPO[i];
+    //       // console.log("objectID")
+    //       // console.log(el.objectID)
+    //       if(resultObjects.indexOf(el.objectID) == -1){
+    //         resultObjects.push(el.objectID)
+    //       }
+    //       if(i == this.ARSResultsSPO.length -1){
+    //         return resultObjects
+    //       }
+          
+    //     }
+
+    //   })
+    //   .then(async(resultObjects)=>{
+    //     console.log("resultObjects")
+    //     console.log(resultObjects)
+    //     this.query.message.query_graph.nodes.gene0.ids = resultObjects
+    //     this.query.message.query_graph.nodes.gene1.categories = ["biolink:ChemicalMixture"]
+    //     console.log(this.query)
+    //     // this.tryARS()
+    //     console.log("####### END #######")
         
-
-        }
-        if(index == file.length - 1){
-          let filename = this.concept_search + "-" + nametag + " two hop results.csv";
-          let element = document.createElement("a");
-          element.setAttribute(
-            "href",
-            "data:application/json;charset=utf-8," + encodeURIComponent(text)
-          );
-          element.setAttribute("download", filename);
-
-          element.style.display = "none";
-          document.body.appendChild(element);
-
-          element.click();
-          document.body.removeChild(element);
-          console.log("file saved!!");
-        }
-      }
+    //   })
 
 
-    },
+    // },
+    
+    // async getGeneSynonyms() {
+    //   // SEND HGNC TO GET ALL SYNONYMS
+    //   PostService.getGeneSynonyms(this.concept_search)
+    //     .then(async (geneinfo) => {
+    //       //GETGENESYNONYMS - PULLS OUT THE DESIRED GENE INFO FROM THE CONCEPT FUNCTION
+
+    //       // ADD BACK THE HGNC ID
+    //       geneinfo.HGNC = this.concept_search;
+
+    //       // GETT THE PARENT TERM FOR PR SYNONYM
+    //       //the parent_id is the general form of the gene that is not species specific - it is also the only one that has drug resutls in the textmining KG
+
+    //       console.log(geneinfo.PR);
+    //       this.queryjson_subclass["message"]["query_graph"]["nodes"]["n2"][
+    //         "id"
+    //       ] = geneinfo.PR;
+    //       let query = this.queryjson_subclass;
+    //       // "api/posts/query/" - URL USED FOR QUERYMEDIK SERVICE
+    //       console.log("query");
+    //       console.log(query);
+    //       console.log(
+    //         "getPRparent query = ",
+    //         await PostService.getPRparent(query)
+    //       );
+    //       // let PRparentData = await PostService.queryMedik(query);
+    //       geneinfo.PRparent = await PostService.getPRparent(query);
+    //       return geneinfo;
+
+    //     })
+
+    //     .then(async (geneinfo) => {
+    //       console.log("********* skipped UMLS");
+    //       console.log("got UMLS info = ", geneinfo);
+    //       let nodes = {};
+    //       let edges = {};
+
+    //       // let currieTypes = ["HGNC","PRparent", "UniProtKB", "NCBI", "umls"]
+    //       let currieTypes = ["HGNC", "PRparent", "UniProtKB", "NCBI"];
+    //       for (let i = 0; i < currieTypes.length; i++) {
+    //         const currietype = currieTypes[i];
+
+    //         let currie = geneinfo[currietype];
+
+    //         if (typeof currie !== "undefined") {
+    //           this.query.message.query_graph.nodes.n2.id = currie;
+    //           let queryResults = await PostService.query_raw(this.query);
+    //           console.log(currie);
+    //           console.log(currietype);
+    //           console.log("queryResults");
+    //           console.log(queryResults);
+    //           // console.log(queryResults.message.knowledge_graph.edges );
+
+    //           edges = {
+    //             ...edges,
+    //             ...queryResults.message.knowledge_graph.edges,
+    //           };
+
+    //           nodes = {
+    //             ...nodes,
+    //             ...queryResults.message.knowledge_graph.nodes,
+    //           };
+    //         }
+    //         if (i == currieTypes.length - 1) {
+    //           console.log("edges");
+    //           console.log(edges);
+    //           console.log("nodes");
+    //           console.log(nodes);
+    //           this.nodelist = Object.keys(nodes);
+    //           return { edges: edges, nodes: nodes };
+    //         }
+    //       }
+    //     })
+    //     .then((results) => {
+    //       console.log(results);
+    //       let nodes = results.nodes;
+    //       let edgekeys = Object.keys(results.edges);
+
+    //       let combinedEdgeNodes = [];
+
+    //       for (let i = 0; i < edgekeys.length; i++) {
+    //         let ggData = {};
+    //         let edgeid = edgekeys[i];
+    //         let edge = results.edges[edgeid];
+    //         let subject = edge.subject;
+    //         let object = edge.object;
+
+    //         // ggData.edgeAtt = edge.attributes;
+    //         ggData.geneTwo = edge.object;
+    //         ggData.geneOne = edge.subject;
+    //         ggData.predicate_gg = edge.predicate;
+    //         ggData.relation_gg = edge.relation;
+    //         // ggData.geneOneAtt = nodes[subject].attributes;
+    //         // ggData.geneTwoAtt = nodes[object].attributes;
+    //         ggData.geneOneName = nodes[subject].name;
+    //         ggData.geneTwoName = nodes[object].name;
+    //         ggData.geneOneCat = nodes[subject].category;
+    //         ggData.geneTwoCat = nodes[object].category;
+
+    //         combinedEdgeNodes.push(ggData);
+
+    //         if (i == edgekeys.length - 1) {
+    //           return combinedEdgeNodes;
+    //         }
+    //       }
+    //     })
+    //     .then(async (results) => {
+    //       console.log(results);
+    //       let drugquery = this.query;
+
+    //       // let nodePlusSynonyms = []
+    //       for (let i = 0; i < results.length; i++) {
+    //         const result = results[i];
+    //         results[i].drugInfo = [];
+    //         // GET SYNONYMS OF ALL GENES
+    //         let synResults = await PostService.getSynonyms(result.geneOne);
+    //         console.log(synResults);
+    //         let synonyms = synResults.synonyms;
+    //         let synkeys = Object.keys(synonyms);
+
+    //         /// ######### needs review below #########
+    //         for (let n = 0; n < synkeys.length; n++) {
+    //           let syn = synkeys[n];
+    //           let nodedata = {};
+    //           nodedata.node = result.geneOne;
+    //           nodedata.PRparent = "";
+    //           nodedata.showSyn = "";
+
+    //           drugquery.message.query_graph.nodes.n1.category = "chem";
+    //           drugquery.message.query_graph.nodes.n2.id = syn;
+
+    //           if (
+    //             (syn.startsWith("NCBI") ||
+    //               syn.startsWith("UniProtKB") ||
+    //               syn.startsWith("PR") ||
+    //               syn.startsWith("UMLS")) &&
+    //             syn != "PR:000000001"
+    //           ) {
+    //             let queryDrugResults = {};
+
+    //             if (syn.startsWith("PR")) {
+    //               // HAVE TO GET PARENT BEFORE GETTING CHEMICALS
+    //               this.queryjson_subclass["message"]["query_graph"]["nodes"][
+    //                 "n2"
+    //               ]["id"] = syn;
+    //               let PRparent = await PostService.getPRparent(
+    //                 this.queryjson_subclass
+    //               );
+
+    //               // GET DRUG DATA ON PARENT
+    //               drugquery.message.query_graph.nodes.n2.id = PRparent;
+    //               queryDrugResults = await PostService.query_raw(drugquery);
+    //               // console.log("syn = ", syn)
+    //               // console.log({queryDrugResults})
+    //               nodedata.synonym = syn;
+    //               nodedata.drugs = queryDrugResults;
+    //               nodedata.PRparent = PRparent;
+    //               nodedata.showSyn = PRparent;
+    //               results[i].drugInfo.push(nodedata);
+    //             } else {
+    //               // IF NOT PR CURRIE THEN CAN GET CHEM DATA
+    //               queryDrugResults = await PostService.query_raw(drugquery);
+    //               // console.log("syn = ", syn)
+    //               // console.log({queryDrugResults})
+    //               nodedata.synonym = syn;
+    //               nodedata.showSyn = syn;
+    //               nodedata.drugs = queryDrugResults;
+    //               results[i].drugInfo.push(nodedata);
+    //             }
+    //           }
+    //         }
+    //         if (i == results.length - 1) {
+    //           return results;
+    //         }
+    //       }
+    //     })
+    //     .then(async (results) => {
+    //       console.log(results);
+    //       let tableResults = [];
+
+    //       for (let i = 0; i < results.length; i++) {
+    //         const result = results[i];
+
+    //         for (let n = 0; n < result.drugInfo.length; n++) {
+    //           const drug = result.drugInfo[n];
+    //           // console.log(drug)
+    //           let drugedges =
+    //             drug["drugs"]["message"]["knowledge_graph"]["edges"];
+    //           // console.log("drugedges = ", drugedges)
+    //           let drugnodes =
+    //             drug["drugs"]["message"]["knowledge_graph"]["nodes"];
+    //           // console.log("drugnodes = ", drugnodes)
+
+    //           let drugedgekeys = Object.keys(drugedges);
+    //           for (let x = 0; x < drugedgekeys.length; x++) {
+    //             let dggResult = {};
+    //             const key = drugedgekeys[x];
+    //             let drug = drugedges[key];
+    //             // console.log("drug")
+    //             // console.log(drug)
+
+    //             // dggResult.edgeAtt = result.edgeAtt;
+    //             dggResult.geneTwo = result.geneTwo;
+    //             dggResult.geneOne = result.geneOne;
+    //             dggResult.predicate_gg = result.predicate_gg;
+    //             dggResult.relation_gg = result.relation_gg;
+    //             // dggResult.geneOneAtt = result.geneOneAtt;
+    //             // dggResult.geneTwoAtt = result.geneTwoAtt;
+    //             dggResult.geneOneName = result.geneOneName;
+    //             dggResult.geneTwoName = result.geneTwoName;
+    //             dggResult.geneOneCat = result.geneOneCat;
+    //             dggResult.geneTwoCat = result.geneTwoCat;
+    //             dggResult.showSyn = drug.showSyn;
+    //             // dggResult.drugAtt = drug.atrributes;
+    //             dggResult.predicateAtt_dg = drug.attributes;
+    //             dggResult.predicate_dg = drug.predicate;
+    //             dggResult.drug = drug.subject;
+    //             dggResult.drugName = drugnodes[drug.subject].name;
+    //             dggResult.drugCat = drugnodes[drug.subject].category;
+    //             // dggResult.drugAtt = drugnodes[drug.subject].attributes;
+
+    //             tableResults.push(dggResult);
+    //             // nodedata.showSyn
+    //           }
+    //         }
+    //         if (i == results.length - 1) {
+    //           console.log("tableResults");
+    //           console.log(tableResults);
+    //           return tableResults;
+    //         }
+    //       }
+    //     })
+    //     .then(async (results) => {
+    //       console.log("finished table results");
+    //       console.log(results);
+    //       // const result = words.filter(word => word.length > 6);
+    //       let filteredResults = results.filter(
+    //         (result) =>
+    //           this.predicate_both.indexOf(result.predicate_dg.split(":")[1]) >
+    //             -1 ||
+    //           this.predicate_both.indexOf(result.predicate_gg.split(":")[1]) >
+    //             -1
+    //       );
+    //       let filteredResultsmore = results.filter(
+    //         (result) =>
+    //           this.predicate_both.indexOf(result.predicate_dg.split(":")[1]) >
+    //             -1 &&
+    //           this.predicate_both.indexOf(result.predicate_gg.split(":")[1]) >
+    //             -1
+    //       );
+    //       console.log("filteredResults = ", filteredResults);
+
+    //       // let predicateArray = []
+    //       // let predicateAllArray = []
+    //       console.log("filteredResults = ", filteredResults);
+    //       console.log("filteredResultsmore = ", filteredResultsmore);
+    //       this.filteredResultsmore = filteredResultsmore;
+
+    //     });
+
+    // },
+
 
     saveThisFile(file, nametag) {
       let text = "";
       console.log("save result");
-
-// {
-//     "value": "infores:automat-robokop",
-//     "value_url": null,
-//     "attributes": null,
-//     "description": null,
-//     "value_type_id": null,
-//     "attribute_source": null,
-//     "attribute_type_id": "biolink:aggregator_knowledge_source",
-//     "original_attribute_name": null
-// }
 
       for (let index = 0; index < file.length; index++) {
         // const result = this.groupedResultsTable[index];
@@ -1722,10 +2058,6 @@ export default {
       document.body.removeChild(element);
       console.log("file saved!!");
     },
-
-
-
-
     saveFile() {
       let text = "";
       console.log("save result");
