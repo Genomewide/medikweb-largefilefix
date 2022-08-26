@@ -29,7 +29,8 @@
     "mongodb": "^3.6.3",
     "mongoose": "^5.11.10",
     "vue-d2b": "^2.0.4",
-    "vue-d3-sunburst": "^1.9.1"
+    "vue-d3-sunburst": "^1.9.1",
+    "vue-table-to-excel": "^1.0.6"
   },
   "devDependencies": {
     "@vue/cli-plugin-router": "^4.5.10",

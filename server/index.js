@@ -51,6 +51,6 @@ if(process.env.NODE_ENV === 'production'){
 
 // console.log(listEndpoints(app));
 
-const port = process.env.PORT || 5001;
+const port = process.env.PORT || 5002;
 
 app.listen(port, () => console.log(`Server stared on port ${port}`))
