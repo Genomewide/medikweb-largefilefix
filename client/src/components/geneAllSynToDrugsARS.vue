@@ -109,6 +109,7 @@
                   <p text-muted>Enter the HGNC ID in the format shown</p>
                 </b-form>
               </b-form-group>
+              genePk: {{genePk}} -- drugPk: {{drugPk}}
               Example: {{ARSrequestID}} 
                               <b-button
                     style="margin-left: 20px"
@@ -116,14 +117,19 @@
                     v-on:click="openARAX"
                     >openARAX
                   </b-button>
-
+                   <b-button
+                    style="margin-left: 20px"
+                    variant="primary"
+                    v-on:click="testRerunPK"
+                    >testRerunPK
+                  </b-button>
             </div>
           </b-form>
         </b-col>
-        <!-- <b-col>
+        <b-col  v-if="showTerm">
 
-          <transition name="fade">
-            <div v-if="show_waiting_card">
+          <transition name="fade"> 
+            <div v-if="showTerm">
               <b-card
                 border-variant="primary"
                 header-tag="header"
@@ -133,16 +139,16 @@
               >
                 <template #header>
                   <div>
-                    <h4 class="mb-0">What are we waiting for..</h4>
+                    <h4 class="mb-0">{{queryTargetLabel}}</h4>
                   </div>
                 </template>
                 <b-card-text>
-                  <h5>{{ waitingfor_text }}</h5></b-card-text
+                  <h5>{{queryTargetId}}</h5></b-card-text
                 >
               </b-card>
             </div>
           </transition>
-        </b-col> -->
+        </b-col>
       </b-row>
 
       <b-container style="margin-top: 20px" :key="componentKey" fluid>
@@ -481,7 +487,7 @@ export default {
       edges: [],
       subject: "chemical",
       predicate: "UMLS:C0004096",
-      concept_search: "HGNC:16716",
+      concept_search: "HGNC:11998",
       testNormalizationArray: ["HGNC:18481", "HGNC:6884" , "HGNC:2625", "HGNC:11998", "HGNC:3236", "HGNC:1100", "HGNC:9588", "HGNC:16716"],
       // HGNC:18481
       // HGNC:6884" MAPK8IP3
@@ -849,7 +855,7 @@ export default {
       geneIDList: [],
       currentDrug: "test",
       araxResultTable: [],
-      ARSrequestID: "f92c8a10-551f-4086-a036-6f6e3162eb42",
+      ARSrequestID: "c923ae1e-2b01-460e-9909-c13a2451e07b",
       resultSetIDs: [],
       ARSResultStatus: {},
       ARSJobId: "bc32c185-6a97-4aff-b467-aa2fac22e275",
@@ -862,7 +868,13 @@ export default {
       geneResults:[],
       drugResults:[],
       queryTerms: [],
-      normalizedTermsAll:[]
+      normalizedTermsAll:[],
+      showTerm: false,
+      queryTarget:"",
+      queryTargetId:"",
+      queryTargetLabel:"",
+      genePk: "",
+      drugPk: ""
 
     };
   },
@@ -878,6 +890,62 @@ export default {
       let url = "https://arax.ncats.io/?r=" + this.ARSrequestID
         window.open(url, "_blank");    
     },
+
+  async testRerunPK(){
+
+    let ARSStatus =  await ARSService.pkQueryData(this.ARSrequestID)
+    console.log("ARSStatus")
+    console.log(ARSStatus)
+
+    this.queryTarget = ARSStatus.fields.data.message.query_graph.nodes.targetGene.ids
+    console.log("this.queryTarget")
+    console.log(this.queryTarget)
+    this.queryTargetId = this.queryTarget[0]
+
+    let normalNodes = await this.nodeNormalize(this.queryTarget)
+    this.showTerm = true
+    console.log("normalNodes")
+    console.log(normalNodes)
+
+    await this.ARSStatusTable()
+
+            for (let i = 0; i < 10; i++) {
+          let ARSStatusCheck = await this.ARSStatusTable()
+            // ################
+            // SORT THE STATUS TABLE ALPHABETICALLY
+            // ################
+            let obj = this.ARSResultStatus
+            let sorted = Object.keys(obj)
+              .sort()
+              .reduce((accumulator, key) => {
+                accumulator[key] = obj[key];
+                return accumulator;
+              }, {});
+              this.ARSResultStatus = sorted
+              
+          console.log("SORTED THE STATUS TABLE")
+          this.componentKey++
+          console.log("I LOOP NUMBER = ", i)
+          // console.log("ARSStatusCheck")
+          // console.log(ARSStatusCheck)
+          // ################
+          // CHECK STATUS OF RESULTS
+          // ################          
+          if(ARSStatusCheck.agentFinished == 0 && ARSStatusCheck.agentCount >13){
+            i = 10
+            // console.log("finish before looping to 10!")
+            // console.log("this.ARSResultStatus")
+            // console.log(this.ARSResultStatus)
+
+            this.componentKey++
+            return
+          } else {
+            await new Promise(resolve => setTimeout(resolve, 5000));
+          }
+        }
+    
+
+  },
 
     async tryARS2() {
 
@@ -970,9 +1038,8 @@ export default {
                 return accumulator;
               }, {});
               this.ARSResultStatus = sorted
-
               
-              console.log("SORTED THE STATUS TABLE")
+          console.log("SORTED THE STATUS TABLE")
           this.componentKey++
           console.log("I LOOP NUMBER = ", i)
           // console.log("ARSStatusCheck")
@@ -989,10 +1056,8 @@ export default {
             this.componentKey++
             return
           } else {
-            await new Promise(resolve => setTimeout(resolve, 3000));
+            await new Promise(resolve => setTimeout(resolve, 5000));
           }
-
-
         }
 
       }) //ARSCleanResults
@@ -1007,18 +1072,59 @@ export default {
           let genesForDrug = this.ARSResults.map(x => x.object)
           genesForDrug.push(this.concept_search)
           this.queryTerms = genesForDrug
-          console.log("this.queryTerms")
-          console.log(this.queryTerms)
+          // console.log("this.queryTerms")
+          // console.log(this.queryTerms)
           let fileName = this.concept_search + "_gene_gene"
           this.saveThisFile2(this.geneResults, fileName)
           this.tryARS2()
         } else{
+          let fileName = this.concept_search + "_drug_gene"
+          this.saveThisFile2(this.drugResults, fileName)
           console.log("THIS IS THE END")
         }
 
         // if()
       })
 
+    },
+
+
+    async nodeNormalize(queryTarget){
+
+    return new Promise(async (resolve, reject) => { // eslint-disable-line
+      console.log("node normal started")
+      // #######################
+      // LOOP THROUGH ALL TERMS TO GET ALL SYNONYMS
+      // #######################
+      synonymService.nodeNormalizationPost(queryTarget)
+      .then(async (normalizedTerms) => {
+      // console.log("passed .then()")
+      this.queryTargetLabel = normalizedTerms[queryTarget[0]].id.label
+
+        let normalKeys = Object.keys(normalizedTerms)
+        let synonyms = []
+        // PROCESS NODENORMALIZER DATA
+        for (let i = 0; i < normalKeys.length; i++) {
+          const key = normalKeys[i];
+          let termData = normalizedTerms[key]
+          // console.log("normalizedTerms[key]")
+          // console.log(normalizedTerms[key])
+          let normTerms = termData.equivalent_identifiers.map(x => x.identifier)
+          synonyms = synonyms.concat(normTerms)
+
+          if(i == normalKeys.length - 1){
+            console.log("synonyms")
+            console.log(synonyms)
+            resolve(synonyms)
+            return
+
+          }
+
+        }
+        // reject(err)
+
+      })
+    })
     },
 
     async setPK(query) {
@@ -1030,17 +1136,24 @@ export default {
       // ################
       // SEND TO ARS
       // ################
-      console.log("################################################")
-      console.log("RUNNING QUERY AFTER THIS")
-      console.log("################################################")
+      // console.log("################################################")
+      // console.log("RUNNING QUERY AFTER THIS")
+      // console.log("################################################")
       let ARSRequest = await ARSService.ARSQuery(query)
-      console.log("query - ", this.resultGroup)
-      console.log(query)      
-      console.log("--------- ARSRequest ---------")
-      console.log(ARSRequest)
+      // console.log("query - ", this.resultGroup)
+      // console.log(query)      
+      // console.log("--------- ARSRequest ---------")
+      // console.log(ARSRequest)
       // ARSStatus - GET PK FROM ARS TO LOOP AND CHECK 
       let ARSrequestID = ARSRequest.pk
       this.ARSrequestID = ARSrequestID
+
+      if(this.resultGroup == "gene"){
+        this.genePk = ARSrequestID
+      }
+      if(this.resultGroup == "drug"){
+        this.drugPk = ARSrequestID
+      }
       resolve(ARSrequestID)
       })
     },
@@ -1051,21 +1164,19 @@ export default {
     async ARSStatusTable () {
       return new Promise(async (resolve, reject) => { // eslint-disable-line
 
-      // this.ARSResults = []
-   
       let ARSStatus =  await ARSService.ARSStatus(this.ARSrequestID)
 
         let resultList = []
         console.log("ARSStatus")
         console.log(ARSStatus)
         resultList  = ARSStatus.children
-        console.log("# of sets of results = ", resultList.length)
+        // console.log("# of sets of results = ", resultList.length)
 
         // ################
         // WAIT FOR 14 RESULTS SO THAT YOU DON'T PROCESS UNTIL THEY ARE ALL RESPONDING WITH SOMETHING - EVEN IF NOT COMLPLETED
         // ################
           
-          console.log("*** resultList = ", resultList)
+          // console.log("*** resultList = ", resultList)
           
           // let recheckStat = ["Running"]
           if(resultList.length == 0){
@@ -1127,13 +1238,13 @@ export default {
                 // CHECK THE STATUS TO SEE IF ANY ARE STILL RUNNING - EXCLUDE UNSECRET FOR NOW
                 // ################ 
                 // this.resultSetIDs = []
-                let checkRerun = this.resultSetIDs.filter(x => x.status == "Running" && x.name != "ara-unsecret")
+                let checkRerun = this.resultSetIDs.filter(x => x.status == "Running" && x.agent != "ara-unsecret")
 
-                console.log("ARSResultStatus = ", this.ARSResultStatus)
+                // console.log("ARSResultStatus = ", this.ARSResultStatus)
                 // console.log("i = ", i)
-                console.log("this.resultSetIDs = ")
-                console.log( this.resultSetIDs)
-                console.log("checkRerun = ", checkRerun)
+                // console.log("this.resultSetIDs = ")
+                // console.log( this.resultSetIDs)
+                // console.log("checkRerun = ", checkRerun)
                 // if (checkRerun.length > 0) {
                   let res = {agentFinished: checkRerun.length, agentCount: resultList.length}
                   this.resultSetIDs = []
@@ -1163,15 +1274,15 @@ export default {
             console.log("id")
             console.log(id)
             this.resultSetIDs.push(this.ARSResultStatus[id])
-            // console.log("this.ARSResultStatus[id]")
-            // console.log(this.ARSResultStatus[id])
+            console.log("this.ARSResultStatus[id]")
+            console.log(this.ARSResultStatus[id])
 
             if(this.ARSResultStatus[id].results.fields.data != null){
               if(Object.prototype.hasOwnProperty.call(this.ARSResultStatus[id].results.fields.data, "message")){
                 if(Object.prototype.hasOwnProperty.call(this.ARSResultStatus[id].results.fields.data.message, "knowledge_graph")){
-                  // console.log("CLEANING RESULTS")
-                  // console.log(this.ARSResultStatus[id].results)
-                  let cleanedResults = await TrapiResultClean.TrapiResultClean(this.ARSResultStatus[id].results.fields.data)
+                  console.log("CLEANING RESULTS")
+                  console.log(this.ARSResultStatus[id].results)
+                  let cleanedResults = await TrapiResultClean.TrapiResultClean(this.ARSResultStatus[id].results.fields.data, id)
                   console.log(cleanedResults)
 
                   this.ARSResults = this.ARSResults.concat(cleanedResults) 
@@ -1179,13 +1290,10 @@ export default {
                   if (i == keys.length - 1){
                     // console.log("this.ARSResults INSIDE IF CLAUSE")
                     // console.log("this.ARSResults before")
-                    // console.log(this.ARSResults)                    
-                    this.ARSResults = this.ARSResults.filter(x => this.synonyms.indexOf(x.subject) != -1)
-                    // console.log("this.synonyms")
-                    // console.log(this.synonyms)
-                    // console.log("this.ARSResults before")
-                    // console.log(this.ARSResults)                    
-
+                    // console.log(this.ARSResults)    
+                    
+                    // ### MAY NEED TO TURN BACK ON:
+                    this.ARSResults = this.ARSResults.filter(x => this.synonyms.indexOf(x.subject) != -1)                                 
 
                       if(this.resultGroup == "gene"){
                         console.log("GENE run done - return")
@@ -1198,6 +1306,8 @@ export default {
                         console.log("DRUG run done - return")
                         this.drugResults = this.ARSResults
                         this.componentKey++
+                        resolve()
+                        return
                       }
                       
                     // return
@@ -1234,269 +1344,6 @@ export default {
   },
 
 
-    async ARSResultsLoop(query) {
-      
-      this.ARSResults = []
-      console.log("------ eventLoop2 REQUEST STARTED")
-
-      // ################
-      // SEND TO ARS
-      // ################
-      console.log("################################################")
-      console.log("RUNNING QUERY AFTER THIS")
-      console.log("################################################")
-      let ARSRequest = await ARSService.ARSQuery(query)
-      console.log("query - ", this.resultGroup)
-      console.log(query)      
-      console.log("--------- ARSRequest ---------")
-      console.log(ARSRequest)
-      // ARSStatus - GET PK FROM ARS TO LOOP AND CHECK 
-      let ARSrequestID = ARSRequest.pk
-      this.ARSrequestID = ARSrequestID
-
-      // ################
-      // START LOOP VIA EVENTS
-      // ################
-
-      const EventEmitter = require("events");
-      class Emitter extends EventEmitter {}
-      const eventEmitter = new Emitter();
-      this.count = 0
-      eventEmitter.on("event", async () => {
-      console.log("************************************************")
-      console.log("EVENT EMMITTED")
-      console.log("************************************************")
-      ARSService.ARSStatus(this.ARSrequestID)
-      .then(async (ARSStatus) => {
-        // let count = 1
-        let resultList = []
-        console.log("ARSStatus")
-        console.log(ARSStatus)
-        resultList  = ARSStatus.children
-        console.log("# of sets of results = ", resultList.length)
-
-        // let recheck = []
-
-        // ################
-        // WAIT FOR 14 RESULTS SO THAT YOU DON'T PROCESS UNTIL THEY ARE ALL RESPONDING WITH SOMETHING - EVEN IF NOT COMLPLETED
-        // ################
-
-        if(resultList.length< 14){
-          console.log("less than 14")
-          
-          await new Promise(resolve => setTimeout(resolve, 3000));
-          console.log(new Date())
-          eventEmitter.emit("event")
-        } else {
-          
-          console.log("*** resultList = ", resultList)
-          
-          // let recheckStat = ["Running"]
-          for (let i = 0; i < resultList.length; i++) {
-
-            // ################
-            // LOOPING THROUGH EACH OF THE RESULTS FROM THE ARS STATUS TO COLLECT ALL OF THE INFORATION
-            // ################
-
-            const resInfo = resultList[i];       
-            let result = await ARSService.ARSResult(resInfo.message)
-
-            let agent = resInfo.actor.agent
-            // if(recheck.indexOf(agent) == -1){
-              console.log("agent")
-              console.log(agent)
-              console.log({result})
-
-              this.ARSResultStatus[agent] = {}
-              this.ARSResultStatus[agent]["agent"] = agent
-              this.ARSResultStatus[agent]["code"] = resInfo.code
-              this.ARSResultStatus[agent]["status"] = resInfo.status
-              this.ARSResultStatus[agent]["id"] = resInfo.message
-              this.ARSResultStatus[agent]["resultCount"] = null
-              this.ARSResultStatus[agent]["results"] = result
-
-              // this.showARS = true
-
-              // if(resInfo.status == "Running" && resInfo.agent != "ara-unsecret"){
-              //   recheck.push(agent)
-              // }
-
-              // CHECK IF THERE IS A KNOWLEDGE GRAPH
-              if(result.fields.data != null){
-                  if(Object.prototype.hasOwnProperty.call(result.fields.data, "message")){
-                    // console.log("FOUND MESSAGE")
-                    if(Object.prototype.hasOwnProperty.call(result.fields.data.message, "knowledge_graph")){
-                      // console.log("FOUND KNOWLEDGE GRAPH")
-                      // if(result.message.results.length > 0){
-                        // console.log("HAS MORE THAN 0 RESULTS")
-                        this.ARSResultStatus[agent].resultCount = result.fields.data.message.results.length
-                      
-                    }
-                  }
-              }
-
-            // }
-
-            this.resultSetIDs.push(this.ARSResultStatus[agent])
-
-            // ################
-            // SORT THE STATUS TABLE ALPHABETICALLY
-            // ################
-            // let obj = this.ARSResultStatus
-            // let sorted = Object.keys(obj)
-            //   .sort()
-            //   .reduce((accumulator, key) => {
-            //     accumulator[key] = obj[key];
-
-            //     return accumulator;
-            //   }, {});
-            //   this.ARSResultStatus = sorted
-            //   this.componentKey++
-            //   console.log("SORTED THE STATUS TABLE")
-
-            if(i == resultList.length - 1 ){
-              // ################
-              // CHECK IF DATA WAS GOTTEN FOR ALL AGENTS
-              // ################      
-              console.log("FINISHED GETTING ALL THE RESULTS")
-
-              // let checkRerun = this.resultSetIDs.filter(x => x.resultCount == null && x.status != "Error")
-
-              // ################
-              // CHECK THE STATUS TO SEE IF ANY ARE STILL RUNNING - EXCLUDE UNSECRET FOR NOW
-              // ################ 
-              let checkRerun = this.resultSetIDs.filter(x => x.status == "Running" && x.name != "ara-unsecret")
-
-              console.log("ARSResultStatus = ", this.ARSResultStatus)
-              console.log("checkRerun = ", checkRerun)
-              if(checkRerun.length > 0 && this.count < 10){
-
-                // ################
-                // IF THERE ARE THINGS STILL RUNNING THEN WAIT FOR SECONDS 
-                // THEN THROUGH A NEW EVENT TO START LOOP OVER
-                // ELSE RETURN
-                // ################ 
-
-                // console.log("WE HAVE TO CHECK AGAIN - NOT DONE")
-                console.log("COUNT OF TIMES CHECKED STATUS OF ALL = ", this.count)
-                await new Promise(resolve => setTimeout(resolve, 3000));
-                this.resultSetIDs = []
-                // this.ARSResultStatus = {}
-                this.count++
-                eventEmitter.emit("event");
-                
-              } else {
-                console.log("return")
-                // return
-              }
-              
-            }    
-          }
-        }
-
-        })
-        .then(async () => {
-          console.log("MAKE IT STOP!!")
-        })
-        .then(async () => {
-          console.log("WENT TO NEXT STEP TO CLEAN RESULTS")
-          this.ARSResults = []
-          let keys = Object.keys(this.ARSResultStatus)
-          console.log(this.ARSResultStatus)
-          this.resultSetIDs = []
-          // console.log(keys)
-          // let tempResults = []
-
-          for (let i = 0; i < keys.length; i++) {
-            const id = keys[i];
-            // console.log("id")
-            // console.log(id)
-            this.resultSetIDs.push(this.ARSResultStatus[id])
-            // console.log("this.ARSResultStatus[id]")
-            // console.log(this.ARSResultStatus[id])
-
-            if(this.ARSResultStatus[id].results.fields.data != null){
-              if(Object.prototype.hasOwnProperty.call(this.ARSResultStatus[id].results.fields.data, "message")){
-                if(Object.prototype.hasOwnProperty.call(this.ARSResultStatus[id].results.fields.data.message, "knowledge_graph")){
-                  // console.log("CLEANING RESULTS")
-                  // console.log(this.ARSResultStatus[id].results)
-                  let cleanedResults = await TrapiResultClean.TrapiResultClean(this.ARSResultStatus[id].results.fields.data)
-                  // console.log(cleanedResults)
-
-                  this.ARSResults = this.ARSResults.concat(cleanedResults) 
-                  // tempResults = tempResults.concat(cleanedResults) 
-
-                  if (i == keys.length - 1){
-                    console.log("this.ARSResults INSIDE IF CLAUSE")
-                    // this.ARSResult = tempResults
-                    
-                    this.ARSResults = this.ARSResults.filter(x => this.synonyms.indexOf(x.subject) != -1)
-                    // console.log(this.ARSResults)
-
-
-                      if(this.resultGroup == "gene"){
-                        this.geneResults = this.ARSResults
-                        return
-                      }
-                      if(this.resultGroup == "drug"){
-                        this.drugResults = this.ARSResults
-                      }
-                    // return
-                  }     
-
-                }
-              }   
-            } 
-            // else if (i == keys.length - 1){
-            if (i == keys.length - 1){
-              console.log("this.ARSResults - OUTSIDE IF CLAUSE")
-
-              this.ARSResults = this.ARSResults.filter(x => this.synonyms.indexOf(x.subject) != -1)
-
-              console.log(this.ARSResults)
-              if(this.resultGroup == "gene"){
-                this.geneResults = this.ARSResults
-                this.componentKey++
-
-                return
-              }
-              if(this.resultGroup == "drug"){
-                this.drugResults = this.ARSResults
-                this.componentKey++
-
-              }
-              // resolve(this.ARSResults);
-              
-
-            }      
-          }
-        })
-        .then(async () => {
-          // ################################################
-          // DONE WITH GENE - GENE NOW UPDATE QUERY AND RUN AGAIN FOR 
-          // ################################################
-          // GET THE CURIES FOR GENES TO TARGET WITH DRUGS
-          // GET THEIR SYNONYMS TO FILTER OUT THE EXTRANEOUS 
-          // THEN RUN THE PROGRAM AGAIN
-          console.log("made it through!")
-          let genesForDrug = this.ARSResults.map(x => x.subject)
-          this.queryTerms = genesForDrug
-          console.log("this.ARSResults")
-          console.log(this.ARSResults)
-          console.log("genesForDrug")
-          console.log(genesForDrug)
-          this.resultGroup = "drug"
-          // this.tryARS2()
-
-          
-        }) 
-
-      })
-
-      eventEmitter.emit("event");
-
-      // }) // FROM PROMISE
-    },
 
 
     saveThisFile2(file, nametag) {
@@ -1513,7 +1360,7 @@ export default {
         let headers = Object.keys(result);
         let allHeaders = headers.concat(attributeInfo) 
         // allHeaders = allHeaders 
-        console.log({headers})
+        // console.log({headers})
 
         if (index == 0) {
           // #################
@@ -1542,6 +1389,7 @@ export default {
         // START ROW
         // #################
         let rowData = ""
+        let pubmedAtt = []
         // #################
         // GRAB EACH COMMON ELEMENT PER ROW - THEN APPEND EACH ATTRIBUTE OF EVIDENCE TO IT AND CREATE A NEW ROW
         // #################
@@ -1555,11 +1403,10 @@ export default {
           // if(header != "edgeinfo" && header != "objectAtt" && header != "subjectAtt"){
               //GET EVERY VALUE TO PUT IN A CELL
               let cell = JSON.stringify(result[header]);
-
-              console.log("cell")
-              console.log(cell)
+              // console.log("cell")
+              // console.log(cell)
               try {
-                cell = cell.replace(/,/gi, ";");
+                cell = cell.replace(/,/gi, ";")
                 cell = cell.replace(/\n/gi, ";")
               } catch (err) {
                 console.error(err);
@@ -1576,14 +1423,22 @@ export default {
                 // APPEND ROW DATA WITH ATTRIBUTE DATA FOR EACH ATTRIBUTE
                 // #################
                 let atts = result["edgeinfo"]["attributes"]
-                console.log("atts")
-                console.log(atts)
+                // console.log("atts")
+                // console.log(atts)
+
                 for (let m = 0; m < atts.length; m++) {
                   const attGroup = atts[m];
-                  console.log("attGroup = ", attGroup)
+                  console.log("attGroup check")
+                  if(attGroup.attribute_source == "infores:pubmed" || attGroup.attribute_source  == "infores:text-mining-provider-targeted"){
+                    console.log("attGroup - publications = ", attGroup)
+                    pubmedAtt.push(attGroup)
+                  }
                   let attTextArray = []
                     for (let x = 0; x < attributeInfo.length; x++) {
                       const att = attributeInfo[x];
+                      // console.log("att")
+                      // console.log(att)
+
                       // CREATE EMPTY DATA VALUE INCASE IT DOES NOT EXIST
                       let attCell = ""
                         // CHECK TO SEE IF THE PART OF THE ATTRIBUTE EXISTS - IF SO THEN SET VALUE TO THAT
@@ -1591,13 +1446,16 @@ export default {
                           // console.log("FOUND ATTGROUP[ATT]")
                           attCell = attGroup[att]
                             // REPLACE COMMAS WITH SEMICOLONS SO THAT IT DOES NOT MESS UP CSV
-                            try {
-                              attCell = attCell.toString()
-                              attCell = attCell.replace(/,/gi, ";");
-                              attCell = attCell.replace(/\n/gi, ";")
-                            } catch (err) {
-                              console.error(err);
-                            }  
+                            if(attCell != null){
+                              try {
+                                attCell = attCell.toString()
+                                attCell = attCell.replace(/,/gi, ";");
+                                attCell = attCell.replace(/\n/gi, ";")
+                              } catch (err) {
+                                console.error(err);
+                              }                               
+                            }
+ 
                         }else {
                           // console.log(" ---- DID NOT FIND ATTGROUP[ATT]")
                         }
@@ -1605,14 +1463,15 @@ export default {
                         attTextArray.splice(x, 0, attCell)
 
                         if(x == attributeInfo.length - 1){
-                          console.log("GOT TO END OF ROW AND ADDED ALL ATTRIBUTES!")
-                          console.log("rowData")
-                          console.log(rowData)
-                          console.log("attTextArray")
-                          console.log(attTextArray)
+                          // console.log("GOT TO END OF ROW AND ADDED ALL ATTRIBUTES!")
+                          // console.log("rowData")
+                          // console.log(rowData)
+                          // console.log("attTextArray")
+                          // console.log(attTextArray)
                           // REPEAT THE LINE TEXT AND ADD THE ATTRIBUTE TEXT AND ADD LINE BREAK
                           // SHOULD GET ONE LINE FOR EACH ATTRIBUTE GROUP
                           text = text + rowData + attTextArray.toString()   + "\r\n"
+                          
                         }
                       
                     }                  
@@ -1624,6 +1483,12 @@ export default {
 
         }
         if(index == file.length - 1){
+          console.log("(new TextEncoder().encode(text)).length")
+          console.log((new TextEncoder().encode(text)).length)
+          // console.log("pubmedAtt")
+          // console.log(pubmedAtt)
+          // console.log("pubmedAtt")
+          // console.log(pubmedAtt)
           let filename = this.concept_search + "-" + nametag + " two hop results.csv";
           let element = document.createElement("a");
           element.setAttribute(

@@ -1,7 +1,7 @@
 class TrapiResultClean {
 
 
-  static TrapiResultClean(TrapiResults) {
+  static TrapiResultClean(TrapiResults, agent) {
     // console.log("started PubCleanService");
 
     return new Promise(async (resolve, reject) => { // eslint-disable-line
@@ -35,6 +35,7 @@ class TrapiResultClean {
             let object = edge.object
             // console.log("nodes[subject]") 
             // console.log(nodes[subject])
+            data.agent = agent
             data.edgeinfo = edge
             data.object = edge.object
             data.predicate = edge.predicate

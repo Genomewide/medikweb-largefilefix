@@ -48,7 +48,7 @@
     <b-col cols="2" class="border-right border-primary sidenav" style="height:100%">
         <b-nav vertical style="padding-top:20px">
     <!-- <b-nav-item active><router-link to="/home">Home</router-link></b-nav-item> -->
-    <b-nav-item active><router-link to="/geneToDrug">Gene to Drug</router-link></b-nav-item>
+    <!-- <b-nav-item active><router-link to="/geneToDrug">Gene to Drug</router-link></b-nav-item>
     <b-nav-item ><router-link to="/twohop">Two Hop G2G2D</router-link></b-nav-item>
     <b-nav-item ><router-link to="/conceptExplore">Concepts Explorer</router-link></b-nav-item>
     <b-nav-item ><router-link to="/apiexplorer">Api Format Tester</router-link></b-nav-item>
@@ -57,12 +57,12 @@
     <b-nav-item ><router-link to="/starburst">starburst</router-link></b-nav-item>
     <b-nav-item ><router-link to="/svgtest">svgtest</router-link></b-nav-item>
     <b-nav-item ><router-link to="/conceptExplorePlus">conceptExplorePlus</router-link></b-nav-item>
-    <b-nav-item ><router-link to="/geneAllSynToDrugs">geneAllSynToDrugs</router-link></b-nav-item>
-    <b-nav-item ><router-link to="/geneAllSynToDrugsARS">geneAllSynToDrugsARS</router-link></b-nav-item>
-    <b-nav-item ><router-link to="/geneAllSynToDrugsv2">geneAllSynToDrugsv2</router-link></b-nav-item>
+    <b-nav-item ><router-link to="/geneAllSynToDrugs">geneAllSynToDrugs</router-link></b-nav-item> -->
+    <b-nav-item active><router-link to="/geneAllSynToDrugsARS">geneAllSynToDrugsARS</router-link></b-nav-item>
+    <!-- <b-nav-item ><router-link to="/geneAllSynToDrugsv2">geneAllSynToDrugsv2</router-link></b-nav-item>
     <b-nav-item ><router-link to="/conceptExploreTextMatch">conceptExploreTextMatch</router-link></b-nav-item>
     <b-nav-item ><router-link to="/conceptConnect">conceptConnect</router-link></b-nav-item>
-    <b-nav-item ><router-link to="/xml">xml</router-link></b-nav-item>
+    <b-nav-item ><router-link to="/xml">xml</router-link></b-nav-item> -->
     <!-- <div>svgtest conceptExplorePlus geneAllSynToDrugs geneAllSynToDrugsARS conceptConnect
       <svg width = "100" height = "100">
         <circle cx = "50" cy = "50" r= "40" stroke = "deeppink" stroke-width="2" fill = "#ffe6ee" />

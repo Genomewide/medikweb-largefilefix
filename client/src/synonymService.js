@@ -79,6 +79,8 @@ class synonymService {
       }
       
       postPacket.curies = idArray
+      console.log("postPacket")
+      console.log(postPacket)
   
     // POST TO NODENORMALIZER
     // "https://rest.ensembl.org/xrefs/id/" + ensemblid + "?content-type=application/json"
