@@ -444,6 +444,9 @@ import synonymService from "../synonymService";
 
 var parser = require("fast-xml-parser");
 import axios from "axios";
+
+import { jsontoexcel } from "vue-table-to-excel";
+
 // import * as d3 from "d3";
 
 // import {
@@ -879,6 +882,11 @@ export default {
     };
   },
   methods: {
+
+    download() {
+      const { data, head, fileName } = this.json;
+      jsontoexcel.getXlsx(data, head, fileName);
+    },
     async testNormalization(){
 
         let synData = await synonymService.nodeNormalizationPost(this.testNormalizationArray)
@@ -1343,7 +1351,168 @@ export default {
         })
   },
 
+    saveExcel(file, nametag) {
+      let text = "";
+      console.log("save result");
 
+      let attributeInfo = ["value","value_url","attributes","description","value_type_id","attribute_source","attribute_type_id","original_attribute_name"]
+      for (let index = 0; index < file.length; index++) {
+        // const result = this.groupedResultsTable[index];
+        const result = file[index];
+        // console.log("result");
+        // console.log(result);
+
+        let headers = Object.keys(result);
+        let allHeaders = headers.concat(attributeInfo) 
+        // allHeaders = allHeaders 
+        // console.log({headers})
+
+        if (index == 0) {
+          // #################
+          // HEADER ROW
+          // #################
+
+          for (let i = 0; i < allHeaders.length; i++) {
+            const header = allHeaders[i];
+          // IGNORE EDGEINFO BECAUSE IT WILL BE USED TO BREAK OUT EACH LINE OF EVIDENCE AS AN ATTRIBUTE objectAtt
+          // if(header != "edgeinfo" && header != "objectAtt" && header != "subjectAtt"){
+
+            if (i == allHeaders.length - 1) {
+              text = text + header + "\r\n"
+              
+            } else {
+              text = text + header + ",";
+            }
+          // }
+
+          }
+        }
+        // ADD REMAINING ROWS IN SAME ORDER BASED ON KEYS FROM HEADER ROW
+        // START ROW THEN REPEAT FOR EACH ATTRIBUTE
+
+        // #################
+        // START ROW
+        // #################
+        let rowData = ""
+        let pubmedAtt = []
+        // #################
+        // GRAB EACH COMMON ELEMENT PER ROW - THEN APPEND EACH ATTRIBUTE OF EVIDENCE TO IT AND CREATE A NEW ROW
+        // #################
+        for (let n = 0; n < headers.length; n++) {
+          let header = headers[n]
+        // #################
+        // SKIP EDGGEINFO BC TOO MUCH PER ROW
+        // #################
+          // console.log("header")
+          // console.log(header)
+          // if(header != "edgeinfo" && header != "objectAtt" && header != "subjectAtt"){
+              //GET EVERY VALUE TO PUT IN A CELL
+              let cell = JSON.stringify(result[header]);
+              // console.log("cell")
+              // console.log(cell)
+              try {
+                cell = cell.replace(/,/gi, ";")
+                cell = cell.replace(/\n/gi, ";")
+              } catch (err) {
+                console.error(err);
+              }
+              rowData = rowData + cell + ","
+              // if(n == headers.length - 1){
+              //   text = rowData + "\r\n"
+              // }
+              
+              if(n == headers.length - 1){
+                // console.log("rowData")
+                // console.log(rowData)
+                // #################
+                // APPEND ROW DATA WITH ATTRIBUTE DATA FOR EACH ATTRIBUTE
+                // #################
+                let atts = result["edgeinfo"]["attributes"]
+                // console.log("atts")
+                // console.log(atts)
+
+                for (let m = 0; m < atts.length; m++) {
+                  const attGroup = atts[m];
+                  console.log("attGroup check")
+                  if(attGroup.attribute_source == "infores:pubmed" || attGroup.attribute_source  == "infores:text-mining-provider-targeted"){
+                    console.log("attGroup - publications = ", attGroup)
+                    pubmedAtt.push(attGroup)
+                  }
+                  let attTextArray = []
+                    for (let x = 0; x < attributeInfo.length; x++) {
+                      const att = attributeInfo[x];
+                      // console.log("att")
+                      // console.log(att)
+
+                      // CREATE EMPTY DATA VALUE INCASE IT DOES NOT EXIST
+                      let attCell = ""
+                        // CHECK TO SEE IF THE PART OF THE ATTRIBUTE EXISTS - IF SO THEN SET VALUE TO THAT
+                        if(Object.prototype.hasOwnProperty.call(attGroup, att)){
+                          // console.log("FOUND ATTGROUP[ATT]")
+                          attCell = attGroup[att]
+                            // REPLACE COMMAS WITH SEMICOLONS SO THAT IT DOES NOT MESS UP CSV
+                            if(attCell != null){
+                              try {
+                                attCell = attCell.toString()
+                                attCell = attCell.replace(/,/gi, ";");
+                                attCell = attCell.replace(/\n/gi, ";")
+                              } catch (err) {
+                                console.error(err);
+                              }                               
+                            }
+ 
+                        }else {
+                          // console.log(" ---- DID NOT FIND ATTGROUP[ATT]")
+                        }
+                        // INSERT VALUE OR BLANK IN ARRAY AT SPECIFIC LOCATION SO IT WILL END UP IN THE RIGHT COLUMN
+                        attTextArray.splice(x, 0, attCell)
+
+                        if(x == attributeInfo.length - 1){
+                          // console.log("GOT TO END OF ROW AND ADDED ALL ATTRIBUTES!")
+                          // console.log("rowData")
+                          // console.log(rowData)
+                          // console.log("attTextArray")
+                          // console.log(attTextArray)
+                          // REPEAT THE LINE TEXT AND ADD THE ATTRIBUTE TEXT AND ADD LINE BREAK
+                          // SHOULD GET ONE LINE FOR EACH ATTRIBUTE GROUP
+                          text = text + rowData + attTextArray.toString()   + "\r\n"
+                          
+                        }
+                      
+                    }                  
+                }
+
+              }
+
+        
+
+        }
+        if(index == file.length - 1){
+          console.log("(new TextEncoder().encode(text)).length")
+          console.log((new TextEncoder().encode(text)).length)
+          // console.log("pubmedAtt")
+          // console.log(pubmedAtt)
+          // console.log("pubmedAtt")
+          // console.log(pubmedAtt)
+          let filename = this.concept_search + "-" + nametag + " two hop results.csv";
+          let element = document.createElement("a");
+          element.setAttribute(
+            "href",
+            "data:application/json;charset=utf-8," + encodeURIComponent(text)
+          );
+          element.setAttribute("download", filename);
+
+          element.style.display = "none";
+          document.body.appendChild(element);
+
+          element.click();
+          document.body.removeChild(element);
+          console.log("file saved!!");
+        }
+      }
+
+
+    },
 
 
     saveThisFile2(file, nametag) {
