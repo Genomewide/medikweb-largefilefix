@@ -53,7 +53,7 @@ const ncbiService = require('./services/ncbiService')
 // let getSynonyms = (searchterm) => {
 //   console.log("#### started getSynonyms  - seatrchterm = ", searchterm)
 //   return new Promise(async (resolve, reject) => { // eslint-disable-line
-//     let url = "https://nodenormalization-sri.renci.org/1.2/get_normalized_nodes?curie=" + searchterm + "&conflate=true" 
+//     let url = "https://nodenormalization-sri.renci.org/1.3/get_normalized_nodes?curie=" + searchterm + "&conflate=true" 
 //     try {
 //       const res = await axios.get(url);
 
@@ -107,7 +107,7 @@ getSynonymsServer(searchterm)
 
 // ################ - end trying new - ################
 
-  // let url = "https://nodenormalization-sri.renci.org/1.2/get_normalized_nodes?curie=" + searchterm + "&conflate=true" 
+  // let url = "https://nodenormalization-sri.renci.org/1.3/get_normalized_nodes?curie=" + searchterm + "&conflate=true" 
 
   // getARAXSynonyms(searchterm)
   // .then(async(araxsyns) =>{

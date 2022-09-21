@@ -31,7 +31,7 @@ class NodeFinderService {
   static nodeNormalizer = (searchterm) => {
     // console.log("started getSynonyms");
     return new Promise(async (resolve, reject) => { // eslint-disable-line
-      let url = "https://nodenormalization-sri.renci.org/1.2/get_normalized_nodes?curie=" + searchterm + "&conflate=true" 
+      let url = "https://nodenormalization-sri.renci.org/1.3/get_normalized_nodes?curie=" + searchterm + "&conflate=true" 
       try {
         const res = await axios.get(url);
 
@@ -49,7 +49,7 @@ class NodeFinderService {
   static nodeNormalizerBulk = (searchterms) => {
     // console.log("started getSynonyms");
     return new Promise(async (resolve, reject) => { // eslint-disable-line
-      let url = "https://nodenormalization-sri.renci.org/1.2/get_normalized_nodes?&conflate=true" 
+      let url = "https://nodenormalization-sri.renci.org/1.3/get_normalized_nodes?&conflate=true" 
       try {
         const res = await axios.post(url, searchterms);
 

@@ -62,7 +62,7 @@ class NodeService {
     });
   }
 
-// https://nodenormalization-sri.renci.org/1.2/get_normalized_nodes?curie=RGD%3A1563691&conflate=true
+// https://nodenormalization-sri.renci.org/1.3/get_normalized_nodes?curie=RGD%3A1563691&conflate=true
 
 static nodeNormalization = (id) => {
 
@@ -73,7 +73,7 @@ static nodeNormalization = (id) => {
 
   // USE ENSEMBL IDS TO GET XREFS
   // "https://rest.ensembl.org/xrefs/id/" + ensemblid + "?content-type=application/json"
-    let normalURL = "https://nodenormalization-sri.renci.org/1.2/get_normalized_nodes?curie=" + id + "&conflate=true"
+    let normalURL = "https://nodenormalization-sri.renci.org/1.3/get_normalized_nodes?curie=" + id + "&conflate=true"
 
     console.log(normalURL)
     try {
@@ -108,7 +108,9 @@ static nodeNormalizationPost = (idArray) => {
 
   // USE ENSEMBL IDS TO GET XREFS
   // "https://rest.ensembl.org/xrefs/id/" + ensemblid + "?content-type=application/json"
-    let normalURL = "https://nodenorm.transltr.io/1.2/get_normalized_nodes"
+    // 'https://nodenorm.transltr.io/1.3/get_normalized_nodes
+    // let normalURL = "https://nodenorm.transltr.io/nodenormalization-sri.renci.org/1.3"
+    let normalURL = "https://nodenorm.transltr.io/1.3/get_normalized_nodes"
 
     console.log(normalURL)
     try {
@@ -149,7 +151,7 @@ static nodeNormalizationPost = (idArray) => {
     static getSynonyms = (searchterm) => {
         // console.log("started getSynonyms");
         return new Promise(async (resolve, reject) => { // eslint-disable-line
-          let url = "https://nodenormalization-sri.renci.org/1.2/get_normalized_nodes?curie=" + searchterm + "&conflate=true" 
+          let url = "https://nodenormalization-sri.renci.org/1.3/get_normalized_nodes?curie=" + searchterm + "&conflate=true" 
           try {
             const res = await axios.get(url);
 

@@ -109,22 +109,89 @@
                   <p text-muted>Enter the HGNC ID in the format shown</p>
                 </b-form>
               </b-form-group>
-              genePk: {{genePk}} -- drugPk: {{drugPk}}
+              genePk: {{genePk}}  
+              <download-excel
+                class="btn btn-default"
+                :data="geneGeneExcel"
+                worksheet="My Worksheet"
+                :fields="excelFields"
+                :name="geneGeneFileName"
+              >
+              <b-button
+                style="margin-left: 20px"
+                variant="primary"
+                >Download Gene Gene sheet
+              </b-button>
+                
+              </download-excel>
+              <br />
+              drugPk: {{drugPk}}
+              <download-excel
+                class="btn btn-default"
+                :data="drugGeneExcel"
+                worksheet="My Worksheet"
+                :fields="excelFields"
+                :name="drugGeneFileName"
+              >
+              <b-button
+                style="margin-left: 20px"
+                variant="primary"
+                >Download Drug Gene sheet
+              </b-button>
+                
+              </download-excel>
+              <br />
               Example: {{ARSrequestID}} 
-                              <b-button
+                  <b-button
                     style="margin-left: 20px"
                     variant="primary"
                     v-on:click="openARAX"
                     >openARAX
                   </b-button>
-                   <b-button
+                  <b-button
                     style="margin-left: 20px"
                     variant="primary"
                     v-on:click="testRerunPK"
                     >testRerunPK
                   </b-button>
+                  <!-- <b-button
+                    style="margin-left: 20px"
+                    variant="primary"
+                    v-on:click="download"
+                    >download
+                  </b-button> -->
+              <!-- <download-excel
+                    class="btn btn-default"
+                    :data="geneResults"
+                    :fields="excelFields"
+                    worksheet="My Worksheet"
+                    :name="geneGeneFileName"
+                  >
+                  <b-button
+                    style="margin-left: 20px"
+                    variant="primary"
+                    >Download Gene Gene sheet
+                  </b-button>
+                    Download Excel (you can customize this with html code!)
+                  </download-excel> -->
+
+                  <download-excel
+                    class="btn btn-default"
+                    :data="geneGeneExcel"
+                    worksheet="My Worksheet"
+                    :fields="excelFields"
+                    :name="geneGeneFileName"
+                  >
+                  <b-button
+                    style="margin-left: 20px"
+                    variant="primary"
+                    >Download Gene Gene sheet
+                  </b-button>
+                    Download Excel (you can customize this with html code!)
+                  </download-excel>
             </div>
           </b-form>
+          {{synonyms}}
         </b-col>
         <b-col  v-if="showTerm">
 
@@ -432,6 +499,7 @@
 import PubCleanService from "../PubCleanService";
 import TrapiResultClean from "../TrapiResultClean";
 import ARSService from "../ARSService";
+// import excel from 'vue-excel-export'
 // import ARAXService from "../ARAXService";
 // import NodeService from "../NodeService";
 // import metagraph from "/Users/andycrouse/Documents/GitHub/medikweb-largefilefix/datafiles/metaknowledgegraph.json"
@@ -445,7 +513,7 @@ import synonymService from "../synonymService";
 var parser = require("fast-xml-parser");
 import axios from "axios";
 
-import { jsontoexcel } from "vue-table-to-excel";
+// import { jsontoexcel } from "vue-table-to-excel";
 
 // import * as d3 from "d3";
 
@@ -490,7 +558,7 @@ export default {
       edges: [],
       subject: "chemical",
       predicate: "UMLS:C0004096",
-      concept_search: "HGNC:11998",
+      concept_search: "HGNC:2625",
       testNormalizationArray: ["HGNC:18481", "HGNC:6884" , "HGNC:2625", "HGNC:11998", "HGNC:3236", "HGNC:1100", "HGNC:9588", "HGNC:16716"],
       // HGNC:18481
       // HGNC:6884" MAPK8IP3
@@ -877,16 +945,63 @@ export default {
       queryTargetId:"",
       queryTargetLabel:"",
       genePk: "",
-      drugPk: ""
+      drugPk: "",
+      json_fields: {
+        "Complete name": "name",
+        City: "city",
+        Telephone: "phone.mobile",
+        "Telephone 2": {
+          field: "phone.landline",
+          callback: (value) => {
+            return `Landline Phone - ${value}`;
+          },
+        },
+      },
+
+      json_meta: [
+        [
+          {
+            key: "charset",
+            value: "utf-8",
+          },
+        ],
+      ],
+      excelFields: {
+        agent: "agent",
+        "Edge ID": "edgeID",
+        "Att Number": "attNum",
+        "Object ID" :"object",
+        "Object category": "objectCat",
+        "Object categories": "objectCats",
+        "Object Name": "objectName",
+        "Predicate": "predicate",
+        "Subject ID": "subject" ,
+        "Subject Category": "subjectCat",
+        "Subject Categories": "subjectCats",
+        "Subject Name": "subjectName",
+        "Att description": "description",
+        "Att Name": "original_attribute_name",
+        "Att value": "value",
+        "Value type ID": "value_type_id",
+        "Att source": "attribute_source",
+        "Att type ID": "attribute_type_id",
+        attributes: "attributes",
+
+      },
+      geneGeneFileName: "",
+      drugGeneFileName: "",
+      geneGeneExcel: [],
+      drugGeneExcel: []
 
     };
   },
   methods: {
 
-    download() {
-      const { data, head, fileName } = this.json;
-      jsontoexcel.getXlsx(data, head, fileName);
-    },
+    // download() {
+    //   console.log(this.json)
+    //   const { data, head, fileName } = this.json;
+    //   jsontoexcel.getXlsx(data, head, fileName);
+    // },
     async testNormalization(){
 
         let synData = await synonymService.nodeNormalizationPost(this.testNormalizationArray)
@@ -915,42 +1030,36 @@ export default {
     console.log("normalNodes")
     console.log(normalNodes)
 
-    await this.ARSStatusTable()
+    await this.makeARSStatusTable() 
+    console.log("makeARSStatusTable")
 
-            for (let i = 0; i < 10; i++) {
-          let ARSStatusCheck = await this.ARSStatusTable()
-            // ################
-            // SORT THE STATUS TABLE ALPHABETICALLY
-            // ################
-            let obj = this.ARSResultStatus
-            let sorted = Object.keys(obj)
-              .sort()
-              .reduce((accumulator, key) => {
-                accumulator[key] = obj[key];
-                return accumulator;
-              }, {});
-              this.ARSResultStatus = sorted
-              
-          console.log("SORTED THE STATUS TABLE")
-          this.componentKey++
-          console.log("I LOOP NUMBER = ", i)
-          // console.log("ARSStatusCheck")
-          // console.log(ARSStatusCheck)
-          // ################
-          // CHECK STATUS OF RESULTS
-          // ################          
-          if(ARSStatusCheck.agentFinished == 0 && ARSStatusCheck.agentCount >13){
-            i = 10
-            // console.log("finish before looping to 10!")
-            // console.log("this.ARSResultStatus")
-            // console.log(this.ARSResultStatus)
+    await this.ARSCleanResults() 
+    console.log("ARSCleanResults")
 
-            this.componentKey++
-            return
-          } else {
-            await new Promise(resolve => setTimeout(resolve, 5000));
-          }
-        }
+
+    if(this.resultGroup == "gene"){
+      this.resultGroup = "drug"
+      console.log("DONE! - gene")
+      console.log("this.geneResults")
+      console.log(this.geneResults)
+      let genesForDrug = this.ARSResults.map(x => x.object)
+      genesForDrug.push(this.concept_search)
+      this.queryTerms = genesForDrug
+      // console.log("this.queryTerms")
+      // console.log(this.queryTerms)
+      this.geneGeneFileName = this.concept_search + "_gene_gene"
+      // let fileName = this.concept_search + "_gene_gene"
+      this.saveExcel(this.geneResults)
+      this.saveThisFile2(this.geneResults, this.geneGeneFileName)
+      // this.tryARS2()
+
+    } else{
+      this.drugGeneFileName = this.concept_search + "_drug_gene"
+      this.saveExcel(this.geneResults)
+      this.saveThisFile2(this.drugResults, this.geneDrugFileName)
+      // this.saveExcel(this.drugResults)
+      console.log("THIS IS THE END")
+    }
     
 
   },
@@ -968,6 +1077,7 @@ export default {
       }
       this.ARSResults = []
       this.ARSResultsSPO = []
+      this.synonyms = []
       
 
       // #######################
@@ -987,8 +1097,8 @@ export default {
         for (let i = 0; i < normalKeys.length; i++) {
           const key = normalKeys[i];
           let termData = normalizedTerms[key]
-          // console.log("normalizedTerms[key]")
-          // console.log(normalizedTerms[key])
+          console.log("normalizedTerms[key]")
+          console.log(normalizedTerms[key])
           let normTerms = termData.equivalent_identifiers.map(x => x.identifier)
           this.synonyms = this.synonyms.concat(normTerms)
 
@@ -1034,6 +1144,7 @@ export default {
         // LOOP TO GET FULL ARS STATUS TABLE BUILT
         // #######################
         for (let i = 0; i < 10; i++) {
+        // for (let i = 0; i < 5; i++) {
           let ARSStatusCheck = await this.ARSStatusTable()
             // ################
             // SORT THE STATUS TABLE ALPHABETICALLY
@@ -1050,8 +1161,8 @@ export default {
           console.log("SORTED THE STATUS TABLE")
           this.componentKey++
           console.log("I LOOP NUMBER = ", i)
-          // console.log("ARSStatusCheck")
-          // console.log(ARSStatusCheck)
+          console.log("ARSStatusCheck")
+          console.log(ARSStatusCheck)
           // ################
           // CHECK STATUS OF RESULTS
           // ################          
@@ -1082,12 +1193,17 @@ export default {
           this.queryTerms = genesForDrug
           // console.log("this.queryTerms")
           // console.log(this.queryTerms)
+          this.geneGeneFileName = this.concept_search + "_gene_gene"
           let fileName = this.concept_search + "_gene_gene"
+          this.saveExcel(this.geneResults)
           this.saveThisFile2(this.geneResults, fileName)
           this.tryARS2()
+
         } else{
+          this.resultGroup == "gene"
           let fileName = this.concept_search + "_drug_gene"
           this.saveThisFile2(this.drugResults, fileName)
+          // this.saveExcel(this.drugResults)
           console.log("THIS IS THE END")
         }
 
@@ -1118,8 +1234,8 @@ export default {
           // console.log("normalizedTerms[key]")
           // console.log(normalizedTerms[key])
           let normTerms = termData.equivalent_identifiers.map(x => x.identifier)
-          synonyms = synonyms.concat(normTerms)
-
+          this.synonyms = this.synonyms.concat(normTerms)
+  
           if(i == normalKeys.length - 1){
             console.log("synonyms")
             console.log(synonyms)
@@ -1165,8 +1281,49 @@ export default {
       resolve(ARSrequestID)
       })
     },
- 
 
+    async makeARSStatusTable(){
+      return new Promise(async (resolve, reject) => { // eslint-disable-line
+
+        for (let i = 0; i < 10; i++) {
+        // for (let i = 0; i < 5; i++) {
+          let ARSStatusCheck = await this.ARSStatusTable()
+            // ################
+            // SORT THE STATUS TABLE ALPHABETICALLY
+            // ################
+            let obj = this.ARSResultStatus
+            let sorted = Object.keys(obj)
+              .sort()
+              .reduce((accumulator, key) => {
+                accumulator[key] = obj[key];
+                return accumulator;
+              }, {});
+              this.ARSResultStatus = sorted
+              
+          console.log("SORTED THE STATUS TABLE")
+          this.componentKey++
+          console.log("I LOOP NUMBER = ", i)
+          // console.log("ARSStatusCheck")
+          // console.log(ARSStatusCheck)
+          // ################
+          // CHECK STATUS OF RESULTS
+          // ################          
+          if(ARSStatusCheck.agentFinished < 3 && ARSStatusCheck.agentCount >13){
+            i = 10
+            // console.log("finish before looping to 10!")
+            // console.log("this.ARSResultStatus")
+            // console.log(this.ARSResultStatus)
+
+            this.componentKey++
+            resolve()
+            return
+          } else {
+            await new Promise(resolve => setTimeout(resolve, 5000));
+          }
+        }
+      })// PROMISE
+
+    },
     
 
     async ARSStatusTable () {
@@ -1236,6 +1393,7 @@ export default {
               // }
 
               this.resultSetIDs.push(this.ARSResultStatus[agent])
+              this.componentKey++
 
               if(i == resultList.length - 1 ){
                 // ################
@@ -1267,247 +1425,211 @@ export default {
     },
 
     async ARSCleanResults(){
-          return new Promise(async (resolve, reject) => { // eslint-disable-line
+      return new Promise(async (resolve, reject) => { // eslint-disable-line
 
-          console.log("WENT TO NEXT STEP TO CLEAN RESULTS")
-          this.ARSResults = []
-          let keys = Object.keys(this.ARSResultStatus)
-          console.log(this.ARSResultStatus)
-          this.resultSetIDs = []
-          // console.log(keys)
-          // let tempResults = []
+      console.log("WENT TO NEXT STEP TO CLEAN RESULTS")
+      this.ARSResults = []
+      let keys = Object.keys(this.ARSResultStatus)
+      console.log(this.ARSResultStatus)
+      this.resultSetIDs = []
+      // console.log(keys)
+      // let tempResults = []
 
-          for (let i = 0; i < keys.length; i++) {
-            const id = keys[i];
-            console.log("id")
-            console.log(id)
-            this.resultSetIDs.push(this.ARSResultStatus[id])
-            console.log("this.ARSResultStatus[id]")
-            console.log(this.ARSResultStatus[id])
+      for (let i = 0; i < keys.length; i++) {
+        const id = keys[i];
+        // console.log("id")
+        // console.log(id)
+        // this.ARSResultStatus[id]
+        // console.log("this.ARSResultStatus[id]")
+        // console.log(this.ARSResultStatus[id])
+        this.resultSetIDs.push(this.ARSResultStatus[id])
+        // console.log("this.ARSResultStatus[id]")
+        // console.log(this.ARSResultStatus[id])
 
-            if(this.ARSResultStatus[id].results.fields.data != null){
-              if(Object.prototype.hasOwnProperty.call(this.ARSResultStatus[id].results.fields.data, "message")){
-                if(Object.prototype.hasOwnProperty.call(this.ARSResultStatus[id].results.fields.data.message, "knowledge_graph")){
-                  console.log("CLEANING RESULTS")
-                  console.log(this.ARSResultStatus[id].results)
-                  let cleanedResults = await TrapiResultClean.TrapiResultClean(this.ARSResultStatus[id].results.fields.data, id)
-                  console.log(cleanedResults)
+        if(this.ARSResultStatus[id].results.fields.data != null){
+          if(Object.prototype.hasOwnProperty.call(this.ARSResultStatus[id].results.fields.data, "message")){
+            if(Object.prototype.hasOwnProperty.call(this.ARSResultStatus[id].results.fields.data.message, "knowledge_graph")){
+              // console.log("CLEANING RESULTS")
+              // console.log(this.ARSResultStatus[id].results)
+              let cleanedResults = await TrapiResultClean.TrapiResultClean(this.ARSResultStatus[id].results.fields.data, id)
+              console.log("cleanedResults")
+              console.log(cleanedResults)
 
-                  this.ARSResults = this.ARSResults.concat(cleanedResults) 
+              this.ARSResults = this.ARSResults.concat(cleanedResults) 
 
-                  if (i == keys.length - 1){
-                    // console.log("this.ARSResults INSIDE IF CLAUSE")
-                    // console.log("this.ARSResults before")
-                    // console.log(this.ARSResults)    
-                    
-                    // ### MAY NEED TO TURN BACK ON:
-                    this.ARSResults = this.ARSResults.filter(x => this.synonyms.indexOf(x.subject) != -1)                                 
-
-                      if(this.resultGroup == "gene"){
-                        console.log("GENE run done - return")
-                        this.geneResults = this.ARSResults
-                        this.componentKey++
-                        resolve()
-                        return
-                      }
-                      if(this.resultGroup == "drug"){
-                        console.log("DRUG run done - return")
-                        this.drugResults = this.ARSResults
-                        this.componentKey++
-                        resolve()
-                        return
-                      }
-                      
-                    // return
-                  }     
-
-                }
-              }   
-            } 
-            // else if (i == keys.length - 1){
-            if (i == keys.length - 1){
-              console.log("this.ARSResults - OUTSIDE IF CLAUSE")
-
-              this.ARSResults = this.ARSResults.filter(x => this.synonyms.indexOf(x.subject) != -1)
-              this.componentKey++
-
-                if(this.resultGroup == "gene"){
-                  console.log("GENE run done - return")
-                  this.geneResults = this.ARSResults
-                  this.componentKey++
-                  resolve()
-                  return
-                }
-                if(this.resultGroup == "drug"){
-                  console.log("DRUG run done - return")
-                  this.drugResults = this.ARSResults
-                  this.componentKey++
-                }
+              if (i == keys.length - 1){
+                // console.log("this.ARSResults INSIDE IF CLAUSE")
+                // console.log("this.ARSResults before")
+                // console.log(this.ARSResults)    
                 
-              
+                // ### MAY NEED TO TURN BACK ON:
+                this.ARSResults = this.ARSResults.filter(x => this.synonyms.indexOf(x.subject) != -1)                                 
 
-            }      
-          }
-        })
+                  if(this.resultGroup == "gene"){
+                    console.log("GENE run done - return")
+                    console.log("this.ARSResults")
+                    console.log(this.ARSResults)
+                    this.geneResults = this.ARSResults
+                    this.componentKey++
+                    resolve()
+                    return
+                  }
+                  if(this.resultGroup == "drug"){
+                    console.log("DRUG run done - return")
+                    this.drugResults = this.ARSResults
+                    this.componentKey++
+                    resolve()
+                    return
+                  }
+                  
+                // return
+              }     
+
+            }
+          }   
+        } 
+        // else if (i == keys.length - 1){
+          if (i == keys.length - 1){
+            // console.log("this.ARSResults INSIDE IF CLAUSE")
+            // console.log("this.ARSResults before")
+            // console.log(this.ARSResults)    
+            
+            // ### MAY NEED TO TURN BACK ON:
+            this.ARSResults = this.ARSResults.filter(x => this.synonyms.indexOf(x.subject) != -1)                                 
+
+              if(this.resultGroup == "gene"){
+                console.log("GENE run done - return")
+                console.log("this.ARSResults")
+                console.log(this.ARSResults)
+                this.geneResults = this.ARSResults
+                this.componentKey++
+                resolve()
+                return
+              }
+              if(this.resultGroup == "drug"){
+                console.log("DRUG run done - return")
+                this.drugResults = this.ARSResults
+                this.componentKey++
+                resolve()
+                return
+              }
+              
+            // return
+          }       
+      }
+    })
   },
 
-    saveExcel(file, nametag) {
-      let text = "";
+    // saveExcel(file, nametag) {
+    saveExcel(file) {
+      // let text = "";
       console.log("save result");
+      console.log("file = ", file)
+      let excelData = []
 
       let attributeInfo = ["value","value_url","attributes","description","value_type_id","attribute_source","attribute_type_id","original_attribute_name"]
       for (let index = 0; index < file.length; index++) {
         // const result = this.groupedResultsTable[index];
         const result = file[index];
-        // console.log("result");
-        // console.log(result);
-
-        let headers = Object.keys(result);
-        let allHeaders = headers.concat(attributeInfo) 
-        // allHeaders = allHeaders 
-        // console.log({headers})
-
-        if (index == 0) {
-          // #################
-          // HEADER ROW
-          // #################
-
-          for (let i = 0; i < allHeaders.length; i++) {
-            const header = allHeaders[i];
-          // IGNORE EDGEINFO BECAUSE IT WILL BE USED TO BREAK OUT EACH LINE OF EVIDENCE AS AN ATTRIBUTE objectAtt
-          // if(header != "edgeinfo" && header != "objectAtt" && header != "subjectAtt"){
-
-            if (i == allHeaders.length - 1) {
-              text = text + header + "\r\n"
-              
-            } else {
-              text = text + header + ",";
-            }
-          // }
-
-          }
-        }
-        // ADD REMAINING ROWS IN SAME ORDER BASED ON KEYS FROM HEADER ROW
-        // START ROW THEN REPEAT FOR EACH ATTRIBUTE
+        // console.log("excel result - row start = ", result)
 
         // #################
-        // START ROW
+        // START RESULT ROW
         // #################
-        let rowData = ""
-        let pubmedAtt = []
-        // #################
-        // GRAB EACH COMMON ELEMENT PER ROW - THEN APPEND EACH ATTRIBUTE OF EVIDENCE TO IT AND CREATE A NEW ROW
-        // #################
-        for (let n = 0; n < headers.length; n++) {
-          let header = headers[n]
-        // #################
-        // SKIP EDGGEINFO BC TOO MUCH PER ROW
-        // #################
-          // console.log("header")
-          // console.log(header)
-          // if(header != "edgeinfo" && header != "objectAtt" && header != "subjectAtt"){
-              //GET EVERY VALUE TO PUT IN A CELL
-              let cell = JSON.stringify(result[header]);
-              // console.log("cell")
-              // console.log(cell)
-              try {
-                cell = cell.replace(/,/gi, ";")
-                cell = cell.replace(/\n/gi, ";")
-              } catch (err) {
-                console.error(err);
-              }
-              rowData = rowData + cell + ","
-              // if(n == headers.length - 1){
-              //   text = rowData + "\r\n"
-              // }
-              
-              if(n == headers.length - 1){
-                // console.log("rowData")
-                // console.log(rowData)
-                // #################
-                // APPEND ROW DATA WITH ATTRIBUTE DATA FOR EACH ATTRIBUTE
-                // #################
-                let atts = result["edgeinfo"]["attributes"]
-                // console.log("atts")
-                // console.log(atts)
 
-                for (let m = 0; m < atts.length; m++) {
-                  const attGroup = atts[m];
-                  console.log("attGroup check")
-                  if(attGroup.attribute_source == "infores:pubmed" || attGroup.attribute_source  == "infores:text-mining-provider-targeted"){
-                    console.log("attGroup - publications = ", attGroup)
-                    pubmedAtt.push(attGroup)
+        let excelRow = {}
+        excelRow.agent = result.agent.toString()
+        excelRow.edgeID = result.edgeKey.toString()
+        excelRow.object = result.object.toString()
+        excelRow.objectCat = result.objectCat.toString()
+        excelRow.objectCats = result.objectCats.toString()
+        excelRow.objectName = result.objectName.toString()
+        excelRow.predicate = result.predicate.toString()
+        excelRow.subject = result.subject.toString()
+        excelRow.subjectCat = result.subjectCat.toString()
+        excelRow.subjectCats = result.subjectCats.toString()
+        excelRow.subjectName = result.subjectName.toString()
+        excelRow.value = ""
+        excelRow.value_url = ""
+        excelRow.attributes = ""
+        excelRow.description = ""
+        excelRow.value_type_id = ""
+        excelRow.attribute_source = ""
+        excelRow.attribute_type_id = ""
+        excelRow.original_attribute_name = ""
+
+        // #################
+        // APPEND ROW DATA WITH ATTRIBUTE DATA FOR EACH ATTRIBUTE
+        // #################
+        let atts = result["edgeinfo"]["attributes"]
+        // console.log("atts")
+        // console.log(atts)
+
+        for (let m = 0; m < atts.length; m++) {
+          const attGroup = atts[m];
+          // console.log("attGroup check = ", attGroup)
+          excelRow.attNum = m
+
+            for (let x = 0; x < attributeInfo.length; x++) {
+              const att = attributeInfo[x];
+              // console.log("att")
+              // console.log(att)
+
+              // CREATE EMPTY DATA VALUE INCASE IT DOES NOT EXIST
+              // let attCell = ""
+                // CHECK TO SEE IF THE PART OF THE ATTRIBUTE EXISTS - IF SO THEN SET VALUE TO THAT
+                if(Object.prototype.hasOwnProperty.call(attGroup, att)){
+                  // console.log("FOUND ATTGROUP[ATT]")
+                  if(attGroup[att] != null){
+                    excelRow[att] = attGroup[att].toString()
+                  } else {
+                    excelRow[att] = ""
                   }
-                  let attTextArray = []
-                    for (let x = 0; x < attributeInfo.length; x++) {
-                      const att = attributeInfo[x];
-                      // console.log("att")
-                      // console.log(att)
-
-                      // CREATE EMPTY DATA VALUE INCASE IT DOES NOT EXIST
-                      let attCell = ""
-                        // CHECK TO SEE IF THE PART OF THE ATTRIBUTE EXISTS - IF SO THEN SET VALUE TO THAT
-                        if(Object.prototype.hasOwnProperty.call(attGroup, att)){
-                          // console.log("FOUND ATTGROUP[ATT]")
-                          attCell = attGroup[att]
-                            // REPLACE COMMAS WITH SEMICOLONS SO THAT IT DOES NOT MESS UP CSV
-                            if(attCell != null){
-                              try {
-                                attCell = attCell.toString()
-                                attCell = attCell.replace(/,/gi, ";");
-                                attCell = attCell.replace(/\n/gi, ";")
-                              } catch (err) {
-                                console.error(err);
-                              }                               
-                            }
- 
-                        }else {
-                          // console.log(" ---- DID NOT FIND ATTGROUP[ATT]")
-                        }
-                        // INSERT VALUE OR BLANK IN ARRAY AT SPECIFIC LOCATION SO IT WILL END UP IN THE RIGHT COLUMN
-                        attTextArray.splice(x, 0, attCell)
-
-                        if(x == attributeInfo.length - 1){
-                          // console.log("GOT TO END OF ROW AND ADDED ALL ATTRIBUTES!")
-                          // console.log("rowData")
-                          // console.log(rowData)
-                          // console.log("attTextArray")
-                          // console.log(attTextArray)
-                          // REPEAT THE LINE TEXT AND ADD THE ATTRIBUTE TEXT AND ADD LINE BREAK
-                          // SHOULD GET ONE LINE FOR EACH ATTRIBUTE GROUP
-                          text = text + rowData + attTextArray.toString()   + "\r\n"
-                          
-                        }
-                      
-                    }                  
                 }
+      
 
-              }
+                if(x == attributeInfo.length - 1){
+                  const row = {...excelRow}
+                  excelData.push(row)
+                  // console.log("excelRow")
+                  // console.log(row)
+
+                  if(index == file.length - 1){
+                    this.geneGeneExcel = excelData
+                  }
+                }
+              
+            }                  
+        }
+
+              
 
         
 
-        }
+        // }
         if(index == file.length - 1){
-          console.log("(new TextEncoder().encode(text)).length")
-          console.log((new TextEncoder().encode(text)).length)
-          // console.log("pubmedAtt")
-          // console.log(pubmedAtt)
-          // console.log("pubmedAtt")
-          // console.log(pubmedAtt)
-          let filename = this.concept_search + "-" + nametag + " two hop results.csv";
-          let element = document.createElement("a");
-          element.setAttribute(
-            "href",
-            "data:application/json;charset=utf-8," + encodeURIComponent(text)
-          );
-          element.setAttribute("download", filename);
+          console.log("excelData")
+          console.log(excelData)
+          // console.log("(new TextEncoder().encode(text)).length")
+          // console.log((new TextEncoder().encode(text)).length)
+          // // console.log("pubmedAtt")
+          // // console.log(pubmedAtt)
+          // // console.log("pubmedAtt")
+          // // console.log(pubmedAtt)
+          // let filename = this.concept_search + "-" + nametag + " two hop results.csv";
+          // let element = document.createElement("a");
+          // element.setAttribute(
+          //   "href",
+          //   "data:application/json;charset=utf-8," + encodeURIComponent(text)
+          // );
+          // element.setAttribute("download", filename);
 
-          element.style.display = "none";
-          document.body.appendChild(element);
+          // element.style.display = "none";
+          // document.body.appendChild(element);
 
-          element.click();
-          document.body.removeChild(element);
-          console.log("file saved!!");
+          // element.click();
+          // document.body.removeChild(element);
+          // console.log("file saved!!");
         }
       }
 

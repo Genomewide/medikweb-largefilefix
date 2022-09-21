@@ -28,7 +28,7 @@ let getARAXSynonyms = (searchterm) => {
 let getSynonyms = (searchterm) => {
   // console.log("#### started getSynonyms  - seatrchterm = ", searchterm)
   return new Promise(async (resolve, reject) => { // eslint-disable-line
-    let url = "https://nodenormalization-sri.renci.org/1.2/get_normalized_nodes?curie=" + searchterm + "&conflate=true" 
+    let url = "https://nodenormalization-sri.renci.org/1.3/get_normalized_nodes?curie=" + searchterm + "&conflate=true" 
     try {
       const res = await axios.get(url);
 
@@ -48,7 +48,7 @@ class synonymService {
     return new Promise(async (resolve, reject) => { // eslint-disable-line
       let url = "https://arax.ncats.io/api/arax/v1.2/entity"
 
-      // let url = "https://nodenormalization-sri.renci.org/1.2/get_normalized_nodes?curie=" + searchterm + "&conflate=true" 
+      // let url = "https://nodenormalization-sri.renci.org/1.3/get_normalized_nodes?curie=" + searchterm + "&conflate=true" 
       console.log("url")
       console.log(url)
       try {
@@ -83,8 +83,9 @@ class synonymService {
       console.log(postPacket)
   
     // POST TO NODENORMALIZER
-    // "https://rest.ensembl.org/xrefs/id/" + ensemblid + "?content-type=application/json"
-      let normalURL = "https://nodenorm.transltr.io/1.2/get_normalized_nodes"
+    // "https://rest.ensembl.org/xrefs/id/" + ensemblid + "?content-type=application/json" 
+    // let normalURL = "https://nodenorm.transltr.io/nodenormalization-sri.renci.org/1.3"
+    let normalURL = "https://nodenorm.transltr.io/1.3/get_normalized_nodes"
   
       console.log(normalURL)
       try {

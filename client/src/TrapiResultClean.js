@@ -23,9 +23,10 @@ class TrapiResultClean {
           for (let index = 0; index < edgeKeys.length; index++) {
             // console.log(index)
             let data = {}
-            const key = edgeKeys[index];
-            // console.log("key = ", key)
-            let edge = edges[key]
+            let edgeKey = edgeKeys[index];
+            // console.log("key = ", edgeKey)
+            let edge = {...edges[edgeKey]}
+            console.log("edge = ", edge)
   
             let subject = edge.subject
             // if(subject == "PR:000010162"){
@@ -35,6 +36,7 @@ class TrapiResultClean {
             let object = edge.object
             // console.log("nodes[subject]") 
             // console.log(nodes[subject])
+            data.edgeKey = edgeKey
             data.agent = agent
             data.edgeinfo = edge
             data.object = edge.object
@@ -43,10 +45,10 @@ class TrapiResultClean {
             data.subject = edge.subject
             data.subjectName = nodes[subject].name
             data.subjectCats = nodes[subject].categories
-            data.subjectCat = nodes[subject].categories[0]
+            data.subjectCat = nodes[subject].categories[nodes[subject].categories.length - 1]
             data.objectName = nodes[object].name
             data.objectCats = nodes[object].categories
-            data.objectCat = nodes[object].categories[0]
+            data.objectCat = nodes[object].categories[nodes[object].categories.length - 1]
             data.objectAtt = nodes[object].attributes
             data.subjectAtt = nodes[subject].attributes
             //
@@ -56,10 +58,6 @@ class TrapiResultClean {
             data.edgepublicationsText = {}
             data.edgepublications= []
 
-            // if(index < 10){
-            //   console.log("edge")
-            //   console.log(edge)
-            // }
 
             for (let index = 0; index < data.edgeinfo.attributes.length; index++) {
               const att = data.edgeinfo.attributes[index];
@@ -117,36 +115,11 @@ class TrapiResultClean {
                 console.log(err)
               }
 
-                // let pubInfotext = att.value.replace(/"/g, "'")
-                // pubInfotext = pubInfotext.replace(/'PMID:/g, '"PMID:')
-                // pubInfotext = pubInfotext.replace(/': {'publication date': '/g, '": {"publication date": "')
-                // pubInfotext = pubInfotext.replace(/', 'sentence': '/g, '", "sentence": "')
-                // pubInfotext = pubInfotext.replace(/', 'subject score'/g, '", "subject score"')
-                // pubInfotext = pubInfotext.replace(/'object score'/g, '"object score"')
-                // // pubInfotext = pubInfotext.replace(/'object score'/g, '"object score"')
-                // // pubInfotext = pubInfotext.replace(/{'/g, '{"')
-                // pubInfotext = pubInfotext.replace(/\\/g, "")
-                // // console.log(att.value)
-                // // console.log(pubInfotext)
-                // try{
-                //   // console.log(JSON.parse(pubInfotext))
-                //   data.pubInfo = JSON.parse(pubInfotext)
-                // } catch(err){
-                //   console.log(err)
-                //   console.log()
-                //   console.log("/'PMID:/g found = ", pubInfotext.includes(/'PMID:/g))
-                //   console.log("/PMID/g found = ", pubInfotext.includes(/PMID/g))
-                //   // console.log(pubInfotext.includes(/PMID/g))
-                // }
               }
               if(index == data.edgeinfo.attributes.length - 1){
                 // withDrugHits[i].geneToGeneResultShown.push(result)
                 clenaedData.push(data)
               } 
-              // if(typeof result.publications == 'undefined'){
-              //   result.publications = []
- 
-              // }
               
             }
             

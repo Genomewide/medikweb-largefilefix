@@ -113,7 +113,7 @@ class FDAService {
     // static getSynonyms = (searchterm) => { https://api.fda.gov/drug/drugsfda.json?search=openfda.unii:31C4KY9ESH
     //     // console.log("started getSynonyms");
     //     return new Promise(async (resolve, reject) => { // eslint-disable-line
-    //       let url = "https://nodenormalization-sri.renci.org/1.2/get_normalized_nodes?curie=" + searchterm + "&conflate=true" 
+    //       let url = "https://nodenormalization-sri.renci.org/1.3/get_normalized_nodes?curie=" + searchterm + "&conflate=true" 
     //       try {
     //         const res = await axios.get(url);
 
