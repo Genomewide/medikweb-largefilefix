@@ -120,29 +120,7 @@ class ARSService {
       }
     });
   }  
-  // static araxQuery_dg = (searchterm) => {
-  //   console.log(searchterm) 
-  //   console.log(ARAXquery_dg) 
-  //   // console.log("started getSynonyms");
-  //   return new Promise(async (resolve, reject) => { // eslint-disable-line
-  //     ARAXquery_dg.message.query_graph.nodes.n00.ids = [searchterm]
-  //     // console.log(ARAXquery_gg)
-  //     let url = "https://arax.ncats.io/beta/api/arax/v1.2/query"
-  //     // let url = 'https://arax.ncats.io/api/arax/v1.2/query'
-  //     // console.log(ARAXquery_gg)
-  //     try {
-  //       const res = await axios.post(url, ARAXquery_dg);
-  //       const data = res.data;
-  //       // });
-  
-  //       console.log("ARAXquery_dg ran")
-  //       // console.log(data)
-  //       resolve(data);
-  //     } catch (err) {
-  //       reject(err);
-  //     }
-  //   });
-  // }
+
     static getSynonyms = (searchterm) => {
         // console.log("started getSynonyms");
         return new Promise(async (resolve, reject) => { // eslint-disable-line
@@ -162,12 +140,29 @@ class ARSService {
         });
       }
       
-
+      static getSynonymsArray = (searchtermArray) => {
+        // console.log("started getSynonyms");
+        return new Promise(async (resolve, reject) => { // eslint-disable-line
+          let url = "https://nodenormalization-sri.renci.org/1.3/get_normalized_nodes"
+          
+            try {
+              const res = await axios.post(url, {"curies": searchtermArray, "conflate" : true});
+              const data = res.data;
+              // });
+        
+              console.log("getSynonymsArray ran")
+              console.log(data)
+              resolve(data);
+            } catch (err) {
+              reject(err);
+            }
+        });
+      }
       
       static getARAXSynonyms = (searchterm) => {
         console.log("started getSynonyms");
         return new Promise(async (resolve, reject) => { // eslint-disable-line
-          let url = "https://arax.ncats.io/api/arax/v1.2/entity?q=" + searchterm
+          let url = "https://arax.ncats.io/api/arax/v1.3/entity?q=" + searchterm
           try {
             const res = await axios.get(url);
 
@@ -183,6 +178,23 @@ class ARSService {
         });
       }
     
+      static getARAXSynonymsArray = (searchterms) => {
+        console.log("started getARAXSynonymsArray");
+        return new Promise(async (resolve, reject) => { // eslint-disable-line
+          let url = "https://arax.transltr.io/api/arax/v1.3/entity"
+          try {
+            const res = await axios.post(url,{"terms" : searchterms} );
+            const data = res.data;
+            // });
+      
+            console.log("getARAXSynonymsArray ran")
+            console.log(data)
+            resolve(data);
+          } catch (err) {
+            reject(err);
+          }
+        });
+      }
 
 
 }

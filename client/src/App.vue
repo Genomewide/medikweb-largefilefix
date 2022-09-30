@@ -59,8 +59,8 @@
     <b-nav-item ><router-link to="/conceptExplorePlus">conceptExplorePlus</router-link></b-nav-item>
     <b-nav-item ><router-link to="/geneAllSynToDrugs">geneAllSynToDrugs</router-link></b-nav-item> -->
     <b-nav-item active><router-link to="/geneAllSynToDrugsARS">geneAllSynToDrugsARS</router-link></b-nav-item>
-    <!-- <b-nav-item ><router-link to="/geneAllSynToDrugsv2">geneAllSynToDrugsv2</router-link></b-nav-item>
-    <b-nav-item ><router-link to="/conceptExploreTextMatch">conceptExploreTextMatch</router-link></b-nav-item>
+    <b-nav-item ><router-link to="/retrieveARSResults">retrieveARSResults</router-link></b-nav-item>
+    <!-- <b-nav-item ><router-link to="/conceptExploreTextMatch">conceptExploreTextMatch</router-link></b-nav-item>
     <b-nav-item ><router-link to="/conceptConnect">conceptConnect</router-link></b-nav-item>
     <b-nav-item ><router-link to="/xml">xml</router-link></b-nav-item> -->
     <!-- <div>svgtest conceptExplorePlus geneAllSynToDrugs geneAllSynToDrugsARS conceptConnect

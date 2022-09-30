@@ -15,18 +15,21 @@ class TrapiResultClean {
         let nodes = TrapiResults.message.knowledge_graph.nodes
         let edges = TrapiResults.message.knowledge_graph.edges 
         let edgeKeys = Object.keys(edges)
+        // let nodeKeys = Object.keys(nodes)
+        // console.log("nodeKeys")
+        // console.log(nodeKeys)
 
         // console.log("length = ", edgeKeys.length)
 
         if(edgeKeys.length > 0){
 
           for (let index = 0; index < edgeKeys.length; index++) {
-            // console.log(index)
+            // console.log("geting info clean")
             let data = {}
             let edgeKey = edgeKeys[index];
             // console.log("key = ", edgeKey)
             let edge = {...edges[edgeKey]}
-            console.log("edge = ", edge)
+            // console.log("edge = ", edge)
   
             let subject = edge.subject
             // if(subject == "PR:000010162"){
