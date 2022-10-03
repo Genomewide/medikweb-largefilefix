@@ -418,7 +418,7 @@
 import PubCleanService from "../PubCleanService";
 import TrapiResultClean from "../TrapiResultClean";
 import ARSService from "../ARSService";
-import searchResult1 from "../assets/searchResult1.json"
+// import searchResult1 from "../assets/searchResult1.json"
 
 // import excel from 'vue-excel-export'
 // import ARAXService from "../ARAXService";
@@ -847,12 +847,13 @@ export default {
       geneIDList: [],
       currentDrug: "test",
       araxResultTable: [],
-      ARSrequestID: "75ae2eb4-d3ba-4b11-b217-f1440787e7ea",
+      ARSrequestID: "eefdcc25-9e5d-4693-939f-6fbfccbe05d1",
+      // ARSrequestID: "75ae2eb4-d3ba-4b11-b217-f1440787e7ea",
       resultSetIDs: [],
       ARSResultStatus: {},
       ARSJobId: "bc32c185-6a97-4aff-b467-aa2fac22e275",
       ARSResults: [], 
-      testARSResults: searchResult1, 
+      // testARSResults: searchResult1, 
       ARSResultsSPO: [],
       count: 0,
       statusTable: [],
@@ -947,69 +948,31 @@ export default {
 
 // searchResult1
 
-  async ARSToTable(){
-
-    // this.filterSubject = false
-    // let ARSStatus =  await ARSService.pkQueryData(this.ARSrequestID)
-    // console.log("ARSStatus")
-    // console.log(ARSStatus)
-
-    // this.ARSResultStatus = {}
-
-    // this.resultGroup == "drug" // TO KEEP FROM LOOPING TO GET MORE INFO
-
-    // await this.makeARSStatusTable() 
-    // console.log("makeARSStatusTable")
-
-    // console.log("this.ARSResultStatus")
-    // console.log(this.ARSResultStatus)
-
-
-    // await this.ARSCleanResults() 
-    // console.log("ARSCleanResults")
-
-    this.ARSResults = await TrapiResultClean.TrapiResultClean(this.testARSResults, "testrun")
-
-    console.log("this.ARSResults DONE")
-    console.log(this.ARSResults)
-    // this.componentKey++
-    let uniqueNodes = await this.getUniqueNodeIDs()
-
-    this.SRINodeData = await ARSService.getARAXSynonymsArray(uniqueNodes)
-
-    console.log("this.SRINodeData")
-    console.log(this.SRINodeData)
-
-    await this.araxCategoryGroup()
-    console.log("getting categories")
-
-    this.saveThisFile2(this.ARSResults, this.ARSrequestID)
-
-  
-  },
-
-  //   async ARSToTable(){
+  // async ARSToTable(){
 
   //   // this.filterSubject = false
-  //   let ARSStatus =  await ARSService.pkQueryData(this.ARSrequestID)
-  //   console.log("ARSStatus")
-  //   console.log(ARSStatus)
+  //   // let ARSStatus =  await ARSService.pkQueryData(this.ARSrequestID)
+  //   // console.log("ARSStatus")
+  //   // console.log(ARSStatus)
 
-  //   this.ARSResultStatus = {}
+  //   // this.ARSResultStatus = {}
 
-  //   this.resultGroup == "drug" // TO KEEP FROM LOOPING TO GET MORE INFO
+  //   // this.resultGroup == "drug" // TO KEEP FROM LOOPING TO GET MORE INFO
 
-  //   await this.makeARSStatusTable() 
-  //   console.log("makeARSStatusTable")
+  //   // await this.makeARSStatusTable() 
+  //   // console.log("makeARSStatusTable")
+
+  //   // console.log("this.ARSResultStatus")
+  //   // console.log(this.ARSResultStatus)
 
 
-  //   console.log("this.ARSResultStatus")
-  //   console.log(this.ARSResultStatus)
-  //   await this.ARSCleanResults() 
-  //   console.log("ARSCleanResults")
+  //   // await this.ARSCleanResults() 
+  //   // console.log("ARSCleanResults")
+
+  //   this.ARSResults = await TrapiResultClean.TrapiResultClean(this.testARSResults, "testrun")
 
   //   console.log("this.ARSResults DONE")
-  //   // console.log(this.ARSResults)
+  //   console.log(this.ARSResults)
   //   // this.componentKey++
   //   let uniqueNodes = await this.getUniqueNodeIDs()
 
@@ -1025,6 +988,47 @@ export default {
 
   
   // },
+
+    async ARSToTable(){
+
+    // this.filterSubject = false
+    let ARSStatus =  await ARSService.pkQueryData(this.ARSrequestID)
+    console.log("ARSStatus")
+    console.log(ARSStatus)
+
+    this.ARSResultStatus = {}
+
+    this.resultGroup == "drug" // TO KEEP FROM LOOPING TO GET MORE INFO
+
+    await this.makeARSStatusTable() 
+    console.log("makeARSStatusTable")
+
+
+    console.log("this.ARSResultStatus")
+    console.log(this.ARSResultStatus)
+    await this.ARSCleanResults() 
+    console.log("ARSCleanResults")
+
+    console.log("this.ARSResults DONE")
+    // console.log(this.ARSResults)
+    // this.componentKey++
+    let uniqueNodes = await this.getUniqueNodeIDs()
+
+    this.SRINodeData = await ARSService.getARAXSynonymsArray(uniqueNodes)
+
+    console.log("this.SRINodeData")
+    console.log(this.SRINodeData)
+
+    console.log("this.ARSResults")
+    console.log(this.ARSResults)
+
+    await this.araxCategoryGroup()
+    console.log("getting categories")
+
+    this.saveThisFile2(this.ARSResults, this.ARSrequestID)
+
+  
+  },
 
 
 async araxCategoryGroup(){
@@ -1048,11 +1052,16 @@ async araxCategoryGroup(){
         if(this.SRINodeData[subject] != null){
           if(this.SRINodeData[subject].id != null){
             try{
-              
+      //               "category": "biolink:Drug",
+      // "identifier": "MESH:Q000819",
+      // "name": "agonists"
                 // let subjectSRIData = await ARSService.getARAXSynonyms(subject)
-                this.ARSResults[n].subjectSRIID = this.SRINodeData[subject].id.SRI_normalizer_curie
-                this.ARSResults[n].subjectSRICat = this.SRINodeData[subject].id.SRI_normalizer_category
-                this.ARSResults[n].subjectSRIName = this.SRINodeData[subject].id.SRI_normalizer_name
+                this.ARSResults[n].subjectSRInormID = this.SRINodeData[subject].id.SRI_normalizer_curie
+                this.ARSResults[n].subjectSRInormCat = this.SRINodeData[subject].id.SRI_normalizer_category
+                this.ARSResults[n].subjectSRInormName = this.SRINodeData[subject].id.SRI_normalizer_name
+                this.ARSResults[n].subjectSRIID = this.SRINodeData[subject].id.identifier
+                this.ARSResults[n].subjectSRICat = this.SRINodeData[subject].id.category
+                this.ARSResults[n].subjectSRIName = this.SRINodeData[subject].id.name             
               } catch (err){
                 console.log("subbject err = ", subject)
                 console.log(this.SRINodeData[subject])
@@ -1061,15 +1070,18 @@ async araxCategoryGroup(){
           }
         }
         if(this.SRINodeData[object] != null){
-          if(this.SRINodeData[subject].id != null){
+          if(this.SRINodeData[object].id != null){
 
             try{
               
               // let objectSRIData = await ARSService.getARAXSynonyms(object)
-              this.ARSResults[n].objectSRIID = this.SRINodeData[object].id.SRI_normalizer_curie
-              this.ARSResults[n].objectSRICat = this.SRINodeData[object].id.SRI_normalizer_category
-              this.ARSResults[n].objectSRIName = this.SRINodeData[object].id.SRI_normalizer_name        
-            } catch (err){
+              this.ARSResults[n].objectSRInormID = this.SRINodeData[object].id.SRI_normalizer_curie
+              this.ARSResults[n].objectSRInormCat = this.SRINodeData[object].id.SRI_normalizer_category
+              this.ARSResults[n].objectSRInormName = this.SRINodeData[object].id.SRI_normalizer_name        
+              this.ARSResults[n].objectSRIID = this.SRINodeData[object].id.identifier
+              this.ARSResults[n].objectSRICat = this.SRINodeData[object].id.category
+              this.ARSResults[n].objectSRIName = this.SRINodeData[object].id.name 
+} catch (err){
               console.log("object err = ", object)
               console.log(this.SRINodeData[object])
 
@@ -1708,7 +1720,7 @@ async araxCategoryGroup(){
       console.log(nametag)
 
       const attributeInfo = ["value","value_url","attributes","description","value_type_id","attribute_source","attribute_type_id","original_attribute_name"]
-      const attributeHeaders = ["value","value_url","attributes","description","value_type_id","attribute_source","attribute_type_id","original_attribute_name"]
+      // const attributeHeaders = ["value","value_url","attributes","description","value_type_id","attribute_source","attribute_type_id","original_attribute_name"]
       for (let index = 0; index < file.length; index++) {
         // const result = this.groupedResultsTable[index];
         const result = file[index];
@@ -1761,6 +1773,7 @@ async araxCategoryGroup(){
           // console.log(header)
           // if(header != "edgeinfo" && header != "objectAtt" && header != "subjectAtt"){
               //GET EVERY VALUE TO PUT IN A CELL
+              //edgepubInfo	edgen_pmids	edgeprovider	edgepublicationsText	edgepublications
           if(header != "edgeinfo" && header != "objectAtt" && header != "subjectAtt"){
 
             let cell = JSON.stringify(result[header]);
@@ -1772,8 +1785,11 @@ async araxCategoryGroup(){
                 // cell = cell.replace(/\r/gi, ";")
               } catch (err) {
                 console.error(err);
+                console.log(header)
                 console.log("cell")
                 console.log(cell)
+                console.log("result")
+                console.log(result)
               }
               rowData = rowData + cell + ","
           }
@@ -1791,10 +1807,10 @@ async araxCategoryGroup(){
                 let atts = result["edgeinfo"]["attributes"]
                 // console.log("atts")
                 // console.log(atts)
-                if(index < 20){
-                  console.log("########## attributeInfo to Start")
-                  console.log(attributeHeaders)                  
-                }
+                // if(index < 20){
+                //   console.log("########## attributeInfo to Start")
+                //   console.log(attributeHeaders)                  
+                // }
 
                 for (let m = 0; m < atts.length; m++) {
                   const attGroup = atts[m];
@@ -1835,40 +1851,15 @@ async araxCategoryGroup(){
 
                       attInfoText = attInfoText + attCell + ","
 
-                      
-                      // GET ATT DATA FOR EACH CELL LIKE ABOVE
-                      
-                        // // CHECK TO SEE IF THE PART OF THE ATTRIBUTE EXISTS - IF SO THEN SET VALUE TO THAT
-                        // // console.log("attTextArray to Start")
-                        // // console.log(attTextArray)
-                        // if(Object.prototype.hasOwnProperty.call(attGroup, att)){
-                        //   // console.log("FOUND ATTGROUP[ATT]")
-                        //   attCell = attGroup[att]
-                        //     // REPLACE COMMAS WITH SEMICOLONS SO THAT IT DOES NOT MESS UP CSV
-                        //     if(attCell != null){
-                        //       try {
-                        //         attCell = attCell.toString()
-                        //         attCell = attCell.replace(/,/gi, ";");
-                        //         attCell = attCell.replace(/\n/gi, ";")
-                        //       } catch (err) {
-                        //         console.error(err);
-                        //       }                               
-                        //     }
- 
-                        // }else {
-                        //   // console.log(" ---- DID NOT FIND ATTGROUP[ATT]")
-                        // }
-                        // // INSERT VALUE OR BLANK IN ARRAY AT SPECIFIC LOCATION SO IT WILL END UP IN THE RIGHT COLUMN
-                        // attTextArray.splice(x, 1, attCell)
 
                         if(x == attributeInfo.length - 1){
                           // console.log("GOT TO END OF ROW AND ADDED ALL ATTRIBUTES!")
                           // console.log("rowData")
                           // console.log(rowData)
-                          if(index < 20){
-                            console.log("attInfoText end")
-                            console.log(attInfoText)                 
-                          }
+                          // if(index < 20){
+                          //   console.log("attTextArray end")
+                          //   console.log(attTextArray)                 
+                          // }
                           
                           // REPEAT THE LINE TEXT AND ADD THE ATTRIBUTE TEXT AND ADD LINE BREAK
                           // SHOULD GET ONE LINE FOR EACH ATTRIBUTE GROUP
@@ -1886,8 +1877,8 @@ async araxCategoryGroup(){
         }
         if(index == file.length - 1){
         // if(index == 100){
-          console.log("(new TextEncoder().encode(text)).length")
-          console.log((new TextEncoder().encode(text)).length)
+          // console.log("(new TextEncoder().encode(text)).length")
+          // console.log((new TextEncoder().encode(text)).length)
           // console.log("pubmedAtt")
           // console.log(pubmedAtt)
           // console.log("pubmedAtt")
@@ -1905,7 +1896,7 @@ async araxCategoryGroup(){
 
           element.click();
           document.body.removeChild(element);
-          console.log("file saved!!");
+          console.log("FILE SAVED!!");
         }
       }
 
