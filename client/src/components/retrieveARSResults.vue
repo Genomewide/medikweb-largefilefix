@@ -916,78 +916,17 @@ export default {
       geneGeneExcel: [],
       drugGeneExcel: [],
       filterSubject: true,
-      SRINodeData: {}
+      SRINodeData: {},
+      allAnswerGraphArray: [],
+      allResultsNodeTable:[],
+      allResultsEdgeTable:[],
+      allResutlDrugDiseaseTable:[]
 
     };
   },
   methods: {
 
 
-
-
-
-  // async testSaveFile2(){
-  //   console.log("testSaveFile")
-  //   // this.ARSResults = searchResult1
-  //   var ARSTable = searchResult1.map(function (res) {
-  //     res.edgeinfo = null
-  //     res.objectAtt = null
-  //     res.subjectAtt = null
-
-  //     return res
-  //   });
-  //   console.log("ARSTable")
-  //   console.log(ARSTable)
-  //   console.log("this.ARSrequestID")
-  //   console.log(this.ARSrequestID)
-  //   // let ARSTable = resultsToSaveTest.map( res => {"agent": res.agent})
-  //   this.saveThisFile(ARSTable, this.ARSrequestID)
-
-  // },
-
-
-// searchResult1
-
-  // async ARSToTable(){
-
-  //   // this.filterSubject = false
-  //   // let ARSStatus =  await ARSService.pkQueryData(this.ARSrequestID)
-  //   // console.log("ARSStatus")
-  //   // console.log(ARSStatus)
-
-  //   // this.ARSResultStatus = {}
-
-  //   // this.resultGroup == "drug" // TO KEEP FROM LOOPING TO GET MORE INFO
-
-  //   // await this.makeARSStatusTable() 
-  //   // console.log("makeARSStatusTable")
-
-  //   // console.log("this.ARSResultStatus")
-  //   // console.log(this.ARSResultStatus)
-
-
-  //   // await this.ARSCleanResults() 
-  //   // console.log("ARSCleanResults")
-
-  //   this.ARSResults = await TrapiResultClean.TrapiResultClean(this.testARSResults, "testrun")
-
-  //   console.log("this.ARSResults DONE")
-  //   console.log(this.ARSResults)
-  //   // this.componentKey++
-  //   let uniqueNodes = await this.getUniqueNodeIDs()
-
-  //   this.SRINodeData = await ARSService.getARAXSynonymsArray(uniqueNodes)
-
-  //   console.log("this.SRINodeData")
-  //   console.log(this.SRINodeData)
-
-  //   await this.araxCategoryGroup()
-  //   console.log("getting categories")
-
-  //   this.saveThisFile2(this.ARSResults, this.ARSrequestID)
-
-  
-  // },
 
     async ARSToTable(){
 
@@ -1006,29 +945,162 @@ export default {
 
     console.log("this.ARSResultStatus")
     console.log(this.ARSResultStatus)
+
     await this.ARSCleanResults() 
     console.log("ARSCleanResults")
 
+    // await this.resultEdgeGroupTable()
+    // console.log("CHECK ITHIS  ---  resultEdgeGroupTable")
+    // this.saveFile_ArrayJSONtoTable(this.allResultsEdgeTable, "edgeTable")
+
+
+    await this.resultNodeGroupTable()
+    console.log("CHECK ITHIS  ---  resultEdgeGroupTable")
+    this.saveFile_ArrayJSONtoTable(this.allResultsNodeTable, "nodeTable")
     console.log("this.ARSResults DONE")
+    // // console.log(this.ARSResults) 
+    // // this.componentKey++
+    // let uniqueNodes = await this.getUniqueNodeIDs()
+
+    // this.SRINodeData = await ARSService.getARAXSynonymsArray(uniqueNodes)
+
+    // console.log("this.SRINodeData")
+    // console.log(this.SRINodeData)
+
+    // console.log("this.ARSResults")
     // console.log(this.ARSResults)
-    // this.componentKey++
-    let uniqueNodes = await this.getUniqueNodeIDs()
 
-    this.SRINodeData = await ARSService.getARAXSynonymsArray(uniqueNodes)
+    // await this.araxCategoryGroup()
+    // console.log("getting categories")
 
-    console.log("this.SRINodeData")
-    console.log(this.SRINodeData)
-
-    console.log("this.ARSResults")
-    console.log(this.ARSResults)
-
-    await this.araxCategoryGroup()
-    console.log("getting categories")
-
-    this.saveThisFile2(this.ARSResults, this.ARSrequestID)
+    // this.saveThisFile2(this.ARSResults, this.ARSrequestID)
 
   
   },
+
+async resultEdgeGroupTable(){
+  console.log("start resultGroupTable")
+  return new Promise(async (resolve, reject) => { // eslint-disable-line
+// results.fields.data
+    // GET EACH DATA SET FROM THE ARAS
+    for (let i = 0; i < this.allAnswerGraphArray.length; i++) {
+    // for (let i = 0; i < 1; i++) {
+      const res = this.allAnswerGraphArray[i].results.fields.data;
+      let agent = this.allAnswerGraphArray[i].agent
+      console.log("-res")
+      console.log(res)
+      let results = res.message.results
+      console.log("--results")
+      console.log(results)
+      // GO THROUGH EACH RESULT
+      for (let n = 0; n < results.length; n++) {
+        const result = results[n];
+        // console.log("----- result")
+        // console.log(result)
+        let edgeKeys = Object.keys(result.edge_bindings)
+        for (let x = 0; x < edgeKeys.length; x++) {
+          const edgeKey = edgeKeys[x];
+          let edge_bindingGroup = result.edge_bindings[edgeKey]
+          // console.log(" ---------- node_bindingGroup and key = ", nodeKey)
+          // console.log(node_bindingGroup)
+          let tableRow = {"agent": agent, "resultGroup": n,  "key": edgeKey, "edgeID": ""}
+          //  EACH NODE IN ARRAY FOR EACH KEY
+          for (let t = 0; t < edge_bindingGroup.length; t++) {
+            // const element = array[t];
+            tableRow.edgeID = edge_bindingGroup[t].id
+            this.allResultsEdgeTable.push(tableRow)
+
+            
+          }
+          
+        }
+
+        
+      }
+
+      if(i == this.allAnswerGraphArray.length -1){
+        console.log("this.allResultsEdgeTable")
+        console.log(this.allResultsEdgeTable)
+        resolve()
+      }
+      
+    }
+  })
+
+},
+
+async resultNodeGroupTable(){
+  console.log("start resultGroupTable")
+  return new Promise(async (resolve, reject) => { // eslint-disable-line
+// results.fields.data
+    // GET EACH DATA SET FROM THE ARAS
+    for (let i = 0; i < this.allAnswerGraphArray.length; i++) {
+    // for (let i = 0; i < 1; i++) {
+      const res = {...this.allAnswerGraphArray[i].results.fields.data}
+      let agent = this.allAnswerGraphArray[i].agent
+      console.log("-res")
+      console.log(res)
+      let results = res.message.results
+      console.log("--results")
+      console.log(results)
+      // GO THROUGH EACH RESULT
+      for (let n = 0; n < results.length; n++) {
+        const result = {...results[n]}
+        // console.log("----- result")
+        // console.log(result)
+        let nodeBindings = {...result.node_bindings}
+        let nodeKeys = Object.keys(nodeBindings)
+        // console.log("nodeBindings")
+        // console.log(nodeBindings)
+        for (let x = 0; x < nodeKeys.length; x++) {
+          const nodeKey = nodeKeys[x];
+          let nodeBindingsCopy = {...nodeBindings}
+          let node_bindingGroup = nodeBindingsCopy[nodeKey]
+          // let node_bindingGroup = nodeBindings[nodeKey]
+          if(n < 5){
+            console.log("agent = ", agent, "-", n)
+            console.log(" ---------- node_bindingGroup and key = ", nodeKey)
+            console.log("node_bindingGroup")
+            console.log(node_bindingGroup)
+            console.log("node_bindingGroup.length")
+            console.log(node_bindingGroup.length)
+            console.log("#########################")
+          }
+
+          let tableRow = {"agent": agent, "resultGroup": n,  "key": nodeKey, "nodeID": ""}
+          //  EACH NODE IN ARRAY FOR EACH KEY
+          for (let t = 0; t < node_bindingGroup.length; t++) {
+            // const element = array[t];
+
+            let node_bindingGroupObject = {...node_bindingGroup[t]}
+            let pushTableRow = {...tableRow, nodeID: node_bindingGroupObject.id}
+            // tableRow.nodeID = node_bindingGroupObject.id
+            // this.allResultsNodeTable.push(tableRow)
+            this.allResultsNodeTable.push(pushTableRow)
+              if(n < 5){
+                console.log("tableRow = ", pushTableRow)
+                // console.log(" ---------- node_bindingGroup and key = ", nodeKey)
+                // console.log(node_bindingGroup)
+                console.log("#########################")
+              }
+            
+          }
+          
+        }
+
+        
+      }
+
+      if(i == this.allAnswerGraphArray.length -1){
+        console.log("this.allResultsNodeTable")
+        console.log(this.allResultsNodeTable)
+        resolve()
+      }
+      
+    }
+  })
+
+},
 
 
 async araxCategoryGroup(){
@@ -1435,6 +1507,9 @@ async araxCategoryGroup(){
               if(resultCount > 0){
                 console.log("this.ARSResultStatus[id].results.fields.data")
                 console.log(this.ARSResultStatus[id].results.fields.data)
+                // console.log("this.ARSResultStatus[id]")
+                // console.log(this.ARSResultStatus[id])
+                this.allAnswerGraphArray.push(this.ARSResultStatus[id])
                 // console.log(this.ARSResultStatus[id].results.fields.data.message.results)
                 // console.log(this.ARSResultStatus[id].results.fields.data.message)
                 // message.knowledge_graph.nodes
@@ -1989,7 +2064,77 @@ async araxCategoryGroup(){
     },
 
 
+    saveFile_ArrayJSONtoTable(data, name) {
+      let text = "";
+      console.log("saveFile result");
 
+      for (let index = 0; index < data.length; index++) {
+        // const result = this.groupedResultsTable[index];
+        const result = {...data[index]}
+        // console.log(result);
+
+        let headers = Object.keys(result);
+        // console.log({headers})
+        console.log("saved row")
+        if (index == 0) {
+          console.log("headers index == 0");
+          // HEADER ROW
+          for (let i = 0; i < headers.length; i++) {
+            const header = headers[i];
+            // if(i == 0){
+            //   text = "gene,"
+            // }
+            if (i != headers.length - 1) {
+              text = text + header + ",";
+            } else {
+              text = text + header + "\r\n";
+            }
+          }
+        } 
+          // ADD REMAINING ROWS IN SAME ORDER BASED ON KEYS FROM HEADER ROW
+          if(index < 10 ){
+            console.log("result")
+            console.log(result)
+          }
+          for (let n = 0; n < headers.length; n++) {
+            let header = headers[n];
+            let cell = JSON.stringify(result[header]);
+            // let cell = result[header]
+            // console.log("cell = ", cell);
+
+            try {
+              cell = cell.replace(/,/gi, ";");
+            } catch (err) {
+              console.error(err);
+            }
+            // if(n == 0){
+            //   text = this.geneInfo.prowl_symbol + ','
+
+            // }
+            if (n != headers.length - 1) {
+              text = text + cell + ",";
+            } else {
+              text = text + cell + "\r\n";
+            }
+          }
+        // }
+      }
+
+      let filename = name + " " + this.ARSrequestID + ".csv";
+      let element = document.createElement("a");
+      element.setAttribute(
+        "href",
+        "data:application/json;charset=utf-8," + encodeURIComponent(text)
+      );
+      element.setAttribute("download", filename);
+
+      element.style.display = "none";
+      document.body.appendChild(element);
+
+      element.click();
+      document.body.removeChild(element);
+
+    },
 
     saveFile() {
       let text = "";
