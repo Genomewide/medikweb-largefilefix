@@ -949,9 +949,9 @@ export default {
     await this.ARSCleanResults() 
     console.log("ARSCleanResults")
 
-    // await this.resultEdgeGroupTable()
-    // console.log("CHECK ITHIS  ---  resultEdgeGroupTable")
-    // this.saveFile_ArrayJSONtoTable(this.allResultsEdgeTable, "edgeTable")
+    await this.resultEdgeGroupTable()
+    console.log("CHECK ITHIS  ---  resultEdgeGroupTable")
+    this.saveFile_ArrayJSONtoTable(this.allResultsEdgeTable, "edgeTable")
 
 
     await this.resultNodeGroupTable()
@@ -1007,7 +1007,10 @@ async resultEdgeGroupTable(){
           //  EACH NODE IN ARRAY FOR EACH KEY
           for (let t = 0; t < edge_bindingGroup.length; t++) {
             // const element = array[t];
-            tableRow.edgeID = edge_bindingGroup[t].id
+            // tableRow.edgeID = edge_bindingGroup[t].id
+            // tableRow.edgeID = edge_bindingGroup[t].id
+            // tableRow.edgeID = edge_bindingGroup[t].id
+            tableRow = {...tableRow, edgeID:edge_bindingGroup[t].id}
             this.allResultsEdgeTable.push(tableRow)
 
             
