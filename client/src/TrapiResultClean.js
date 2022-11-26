@@ -3,18 +3,22 @@ class TrapiResultClean {
 
   static TrapiResultClean(TrapiResults, agent) {
     // console.log("started PubCleanService");
-
+    
     return new Promise(async (resolve, reject) => { // eslint-disable-line
       console.log("########## Start TrapiResultClean")
       // console.log("TrapiResults")
       // console.log(TrapiResults)
       // console.log(prResults.length)
       let clenaedData = []
+      let edgeCheck = ""
+      let nodeCheck = ""
+      let nodesCheck = ""
 
       try {
         let nodes = TrapiResults.message.knowledge_graph.nodes
         let edges = TrapiResults.message.knowledge_graph.edges 
         let edgeKeys = Object.keys(edges)
+        nodesCheck = nodes
         // let nodeKeys = Object.keys(nodes)
         // console.log("nodeKeys")
         // console.log(nodeKeys)
@@ -29,6 +33,7 @@ class TrapiResultClean {
             let edgeKey = edgeKeys[index];
             // console.log("key = ", edgeKey)
             let edge = {...edges[edgeKey]}
+            edgeCheck = edge
             // console.log("edge = ", edge)
   
             let subject = edge.subject
@@ -39,6 +44,25 @@ class TrapiResultClean {
             let object = edge.object
             // console.log("nodes[subject]") 
             // console.log(nodes[subject])
+            data.edgeKey = ""
+            data.agent = ""
+            data.edgeinfo = ""
+            data.object = ""
+            data.predicate = ""
+            // data.relation = edge.relation
+            data.subject = ""
+            nodeCheck = ""
+            data.subjectName = ""
+            data.subjectCats = ""
+            data.subjectCat = ""
+            nodeCheck = ""
+            data.objectName = ""
+            data.objectCats = ""
+            data.objectCat = ""
+            data.objectAtt = ""
+            data.subjectAtt = ""
+
+          try {
             data.edgeKey = edgeKey
             data.agent = agent
             data.edgeinfo = edge
@@ -46,14 +70,20 @@ class TrapiResultClean {
             data.predicate = edge.predicate
             // data.relation = edge.relation
             data.subject = edge.subject
+            nodeCheck = nodes[subject]
             data.subjectName = nodes[subject].name
             data.subjectCats = nodes[subject].categories
             data.subjectCat = nodes[subject].categories[nodes[subject].categories.length - 1]
+            nodeCheck = nodes[object]
             data.objectName = nodes[object].name
             data.objectCats = nodes[object].categories
             data.objectCat = nodes[object].categories[nodes[object].categories.length - 1]
             data.objectAtt = nodes[object].attributes
             data.subjectAtt = nodes[subject].attributes
+
+          } catch (error){
+            console.error(error)
+          }
             //
             data.edgepubInfo = null
             data.edgen_pmids = 0
@@ -142,7 +172,11 @@ class TrapiResultClean {
       //  resolve(nodes)
       } catch (err) {
         console.error("ERROR IN TrapiResultClean")
-        
+        // console.log("nodes = ", nodes)
+        console.log("nodeCheck = ", nodeCheck)
+        console.log("nodesCheck = ", nodesCheck)
+        console.log("edgeCheck = ", edgeCheck)
+        // console.log("current cleaned data = ",  data)        
         console.error(err)
         reject({});
       }

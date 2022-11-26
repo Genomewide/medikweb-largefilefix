@@ -1,6 +1,6 @@
 import axios from 'axios';
 
-
+// let testData = ""
 class NodeService {
 
   // static getAllSynOrtho (){
@@ -114,7 +114,7 @@ static nodeNormalizationPost = (idArray) => {
 
     console.log(normalURL)
     try {
-      const res = await axios.post(url, postPacket);
+      const res = await axios.post(normalURL, postPacket);
         const data = res.data;
         console.log("nodeNormalizationPost RAN")
         console.log(data)
@@ -186,7 +186,52 @@ static nodeNormalizationPost = (idArray) => {
         });
       }
     
-
+      static getCooccurance = (query) => {
+        console.log("started getCooccurance");
+        return new Promise(async (resolve, reject) => { // eslint-disable-line
+          let url = "https://cooccurrence-p36smkc6hq-uc.a.run.app/query" 
+          // query = {
+          //   "message": {
+          //     "query_graph": {
+          //       "edges": {
+          //         "e00": {
+          //           "object": "n01",
+          //           "predicates": [
+          //             "biolink:occurs_together_in_literature_with"
+          //           ],
+          //           "subject": "n00"
+          //         }
+          //       },
+          //       "nodes": {
+          //         "n00": {
+          //           "categories": [
+          //             "biolink:AnatomicalEntity"
+          //           ]
+          //         },
+          //         "n01": {
+          //           "ids": [
+          //             "NCBITaxon:33746"
+          //           ]
+          //         }
+          //       }
+          //     }
+          //   }
+          // }
+          try {
+            const res = await axios.post(url, query);
+              const data = res.data;
+              // let testData = res
+              console.log("getCooccurance RAN")
+              console.log(res)
+              console.log(data)
+              resolve(data);
+          } catch (err) {
+            // console.log("testData")
+            // console.log(testData)
+            reject(err);
+          }
+        });
+      }
 
 }
 

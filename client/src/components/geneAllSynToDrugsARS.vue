@@ -201,7 +201,19 @@
                     variant="primary"
                     >Download Gene Gene sheet
                   </b-button>
-                    Download Excel (you can customize this with html code!)
+                  </download-excel>
+                  <download-excel
+                    class="btn btn-default"
+                    :data="drugGeneExcel"
+                    worksheet="My Worksheet"
+                    :fields="excelFields"
+                    :name="drugGeneFileName"
+                  >
+                  <b-button
+                    style="margin-left: 20px"
+                    variant="primary"
+                    >Download Drug Gene sheet
+                  </b-button>
                   </download-excel>
             </div>
           </b-form>
@@ -1274,6 +1286,7 @@ export default {
           this.resultGroup == "gene"
           let fileName = this.concept_search + "_drug_gene"
           this.saveThisFile2(this.drugResults, fileName)
+          this.saveExcel(this.drugResults)
           // this.saveExcel(this.drugResults)
           console.log("THIS IS THE END")
         }
@@ -1667,8 +1680,18 @@ export default {
                   // console.log("excelRow")
                   // console.log(row)
 
+
                   if(index == file.length - 1){
-                    this.geneGeneExcel = excelData
+
+                    if(this.resultGroup == "gene"){
+                      this.geneGeneExcel = excelData
+                    }
+
+                    if(this.resultGroup == "drug"){
+                      this.drugGeneExcel = excelData
+                    }
+
+                    
                   }
                 }
               

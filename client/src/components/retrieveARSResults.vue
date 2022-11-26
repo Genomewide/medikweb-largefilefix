@@ -355,59 +355,13 @@
         <!-- <b-container>
           <b-row>
             <b-card style="margin-top: 20px; width: 100%" :key="componentKey">
-              <template #header>
-                <h4 class="mb-0">Drug Gene Progress:</h4>
-              </template>
-
-              <b-card-title>{{gene.predicates}}</b-card-title>
-
-              <b-card-sub-title  v-for="(predicate, index) in resultWithDrugs.predicates" :key="index" >Predicate: {{predicate}} </b-card-sub-title>
-              <b-card-text>
-                {{currentDrug}}
-                <b-table
-                  bordered
-                  striped
-                  hover
-                  ref="progressTable"
-                  table-layout:
-                  fixed
-                  :items="progressTable"
-                >
-                </b-table>
-              </b-card-text>
-              <b-card-body> </b-card-body>
-            </b-card>
-            <b-col> </b-col>
-          </b-row>
-        </b-container> -->
-                <!-- <b-container :key="componentKey">
-          <b-row
-            style="margin-top: 20px; width: 100%"
-            v-for="gene in geneIDList"
-            :key="gene.id"
-          >
-            <b-card style="margin-top: 20px; width: 100%" :key=" gene.id + componentKey">
-              <template #header>
-                <h4 class="mb-0">{{ progressObject[gene].groupName }}</h4> (all drugs with any predicate: {{progressObject[gene].chemCountTotal}})
-              </template>
-
-              <b-card-text>
-                Drugs with clear predicate ({{progressObject[gene].chemCount}})
-                <div>
-                  <h5>Getting and filtering synonyms: </h5>
-                      <b-progress :value="progressObject[gene].synCurrentCount" :max="progressObject[gene].chemCount" show-progress animated></b-progress>
-                        {{progressObject[gene]}}
-                </div>        
-                <div>
-                  <h5>Checking FDA status: </h5>
-                    <b-progress :value="progressObject[gene].FDACurrentCount" :max="progressObject[gene].chemCount" show-progress animated></b-progress>
-                      {{progressObject[gene]}}
-                </div>
-              </b-card-text> 
-              <b-card-body> </b-card-body>
+              <div>
+                <b-table hover :items="noveltyTable"></b-table>
+              </div>
             </b-card>
           </b-row>
         </b-container> -->
+ 
       </b-container>
     </div>
   </div>
@@ -422,7 +376,7 @@ import ARSService from "../ARSService";
 
 // import excel from 'vue-excel-export'
 // import ARAXService from "../ARAXService";
-// import NodeService from "../NodeService";
+import NodeService from "../NodeService";
 // import metagraph from "/Users/andycrouse/Documents/GitHub/medikweb-largefilefix/datafiles/metaknowledgegraph.json"
 // import resultsAD from  "/Users/andycrouse/Documents/GitHub/medikweb_dev/datafiles/resultsAD.json"
 // import svgtest from "./svgtest.vue"
@@ -847,7 +801,8 @@ export default {
       geneIDList: [],
       currentDrug: "test",
       araxResultTable: [],
-      ARSrequestID: "eefdcc25-9e5d-4693-939f-6fbfccbe05d1",
+      // ARSrequestID: "3ff82c51-3fd4-43e1-af82-e40c629b74fa",
+      ARSrequestID: "eefdcc25-9e5d-4693-939f-6fbfccbe05d1", 
       // ARSrequestID: "75ae2eb4-d3ba-4b11-b217-f1440787e7ea",
       resultSetIDs: [],
       ARSResultStatus: {},
@@ -920,8 +875,31 @@ export default {
       allAnswerGraphArray: [],
       allResultsNodeTable:[],
       allResultsEdgeTable:[],
-      allResutlDrugDiseaseTable:[]
-
+      allResutlDrugDiseaseTable:[],
+      synData: [],
+      cooccurrenceNodeData: [],
+       noveltyTable: [],
+      coocurrenceQuery: {
+          "message": {
+            "query_graph": {
+              "edges": {
+        "e1" :{"object": "n1", "predicates":["biolink:occurs_together_in_literature_with"], "subject": "n2"},
+        "e2" :{"object": "n3", "predicates":["biolink:occurs_together_in_literature_with"], "subject": "n4"},
+        "e3" :{"object": "n5", "predicates":["biolink:occurs_together_in_literature_with"], "subject": "n6"}
+              },
+              "nodes": {
+        "n1":{ "ids":["DRUGBANK:DB01261"]},
+        "n2":{ "ids":["MONDO:0005148"]},
+        "n3":{ "ids":["DRUGBANK:DB00672"]},
+        "n4":{ "ids":["MONDO:0005015"]},
+        "n5":{ "ids":["DRUGBANK:DB00945"]},
+        "n6":{ "ids":["MONDO:0005015"]}
+              }
+            }
+          }
+        },
+        queryName: ""
+       
     };
   },
   methods: {
@@ -934,6 +912,8 @@ export default {
     let ARSStatus =  await ARSService.pkQueryData(this.ARSrequestID)
     console.log("ARSStatus")
     console.log(ARSStatus)
+    
+    await this.getNameing(ARSStatus)
 
     this.ARSResultStatus = {}
 
@@ -955,33 +935,434 @@ export default {
 
 
     await this.resultNodeGroupTable()
-    console.log("CHECK ITHIS  ---  resultEdgeGroupTable")
+    console.log("CHECK ITHIS  ---  resultNodeGroupTable")
+    console.log("this.allResultsNodeTable")
+    console.log(this.allResultsNodeTable)
     this.saveFile_ArrayJSONtoTable(this.allResultsNodeTable, "nodeTable")
     console.log("this.ARSResults DONE")
-    // // console.log(this.ARSResults) 
-    // // this.componentKey++
-    // let uniqueNodes = await this.getUniqueNodeIDs()
+    // console.log(this.ARSResults) 
+    // this.componentKey++
+    
 
-    // this.SRINodeData = await ARSService.getARAXSynonymsArray(uniqueNodes)
+    let uniqueNodes = await this.getUniqueNodeIDs()
+    console.log("uniqueNodes")
+    console.log(uniqueNodes)
+    this.SRINodeData = await ARSService.getARAXSynonymsArray(uniqueNodes)
 
-    // console.log("this.SRINodeData")
-    // console.log(this.SRINodeData)
+    console.log("this.SRINodeData")
+    console.log(this.SRINodeData)
 
-    // console.log("this.ARSResults")
-    // console.log(this.ARSResults)
-
-    // await this.araxCategoryGroup()
-    // console.log("getting categories")
-
-    // this.saveThisFile2(this.ARSResults, this.ARSrequestID)
+    // this.getDrugSynonyms()
 
   
+
+    console.log("this.ARSResults")
+    console.log(this.ARSResults)
+
+    await this.araxCategoryGroup()
+    console.log("getting categories")
+
+    this.saveThisFile2(this.ARSResults, this.ARSrequestID)
+
+  // MAKE THE NODES AND EDGES FOR THE COOCURRANCE
+
+    console.log("running getSynonymDataForCooccuranceQuery ")
+    await this.getSynonymDataForCooccuranceQuery()
+
+    console.log("formatCoocurranceQueryBuild")
+    let coocData = await this.formatCoocurranceQueryBuild()
+    console.log("finshed formatCoocurranceQueryBuild")
+
+    this.formatCoocurrData(coocData)
+
   },
 
+// let synData = []
+// console.log(synData)
+async getNameing (ARSStatus){
+  return new Promise(async (resolve, reject) => { // eslint-disable-line
+
+// this.queryName = ""
+    let nodes = ARSStatus.fields.data.message.query_graph.nodes
+    let nodeKeys = Object.keys(nodes)
+    this.queryName = ""
+    for (let i = 0; i < nodeKeys.length; i++) {
+      const node =nodeKeys[i];
+      let nodeData  = {...nodes[node]}
+      console.log(nodeData)
+        if(Object.prototype.hasOwnProperty.call(nodeData, "name")){
+          this.queryName = this.queryName + " " + node + "-" + nodeData.name
+        } else if(Object.prototype.hasOwnProperty.call(nodeData, "ids")){
+          this.queryName = this.queryName + " " + node + "-" + nodeData.ids[0]
+        } else if(Object.prototype.hasOwnProperty.call(nodeData, "categories")){
+          this.queryName = this.queryName + " " + node + "-" + nodeData.categories[0]
+        } else {
+          this.queryName = this.queryName + " " + node + "-" + "namedThing"
+        }
+      if(i == nodeKeys.length - 1){
+        resolve()
+      }
+    }
+  })
+},
+
+
+async formatCoocurrData (coocData){
+  console.log("STARTED formatCoocurrData")
+  let nodes = coocData.message.knowledge_graph.nodes
+  let edges = coocData.message.knowledge_graph.edges
+  let edgeKeys = Object.keys(edges)
+
+  for (let i = 0; i < edgeKeys.length; i++) {
+    let coocurrInfoRow = {}
+    const edgeKey = edgeKeys[i];
+    let edge = edges[edgeKey]
+    coocurrInfoRow.subID = edge.subject
+    coocurrInfoRow.subName = nodes[edge.subject].name
+    coocurrInfoRow.objID = edge.object
+    coocurrInfoRow.objName = nodes[edge.object].name
+
+    for (let n = 0; n < edge.attributes.length; n++) {
+      const att = edge.attributes[n];
+      switch (true) {
+        case att.attribute_type_id == "biolink:concept_count_subject":
+          coocurrInfoRow.subCount = att.value
+          break;
+        case att.attribute_type_id == "biolink:concept_count_object":
+          coocurrInfoRow.objCount = att.value
+          break;
+        case att.attribute_type_id == "biolink:concept_pair_count":
+          coocurrInfoRow.pairCount = att.value
+          break;
+        case att.attribute_type_id == "biolink:tmkp_normalized_pointwise_mutual_information":
+          coocurrInfoRow.normPointwise = att.value
+          break;
+      }
+      if(n == edge.attributes.length - 1){
+        this.noveltyTable.push(...coocurrInfoRow)
+        // console.log("ENDED formatCoocurrData")
+      }
+      
+    }
+    if( i == edgeKeys.length - 1){
+      console.log("ENDED formatCoocurrData - updating to show table")
+      this.componentKey++
+      this.saveFile_ArrayJSONtoTable(this.noveltyTable, "Novelty")
+    }
+
+    // noveltyTable
+  }
+  
+
+
+},
+
+async getSynonymDataForCooccuranceQuery(){
+    return new Promise(async (resolve, reject) => { // eslint-disable-line
+
+    console.log("getDrugSynonyms started")
+    let synKeys = Object.keys(this.SRINodeData)
+    console.log(synKeys)
+
+    let drugNodes = this.allResultsNodeTable.filter(x => x.key == "drug")
+    let diseaseNodes = this.allResultsNodeTable.filter(x => x.key == "disease")
+
+    console.log("drugNodes")
+    console.log(drugNodes)
+    console.log("diseaseNodes")
+    console.log(diseaseNodes)
+
+
+    // GO THROUGH THE NODES THAT ARE DRUGS AND GET THEIR SYNONYMS
+    for (let i = 0; i < drugNodes.length; i++) {
+      const drugNode = drugNodes[i];
+      let drugNodeid = drugNode.nodeID
+      drugNode.diseaseName = ""
+      // console.log("drugNodeid")
+      // console.log(drugNodeid)
+      // console.log("this.SRINodeData[drugNodeid]")
+      // console.log(this.SRINodeData[drugNodeid])
+      let disMatchNode = diseaseNodes.filter(x => x.resultGroup ==drugNode.resultGroup && x.agent == drugNode.agent)
+      // console.log("disMatchNode")
+      // console.log(disMatchNode)
+
+      drugNode.disease = disMatchNode[0].nodeID
+      drugNode.edgeID = drugNode.agent + "_" + drugNode.resultGroup
+      // console.log("drugNode")
+      // console.log(drugNode)
+      try {
+        if(Object.prototype.hasOwnProperty.call(this.SRINodeData[drugNode.disease], "nodes")){
+          drugNode.diseaseName = this.SRINodeData[drugNode.disease].equivalent_identifiers[0].normalizer_name
+        }
+      }
+      catch(err) {
+        console.log("disease name error")
+        console.log(err)
+      }
+      drugNode.drugName = ""
+
+      try{
+        if(Object.prototype.hasOwnProperty.call(this.SRINodeData[drugNodeid], "nodes")){
+        
+            let sybGroupDataNodes = this.SRINodeData[drugNodeid].nodes
+            drugNode.drugName = this.SRINodeData[drugNodeid].equivalent_identifiers[0].normalizer_name
+            // CHECK THE SRI NORMALIZER DATA THAT WAS CREATED FOR POSSIBLE SYNONYMS THAT MEET THE COOCURRANCE QUERY REQUIREMENTS
+            for (let n = 0; n < sybGroupDataNodes.length; n++) {
+              const node = sybGroupDataNodes[n];
+
+              if(node.identifier.split(":")[0] == "CHEBI" && node.category == "biolink:ChemicalMixture"){
+                  // synData.ChemicalMixture_chebi = node.identifier
+                  drugNode.synonym = node.identifier
+                  // drugNode.drugName = node.normalizer_name
+                } else if (node.identifier.split(":")[0] == "CHEBI" && node.category == "biolink:ChemicalEntity"){
+                  // synData.ChemicalEntity_chebi = node.identifier
+                  drugNode.synonym = node.identifier
+                  // drugNode.drugName = node.normalizer_name
+
+                } else if (node.identifier.split(":")[0] == "DRUGBANK" && node.category == "biolink:ChemicalEntity"){
+                  // synData.ChemicalEntity_drugbank = node.identifier
+                  drugNode.synonym = node.identifier
+                  // drugNode.drugName = node.normalizer_name
+
+                } else if (node.identifier.split(":")[0] == "CHEBI" && node.category == "biolink:Polypeptide"){
+                  // synData.Polypeptide_chebi = node.identifier
+                  drugNode.synonym = node.identifier
+                  // drugNode.drugName = node.normalizer_name
+
+                } else if (node.identifier.split(":")[0] == "CHEBI" && node.category == "biolink:MolecularMixture"){
+                  // synData.MolecularMixture_chebi = node.identifier
+                  drugNode.synonym = node.identifier
+                  // drugNode.drugName = node.normalizer_name
+
+                } else if (node.identifier.split(":")[0] == "DRUGBANK" && node.category == "biolink:MolecularMixture"){
+                  // synData.MolecularMixture_drugbank = node.identifier
+                  drugNode.synonym = node.identifier
+                  // drugNode.drugName = node.normalizer_name
+
+                } else if (node.identifier.split(":")[0] == "CHEBI" && node.category == "biolink:Protein"){
+                  // synData.Protein_chebi = node.identifier
+                  drugNode.synonym = node.identifier
+                  // drugNode.drugName = node.normalizer_name
+
+                } else if (node.identifier.split(":")[0] == "PR" && node.category == "biolink:Protein"){
+                  // synData.Protein_pr = node.identifier
+                  drugNode.synonym = node.identifier
+                  // drugNode.drugName = node.normalizer_name
+
+                } else if (node.identifier.split(":")[0] == "CHEBI" && node.category == "biolink:SmallMolecule"){
+                  // synData.SmallMolecule_chebi = node.identifier
+                  drugNode.synonym = node.identifier
+                  // drugNode.drugName = node.normalizer_name
+
+                } else if (node.identifier.split(":")[0] == "DRUGBANK" && node.category == "biolink:SmallMolecule"){
+                  // synData.SmallMolecule_drugbank = node.identifier
+                  drugNode.synonym = node.identifier
+                  // drugNode.drugName = node.normalizer_name
+
+                } else if (node.identifier.split(":")[0] == "CHEBI" && node.category == "biolink:ComplexMolecularMixture"){
+                  // synData.ComplexMolecularMixture_chebi = node.identifier
+                  drugNode.synonym = node.identifier
+                  // drugNode.drugName = node.normalizer_name
+
+                } else if (node.identifier.split(":")[0] == "DRUGBANK" && node.category == "biolink:ComplexMolecularMixture"){
+                  // synData.ComplexMolecularMixture_drugbank = node.identifier
+                  drugNode.synonym = node.identifier
+                  // drugNode.drugName = node.normalizer_name
+
+                }
+                
+                if(n == sybGroupDataNodes.length - 1){
+                  this.cooccurrenceNodeData.push(drugNode)
+                } 
+            }
+      }
+
+    } catch {
+      // console.log(err)
+      // console.log("FAILED AT ") 
+      console.log("FAILED AT  drugNode") 
+      // console.log(drugNode) 
+      // console.log("disMatchNode") 
+      // console.log(disMatchNode) 
+    }
+
+    if(i == drugNodes.length - 1){
+      console.log("this.cooccurrenceNodeData FINISHED")
+      console.log(this.cooccurrenceNodeData)
+
+      resolve()
+    }
+      
+    }
+  })
+
+},
+
+async formatCoocurranceQueryBuild(){
+
+  return new Promise(async (resolve, reject) => { // eslint-disable-line
+
+    console.log("START formatCoocurranceQueryBuild")
+    let nodes = {}
+    let edges = {}
+    // let node = {"n1":{ "ids":["DRUGBANK:DB01261"]}}
+    // let edge = {"e1" :{"object": "n1", "predicates":["biolink:occurs_together_in_literature_with"], "subject": "n2"}}
+
+    for (let i = 0; i < this.cooccurrenceNodeData.length; i++) {
+    // for (let i = 0; i < 2; i++) {
+      const nodeData = this.cooccurrenceNodeData[i];
+
+      if(nodeData.synonym != null && nodeData.disease != null){
+        console.log("getting nodes and edges")
+        
+        let drugNodeID = "drug_" + i
+        let disNodeID = "dis_" + i
+        let edgeID = "e" + i
+        nodes[drugNodeID] = {"ids":[nodeData.synonym]}
+        nodes[disNodeID] = {"ids":[nodeData.disease]}
+        edges[edgeID] = {"object": drugNodeID, "predicates":["biolink:occurs_together_in_literature_with"], "subject": disNodeID}
+      }
+
+      // if(i == this.cooccurrenceNodeData.length - 1){
+      if(i == this.cooccurrenceNodeData.length -1){
+        console.log("nodes")
+        console.log(nodes)
+        console.log("edges")
+        console.log(edges)
+        this.coocurrenceQuery.message.query_graph.edges = edges
+        this.coocurrenceQuery.message.query_graph.nodes = nodes
+        console.log("this.coocurrenceQuery")
+        console.log(this.coocurrenceQuery)
+        let cooccData = await NodeService.getCooccurance(this.coocurrenceQuery)
+        console.log("cooccData")
+        console.log(cooccData)
+
+        resolve(cooccData)
+
+      }
+      
+    }
+  })
+},
+
+async getDrugSynonyms(){
+console.log("getDrugSynonyms started")
+let synKeys = Object.keys(this.SRINodeData)
+console.log(synKeys)
+
+// let categories = ["biolink:ChemicalMixture","biolink:ChemicalEntity", "biolink:NamedThing", "biolink:Polypeptide", "biolink:MolecularMixture", "biolink:Protein", "biolink:SmallMolecule", "biolink:ComplexMolecularMixture" ]
+  for (let i = 0; i < synKeys.length; i++) {
+    // SETUP BLANK TO ADD DATA IF EXISTS
+      let synData = {}
+      synData.id = ""
+      synData.ChemicalMixture_chebi = ""
+      synData.ChemicalEntity_chebi = ""
+      synData.ChemicalEntity_drugbank = ""
+      synData.Polypeptide_chebi = ""
+      synData.MolecularMixture_chebi = ""
+      synData.MolecularMixture_drugbank = ""
+      synData.Protein_chebi = ""
+      synData.Protein_pr = ""
+      synData.SmallMolecule_chebi = ""
+      synData.SmallMolecule_drugbank = ""
+      synData.ComplexMolecularMixture_chebi = ""
+      synData.ComplexMolecularMixture_drugbank = ""
+      synData.synonym = ""
+    //  end
+
+
+    // CHECK FOR AVAILABLE DATA
+      const synGroup = synKeys[i];
+      // data.key = synGroup
+      // data.drugbank = ""
+      synData.id = synGroup
+      console.log("synGroup")
+      console.log(synGroup)
+
+      // if(Object.prototype.hasOwnProperty.call(this.SRINodeData[synGroup], "nodes")){
+      try{
+        let sybGroupDataNodes = this.SRINodeData[synGroup].nodes
+
+        for (let n = 0; n < sybGroupDataNodes.length; n++) {
+          const node = sybGroupDataNodes[n];
+
+          if(node.identifier.split(":")[0] == "CHEBI" && node.category == "biolink:ChemicalMixture"){
+            synData.ChemicalMixture_chebi = node.identifier
+            synData.synonym = node.identifier
+          } else if (node.identifier.split(":")[0] == "CHEBI" && node.category == "biolink:ChemicalEntity"){
+            synData.ChemicalEntity_chebi = node.identifier
+            synData.synonym = node.identifier
+
+          } else if (node.identifier.split(":")[0] == "DRUGBANK" && node.category == "biolink:ChemicalEntity"){
+            synData.ChemicalEntity_drugbank = node.identifier
+            synData.synonym = node.identifier
+
+          } else if (node.identifier.split(":")[0] == "CHEBI" && node.category == "biolink:Polypeptide"){
+            synData.Polypeptide_chebi = node.identifier
+            synData.synonym = node.identifier
+
+          } else if (node.identifier.split(":")[0] == "CHEBI" && node.category == "biolink:MolecularMixture"){
+            synData.MolecularMixture_chebi = node.identifier
+            synData.synonym = node.identifier
+
+          } else if (node.identifier.split(":")[0] == "DRUGBANK" && node.category == "biolink:MolecularMixture"){
+            synData.MolecularMixture_drugbank = node.identifier
+            synData.synonym = node.identifier
+
+          } else if (node.identifier.split(":")[0] == "CHEBI" && node.category == "biolink:Protein"){
+            synData.Protein_chebi = node.identifier
+            synData.synonym = node.identifier
+
+          } else if (node.identifier.split(":")[0] == "PR" && node.category == "biolink:Protein"){
+            synData.Protein_pr = node.identifier
+            synData.synonym = node.identifier
+
+          } else if (node.identifier.split(":")[0] == "CHEBI" && node.category == "biolink:SmallMolecule"){
+            synData.SmallMolecule_chebi = node.identifier
+            synData.synonym = node.identifier
+
+          } else if (node.identifier.split(":")[0] == "DRUGBANK" && node.category == "biolink:SmallMolecule"){
+            synData.SmallMolecule_drugbank = node.identifier
+            synData.synonym = node.identifier
+
+          } else if (node.identifier.split(":")[0] == "CHEBI" && node.category == "biolink:ComplexMolecularMixture"){
+            synData.ComplexMolecularMixture_chebi = node.identifier
+            synData.synonym = node.identifier
+
+          } else if (node.identifier.split(":")[0] == "DRUGBANK" && node.category == "biolink:ComplexMolecularMixture"){
+            synData.ComplexMolecularMixture_drugbank = node.identifier
+            synData.synonym = node.identifier
+
+          }
+
+          
+          if(n == sybGroupDataNodes.length - 1){
+            this.synData.push(synData)
+          }        
+      }
+
+        } catch (err) {
+          console.log(err)
+          console.log("FAILED AT ") 
+          console.log(this.SRINodeData[synGroup])
+        }
+      // }
+
+    if(i == synKeys.length - 1){
+      console.log("finished getting synonym table")
+      this.saveFile_ArrayJSONtoTable(this.synData, "synonym table ")
+    }
+
+  }
+
+// saveFile_ArrayJSONtoTable(data, name)
+
+
+},
 async resultEdgeGroupTable(){
   console.log("start resultGroupTable")
   return new Promise(async (resolve, reject) => { // eslint-disable-line
-// results.fields.data
+    // results.fields.data
     // GET EACH DATA SET FROM THE ARAS
     for (let i = 0; i < this.allAnswerGraphArray.length; i++) {
     // for (let i = 0; i < 1; i++) {
@@ -1041,11 +1422,11 @@ async resultNodeGroupTable(){
     // for (let i = 0; i < 1; i++) {
       const res = {...this.allAnswerGraphArray[i].results.fields.data}
       let agent = this.allAnswerGraphArray[i].agent
-      console.log("-res")
-      console.log(res)
+      // console.log("-res")
+      // console.log(res)
       let results = res.message.results
-      console.log("--results")
-      console.log(results)
+      // console.log("--results")
+      // console.log(results)
       // GO THROUGH EACH RESULT
       for (let n = 0; n < results.length; n++) {
         const result = {...results[n]}
@@ -1060,15 +1441,15 @@ async resultNodeGroupTable(){
           let nodeBindingsCopy = {...nodeBindings}
           let node_bindingGroup = nodeBindingsCopy[nodeKey]
           // let node_bindingGroup = nodeBindings[nodeKey]
-          if(n < 5){
-            console.log("agent = ", agent, "-", n)
-            console.log(" ---------- node_bindingGroup and key = ", nodeKey)
-            console.log("node_bindingGroup")
-            console.log(node_bindingGroup)
-            console.log("node_bindingGroup.length")
-            console.log(node_bindingGroup.length)
-            console.log("#########################")
-          }
+          // if(n < 5){
+          //   console.log("agent = ", agent, "-", n)
+          //   console.log(" ---------- node_bindingGroup and key = ", nodeKey)
+          //   console.log("node_bindingGroup")
+          //   console.log(node_bindingGroup)
+          //   console.log("node_bindingGroup.length")
+          //   console.log(node_bindingGroup.length)
+          //   console.log("#########################")
+          // }
 
           let tableRow = {"agent": agent, "resultGroup": n,  "key": nodeKey, "nodeID": ""}
           //  EACH NODE IN ARRAY FOR EACH KEY
@@ -1080,12 +1461,12 @@ async resultNodeGroupTable(){
             // tableRow.nodeID = node_bindingGroupObject.id
             // this.allResultsNodeTable.push(tableRow)
             this.allResultsNodeTable.push(pushTableRow)
-              if(n < 5){
-                console.log("tableRow = ", pushTableRow)
-                // console.log(" ---------- node_bindingGroup and key = ", nodeKey)
-                // console.log(node_bindingGroup)
-                console.log("#########################")
-              }
+              // if(n < 5){
+              //   console.log("tableRow = ", pushTableRow)
+              //   // console.log(" ---------- node_bindingGroup and key = ", nodeKey)
+              //   // console.log(node_bindingGroup)
+              //   console.log("#########################")
+              // }
             
           }
           
@@ -1118,18 +1499,23 @@ async araxCategoryGroup(){
       this.ARSResults[n].subjectSRIID = this.ARSResults[n].subject
       this.ARSResults[n].subjectSRICat = this.ARSResults[n].subjectCat
       this.ARSResults[n].subjectSRIName = this.ARSResults[n].subjectName
+      this.ARSResults[n].subjectSRInormID = null
+      this.ARSResults[n].subjectSRInormCat = null
+      this.ARSResults[n].subjectSRInormName = null
       this.ARSResults[n].objectSRIID = this.ARSResults[n].object
       this.ARSResults[n].objectSRICat = this.ARSResults[n].objectCat
       this.ARSResults[n].objectSRIName = this.ARSResults[n].objectName
-
+      this.ARSResults[n].objectSRInormID = null
+      this.ARSResults[n].objectSRInormCat = null
+      this.ARSResults[n].objectSRInormName = null 
 
       try{
         if(this.SRINodeData[subject] != null){
           if(this.SRINodeData[subject].id != null){
             try{
-      //               "category": "biolink:Drug",
-      // "identifier": "MESH:Q000819",
-      // "name": "agonists"
+                //"category": "biolink:Drug",
+                // "identifier": "MESH:Q000819",
+                // "name": "agonists"
                 // let subjectSRIData = await ARSService.getARAXSynonyms(subject)
                 this.ARSResults[n].subjectSRInormID = this.SRINodeData[subject].id.SRI_normalizer_curie
                 this.ARSResults[n].subjectSRInormCat = this.SRINodeData[subject].id.SRI_normalizer_category
@@ -1156,7 +1542,7 @@ async araxCategoryGroup(){
               this.ARSResults[n].objectSRIID = this.SRINodeData[object].id.identifier
               this.ARSResults[n].objectSRICat = this.SRINodeData[object].id.category
               this.ARSResults[n].objectSRIName = this.SRINodeData[object].id.name 
-} catch (err){
+            } catch (err){
               console.log("object err = ", object)
               console.log(this.SRINodeData[object])
 
@@ -1338,8 +1724,8 @@ async araxCategoryGroup(){
 
     async makeARSStatusTable(){
       return new Promise(async (resolve, reject) => { // eslint-disable-line
-
-        for (let i = 0; i < 10; i++) {
+        let loopCount = 100
+        for (let i = 0; i < loopCount; i++) {
         // for (let i = 0; i < 5; i++) {
           let ARSStatusCheck = await this.ARSStatusTable()
             // ################
@@ -1361,9 +1747,13 @@ async araxCategoryGroup(){
           // console.log(ARSStatusCheck)
           // ################
           // CHECK STATUS OF RESULTS
-          // ################          
-          if(ARSStatusCheck.agentFinished < 3 && ARSStatusCheck.agentCount >13){
-            i = 10
+          // ################     resultCount   
+          // let ARSStatusCheckArray = Object.entries(ARSStatusCheck)
+          // let checkForAnyResults = ARSStatusCheckArray.filter(x => x.resultCount > 0)
+          // if(ARSStatusCheck.agentFinished < 3 && ARSStatusCheck.agentCount >13){
+          if(ARSStatusCheck.agentFinished < 3){
+          // if(checkForAnyResults.length != 0){
+            i = loopCount
             console.log("finish before looping to 10!")
             console.log("this.ARSResultStatus")
             console.log(this.ARSResultStatus)
@@ -1372,7 +1762,7 @@ async araxCategoryGroup(){
             resolve()
             return
           } else {
-            await new Promise(resolve => setTimeout(resolve, 1000));
+            await new Promise(resolve => setTimeout(resolve, 3000));
           }
         }
       })// PROMISE
@@ -1439,7 +1829,12 @@ async araxCategoryGroup(){
                         // if(result.message.results.length > 0){
                           console.log("HAS MORE THAN 0 RESULTS")
                           console.log(result.fields.data)
-                          this.ARSResultStatus[agent].resultCount = result.fields.data.message.results.length
+                          if(result.fields.data.message.results == null){
+                            this.ARSResultStatus[agent].resultCount = 0
+                          } else {
+                            this.ARSResultStatus[agent].resultCount = result.fields.data.message.results.length
+                          }
+                          // this.ARSResultStatus[agent].resultCount = result.fields.data.message.results.length
                         
                       }
                     }
@@ -1504,6 +1899,9 @@ async araxCategoryGroup(){
         if(this.ARSResultStatus[id].results.fields.data != null){
           if(Object.prototype.hasOwnProperty.call(this.ARSResultStatus[id].results.fields.data, "message")){
             if(Object.prototype.hasOwnProperty.call(this.ARSResultStatus[id].results.fields.data.message, "knowledge_graph")){
+              if(this.ARSResultStatus[id].results.fields.data.message.results != null){
+
+              
               console.log("CLEANING RESULTS")
 
               let resultCount = this.ARSResultStatus[id].results.fields.data.message.results.length
@@ -1552,6 +1950,13 @@ async araxCategoryGroup(){
                   // this.ARSResults = this.ARSResults.filter(x => this.synonyms.indexOf(x.subject) != -1)                                 
                 // }
 
+
+                // SAVE THE RAW DATA TO EXCEL
+                console.log("about to save as test")
+                this.saveFile_ArrayJSONtoTable(this.ARSResults, "test")
+                console.log("save as test")
+
+                // BELOW IS FOR THE TWO HOP DRUG GENE GENE
                   if(this.resultGroup == "gene"){
                     console.log("GENE run done - return")
                     console.log("this.ARSResults")
@@ -1570,8 +1975,8 @@ async araxCategoryGroup(){
                   }
                   
                 // return
-              }     
-
+                }     
+              }
             }
           }   
         } 
@@ -1802,7 +2207,8 @@ async araxCategoryGroup(){
       for (let index = 0; index < file.length; index++) {
         // const result = this.groupedResultsTable[index];
         const result = file[index];
-        console.log("result");
+        result.edgeGroup = index
+        // console.log("result");
         // console.log(result);
 
         let headers = Object.keys(result);
@@ -1857,18 +2263,25 @@ async araxCategoryGroup(){
             let cell = JSON.stringify(result[header]);
               // console.log("cell")
               // console.log(cell)
-              try {
-                cell = cell.replace(/,/gi, ";")
-                cell = cell.replace(/\n/gi, ";")
-                // cell = cell.replace(/\r/gi, ";")
-              } catch (err) {
-                console.error(err);
-                console.log(header)
-                console.log("cell")
-                console.log(cell)
-                console.log("result")
-                console.log(result)
+              if(cell != null){
+                try {
+                  cell = cell.replace(/,/gi, ";")
+                  cell = cell.replace(/\n/gi, ";")
+                  // cell = cell.replace(/\r/gi, ";")
+                } catch (err) {
+                  console.error("err trying to get cell info for undefined");
+                  console.error(err);
+                  console.log(header)
+                  console.log("cell")
+                  console.log(cell)
+                  console.log("result")
+                  console.log(result)
+                  cell = ""
+                }
+              } else {
+                cell = ""
               }
+
               rowData = rowData + cell + ","
           }
               
@@ -1960,8 +2373,11 @@ async araxCategoryGroup(){
           // console.log("pubmedAtt")
           // console.log(pubmedAtt)
           // console.log("pubmedAtt")
-          // console.log(pubmedAtt)
-          let filename = this.concept_search + "-" + nametag + " two hop results.csv";
+          // console.log(pubmedAtt) this.getNameing this.queryName
+          // let filename =  "Edges with attributes - " + nametag + ".csv";
+          // let filename = name + " " + this.ARSrequestID + ".csv";
+          let filename =  "Edges with attributes - "  + this.queryName + nametag  + this.ARSrequestID+  ".csv";
+          console.log("FILENAME ===== ", filename)
           let element = document.createElement("a");
           element.setAttribute(
             "href",
@@ -1984,6 +2400,7 @@ async araxCategoryGroup(){
     saveThisFile(file, nametag) {
       let text = "";
       console.log("saveThisFile result");
+      
 
 // {
 //     "value": "infores:automat-robokop",
@@ -2068,8 +2485,10 @@ async araxCategoryGroup(){
 
 
     saveFile_ArrayJSONtoTable(data, name) {
+      name = name + this.queryName
       let text = "";
       console.log("saveFile result");
+      // let counter = 0
 
       for (let index = 0; index < data.length; index++) {
         // const result = this.groupedResultsTable[index];
@@ -2078,7 +2497,10 @@ async araxCategoryGroup(){
 
         let headers = Object.keys(result);
         // console.log({headers})
-        console.log("saved row")
+        // if(counter % 100 == 0){
+        //   console.log("saved 1000 rows")
+        // }
+        
         if (index == 0) {
           console.log("headers index == 0");
           // HEADER ROW
@@ -2095,10 +2517,10 @@ async araxCategoryGroup(){
           }
         } 
           // ADD REMAINING ROWS IN SAME ORDER BASED ON KEYS FROM HEADER ROW
-          if(index < 10 ){
-            console.log("result")
-            console.log(result)
-          }
+          // if(index < 10 ){
+          //   console.log("result")
+          //   console.log(result)
+          // }
           for (let n = 0; n < headers.length; n++) {
             let header = headers[n];
             let cell = JSON.stringify(result[header]);
