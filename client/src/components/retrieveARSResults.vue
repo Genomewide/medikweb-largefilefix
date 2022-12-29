@@ -38,13 +38,21 @@
                     v-on:click="ARSToTable"
                     >ARSToTable
                   </b-button>
-                  <!-- <b-button
+                  <b-button
+                    style="margin-left: 20px"
+                    variant="primary"
+                    v-on:click="testClean"
+                    >testClean
+                  </b-button>
+                  <br /> 
+                  <!-- {{routPK}} -->
+                  <!-- <b-button testClean
                     style="margin-left: 20px"
                     variant="primary"
                     v-on:click="testSaveFile2"
                     >testSaveFile2
                   </b-button> -->
-                  <!-- <br /> testSaveFile2
+                  <!-- testSaveFile2
               Example: {{ARSrequestID}} 
                   <b-button
                     style="margin-left: 20px"
@@ -373,6 +381,7 @@ import PubCleanService from "../PubCleanService";
 import TrapiResultClean from "../TrapiResultClean";
 import ARSService from "../ARSService";
 // import searchResult1 from "../assets/searchResult1.json"
+import araxResult from "../assets/araxResult.json"
 
 // import excel from 'vue-excel-export'
 // import ARAXService from "../ARAXService";
@@ -388,23 +397,8 @@ import synonymService from "../synonymService";
 var parser = require("fast-xml-parser");
 import axios from "axios";
 
-// import { jsontoexcel } from "vue-table-to-excel";
+// import cleanedDiabetesResults from "../assets/treatdiabetesCleaned.json"
 
-// import * as d3 from "d3";
-
-// import {
-//   breadcrumbTrail,
-//   highlightOnHover,
-//   nodeInfoDisplayer,
-//   sunburst,
-//   zoomOnClick
-// } from 'vue-d3-sunburst';
-// import "vue-d3-sunburst/dist/vue-d3-sunburst.css";
-// import got from 'got';
-// const EventEmitter = require("events");
-
-// class MyEmitter extends EventEmitter {}
-// const eventEmitter = new MyEmitter();
 
 export default {
   name: "Gene2Drugs",
@@ -802,8 +796,14 @@ export default {
       currentDrug: "test",
       araxResultTable: [],
       // ARSrequestID: "3ff82c51-3fd4-43e1-af82-e40c629b74fa",
-      ARSrequestID: "eefdcc25-9e5d-4693-939f-6fbfccbe05d1", 
-      // ARSrequestID: "75ae2eb4-d3ba-4b11-b217-f1440787e7ea",
+      // ARSrequestID: "eefdcc25-9e5d-4693-939f-6fbfccbe05d1", // 10k rows 
+      // ARSrequestID: "75ae2eb4-d3ba-4b11-b217-f1440787e7ea", 
+      // ARSrequestID: "1c711ee9-2014-4208-b84a-53aa24e09ecd", 
+      // ARSrequestID: "08baba0c-8ca1-4a51-8937-8e5c46415f0a", 
+      // ARSrequestID: "4d220c57-4d02-425c-aa9e-2e283948b977", // 2 hop rhobtb2 // 
+      ARSrequestID: "9094f579-ded4-4ad0-8b7f-7d4d43fe3c9e", // treats diabetes with unsecret and aragorn// 
+      // 5c87c928-3b7b-4879-90ca-17508352384a 2 hop DLG4
+      // 2fe9efb8-d677-4215-bb5d-eb805d667672 //pfocr
       resultSetIDs: [],
       ARSResultStatus: {},
       ARSJobId: "bc32c185-6a97-4aff-b467-aa2fac22e275",
@@ -898,17 +898,46 @@ export default {
             }
           }
         },
-        queryName: ""
+        queryName: "",
+        routPK: ""
        
     };
   },
+    mounted() {
+    // update data when mounting the component
+    if ("pkid" in this.$route.query) {
+      this.routPK = this.$route.query.pkid
+      this.ARSrequestID = this.$route.query.pkid
+    }
+  },
   methods: {
 
-
+    async testClean(){
+      console.log("this.routPK before")
+      console.log(this.routPK)
+      this.routPK = this.$route.query
+      console.log("this.routPK")
+      console.log(this.routPK)
+      console.log("araxResult")
+      console.log(araxResult)
+      // let cleanedResults = await TrapiResultClean.TrapiResultClean(araxResult)
+      // console.log("finished cleanedResults")
+      // console.log(cleanedResults)
+    },
 
     async ARSToTable(){
+// console.log(cleanedDiabetesResults)
+    // this.filterSubject = false cleanedCiabetesResults
 
-    // this.filterSubject = false
+    // TEST NEW FLAT METHOD
+    // console.log("cleanedDiabetesResults")
+    // console.log(cleanedDiabetesResults)
+    // let cleanedFlatResults = await TrapiResultClean.flattenGetPublications(cleanedDiabetesResults)
+    // console.log("cleanedFlatResults")
+    // console.log(cleanedFlatResults)
+
+    // let flatTitle = "Flatened - Pubs - " + this.ARSrequestID
+    // this.saveFile_ArrayJSONtoTable(cleanedFlatResults.flatResults, flatTitle)
     let ARSStatus =  await ARSService.pkQueryData(this.ARSrequestID)
     console.log("ARSStatus")
     console.log(ARSStatus)
@@ -929,51 +958,129 @@ export default {
     await this.ARSCleanResults() 
     console.log("ARSCleanResults")
 
-    await this.resultEdgeGroupTable()
-    console.log("CHECK ITHIS  ---  resultEdgeGroupTable")
-    this.saveFile_ArrayJSONtoTable(this.allResultsEdgeTable, "edgeTable")
-
-
-    await this.resultNodeGroupTable()
-    console.log("CHECK ITHIS  ---  resultNodeGroupTable")
-    console.log("this.allResultsNodeTable")
-    console.log(this.allResultsNodeTable)
-    this.saveFile_ArrayJSONtoTable(this.allResultsNodeTable, "nodeTable")
-    console.log("this.ARSResults DONE")
-    // console.log(this.ARSResults) 
-    // this.componentKey++
-    
-
-    let uniqueNodes = await this.getUniqueNodeIDs()
-    console.log("uniqueNodes")
-    console.log(uniqueNodes)
-    this.SRINodeData = await ARSService.getARAXSynonymsArray(uniqueNodes)
-
-    console.log("this.SRINodeData")
-    console.log(this.SRINodeData)
-
-    // this.getDrugSynonyms()
-
-  
-
     console.log("this.ARSResults")
     console.log(this.ARSResults)
 
-    await this.araxCategoryGroup()
-    console.log("getting categories")
+    // var dt = new Date();
+    // let year = new Date().getFullYear()
+    // let month = new Date().getMonth()
 
-    this.saveThisFile2(this.ARSResults, this.ARSrequestID)
 
+
+// ####################################################
+// UNCOMMMENT OUT BELOW
+// ####################################################
+    let hour = new Date().getHours()
+    let min = new Date().getMinutes()
+    let date = hour + " " + min
+    // TEST NEW FLAT METHOD 
+    console.log("start cleanedFlatResults")
+    let cleanedFlatResults = await TrapiResultClean.flattenGetPublications(this.ARSResults)
+    // let cleanedFlatResults = await TrapiResultClean.flattenGetPublications(cleanedDiabetesResults)
+    console.log("cleanedFlatResults")
+    console.log(cleanedFlatResults)
+    let flatTitle_flat = "Flatened - ALL - " + date + " " + this.ARSrequestID 
+    this.saveFile_ArrayJSONtoTable(cleanedFlatResults.flatResults, flatTitle_flat)
+    // 
+
+
+    console.log("start cleanedFlatResults_textminer")
+    console.log(cleanedFlatResults.flatResults_textminer)
+    if(cleanedFlatResults.flatResults_textminer.length > 0){
+      let cleanedFlatResults_textminer = await TrapiResultClean.fixPublicationsTextminer(cleanedFlatResults.flatResults_textminer)
+      console.log("cleanedFlatResults_textminer")
+      console.log(cleanedFlatResults_textminer)
+
+      let flatTitleTM = "Flatened - text mine Pubs - " + date + " " + this.ARSrequestID 
+      this.saveFile_ArrayJSONtoTable(cleanedFlatResults_textminer, flatTitleTM)      
+    } else {
+      console.log("0 flatResults_textminer RESULTS")
+    }
+
+
+
+    console.log("start cleanedFlatResults_semmeddb")
+    console.log(cleanedFlatResults.flatResults_semmeddb)
+    if(cleanedFlatResults.flatResults_semmeddb.length > 0){
+      let cleanedFlatResults_semmeddb = await TrapiResultClean.fixPublicationsSemmeddb(cleanedFlatResults.flatResults_semmeddb)
+      console.log("cleanedFlatResults_semmeddb")
+      console.log(cleanedFlatResults_semmeddb)
+
+      let flatTitleSemmed = "Flatened - semmeddb Pubs - " + date + " " + this.ARSrequestID 
+      this.saveFile_ArrayJSONtoTable(cleanedFlatResults_semmeddb, flatTitleSemmed)
+    } else {
+      console.log("0 cleanedFlatResults_semmeddb RESULTS")
+    }
+
+    console.log("start cleanedFlatResults_pfocr")
+    console.log(cleanedFlatResults.flatResults_pfocr)
+    if(cleanedFlatResults.flatResults_semmeddb.length > 0){
+
+      let cleanedFlatResults_pfocr = await TrapiResultClean.fixPublicationspfocr(cleanedFlatResults.flatResults_pfocr)
+      console.log("cleanedFlatResults_pfocr")
+      console.log(cleanedFlatResults_pfocr)
+
+      let flatTitlePfocr = "Flatened - pfocr Pubs - " + date + " " + this.ARSrequestID 
+      this.saveFile_ArrayJSONtoTable(cleanedFlatResults_pfocr, flatTitlePfocr)
+    } else {
+      console.log("0 cleanedFlatResults_pfocr RESULTS")
+    }
+// ####################################################
+// END -- UNCOMMMENT OUT BELOW
+// ####################################################
+
+// flatResults_pfocr
+    // let flatTitle = "Flatened - Pubs - " + this.ARSrequestID fixPublicationsSemmeddb
+    // this.saveFile_ArrayJSONtoTable(cleanedFlatResults.flatResults, flatTitle)
+
+    // await this.resultEdgeGroupTable()
+    // console.log("CHECK THIS  ---  resultEdgeGroupTable")
+    // this.saveFile_ArrayJSONtoTable(this.allResultsEdgeTable, "edgeTable")
+
+
+    // await this.resultNodeGroupTable()
+    // console.log("CHECK ITHIS  ---  resultNodeGroupTable")
+    // console.log("this.allResultsNodeTable")
+    // console.log(this.allResultsNodeTable)
+    // this.saveFile_ArrayJSONtoTable(this.allResultsNodeTable, "nodeTable")
+    // console.log("this.ARSResults DONE")
+    // // console.log(this.ARSResults) 
+    // // this.componentKey++
+    
+
+    // let uniqueNodes = await this.getUniqueNodeIDs()
+    // console.log("uniqueNodes")
+    // console.log(uniqueNodes)
+    // this.SRINodeData = await ARSService.getARAXSynonymsArray(uniqueNodes)
+
+    // console.log("this.SRINodeData")
+    // console.log(this.SRINodeData)
+
+    // // this.getDrugSynonyms()
+
+  
+
+    // console.log("this.ARSResults")
+    // console.log(this.ARSResults)
+
+
+
+    // await this.araxCategoryGroup()
+    // console.log("getting categories")
+
+    // this.saveThisFile2(this.ARSResults, this.ARSrequestID)
+
+// ################ - COOCURRANCE CAN STAY COMMENTED OUT
   // MAKE THE NODES AND EDGES FOR THE COOCURRANCE
 
-    console.log("running getSynonymDataForCooccuranceQuery ")
-    await this.getSynonymDataForCooccuranceQuery()
+    // console.log("running getSynonymDataForCooccuranceQuery ")
+    // await this.getSynonymDataForCooccuranceQuery()
 
-    console.log("formatCoocurranceQueryBuild")
-    let coocData = await this.formatCoocurranceQueryBuild()
-    console.log("finshed formatCoocurranceQueryBuild")
+    // console.log("formatCoocurranceQueryBuild")
+    // let coocData = await this.formatCoocurranceQueryBuild()
+    // console.log("finshed formatCoocurranceQueryBuild")
 
-    this.formatCoocurrData(coocData)
+    // this.formatCoocurrData(coocData)
 
   },
 
@@ -1750,8 +1857,8 @@ async araxCategoryGroup(){
           // ################     resultCount   
           // let ARSStatusCheckArray = Object.entries(ARSStatusCheck)
           // let checkForAnyResults = ARSStatusCheckArray.filter(x => x.resultCount > 0)
-          // if(ARSStatusCheck.agentFinished < 3 && ARSStatusCheck.agentCount >13){
-          if(ARSStatusCheck.agentFinished < 3){
+          if(ARSStatusCheck.agentFinished < 3 && ARSStatusCheck.agentCount >13){
+          // if(ARSStatusCheck.agentFinished < 3){
           // if(checkForAnyResults.length != 0){
             i = loopCount
             console.log("finish before looping to 10!")
@@ -1797,7 +1904,8 @@ async araxCategoryGroup(){
               // LOOPING THROUGH EACH OF THE RESULTS FROM THE ARS STATUS TO COLLECT ALL OF THE INFORATION
               // ################
 
-              const resInfo = resultList[i];       
+              const resInfo = resultList[i];    
+              console.log("about to start ARSService.ARSResult")   
               let result = await ARSService.ARSResult(resInfo.message)
 
               let agent = resInfo.actor.agent
@@ -1827,12 +1935,15 @@ async araxCategoryGroup(){
                       if(Object.prototype.hasOwnProperty.call(result.fields.data.message, "knowledge_graph")){
                         // console.log("FOUND KNOWLEDGE GRAPH")
                         // if(result.message.results.length > 0){
-                          console.log("HAS MORE THAN 0 RESULTS")
+                          console.log("MAY HAVE RESULTS - CHECKING")
                           console.log(result.fields.data)
                           if(result.fields.data.message.results == null){
                             this.ARSResultStatus[agent].resultCount = 0
+                            console.log("result.fields.data.message.results == null")
                           } else {
                             this.ARSResultStatus[agent].resultCount = result.fields.data.message.results.length
+                            console.log("result.fields.data.message.results.length")
+                            console.log(result.fields.data.message.results.length)
                           }
                           // this.ARSResultStatus[agent].resultCount = result.fields.data.message.results.length
                         
@@ -1941,9 +2052,9 @@ async araxCategoryGroup(){
 
 
               if (i == keys.length - 1){
-                // console.log("this.ARSResults INSIDE IF CLAUSE")
-                // console.log("this.ARSResults before")
-                // console.log(this.ARSResults)    
+                console.log("this.ARSResults INSIDE IF CLAUSE")
+                console.log("this.ARSResults before")
+                console.log(this.ARSResults)    
                 
                 // ### MAY NEED TO TURN BACK ON:
                 // if(this.filterSubject == true){
@@ -1953,14 +2064,15 @@ async araxCategoryGroup(){
 
                 // SAVE THE RAW DATA TO EXCEL
                 console.log("about to save as test")
-                this.saveFile_ArrayJSONtoTable(this.ARSResults, "test")
+                // @remind uncomment this when ready to save again
+                // this.saveFile_ArrayJSONtoTable(this.ARSResults, "test")
                 console.log("save as test")
 
                 // BELOW IS FOR THE TWO HOP DRUG GENE GENE
                   if(this.resultGroup == "gene"){
                     console.log("GENE run done - return")
-                    console.log("this.ARSResults")
-                    console.log(this.ARSResults)
+                    // console.log("this.ARSResults")
+                    // console.log(this.ARSResults)
                     this.geneResults = this.ARSResults
                     this.componentKey++
                     resolve()
@@ -2376,7 +2488,7 @@ async araxCategoryGroup(){
           // console.log(pubmedAtt) this.getNameing this.queryName
           // let filename =  "Edges with attributes - " + nametag + ".csv";
           // let filename = name + " " + this.ARSrequestID + ".csv";
-          let filename =  "Edges with attributes - "  + this.queryName + nametag  + this.ARSrequestID+  ".csv";
+          let filename =  "Edges with attributes - "  + this.queryName + nametag  + " " + this.ARSrequestID+  ".csv";
           console.log("FILENAME ===== ", filename)
           let element = document.createElement("a");
           element.setAttribute(
@@ -2397,31 +2509,13 @@ async araxCategoryGroup(){
 
     },
 
-    saveThisFile(file, nametag) {
+      saveThisFile(file, nametag) {
       let text = "";
-      console.log("saveThisFile result");
-      
-
-// {
-//     "value": "infores:automat-robokop",
-//     "value_url": null,
-//     "attributes": null,
-//     "description": null,
-//     "value_type_id": null,
-//     "attribute_source": null,
-//     "attribute_type_id": "biolink:aggregator_knowledge_source",
-//     "original_attribute_name": null
-// }
+      console.log("save result");
 
       for (let index = 0; index < file.length; index++) {
         // const result = this.groupedResultsTable[index];
-        const result = {...file[index]}
-
-        if(["infores:service-provider-trapi:NCBIGene:23162-biolink:entity_negatively_regulated_by_entity-PUBCHEM.COMPOUND:5311", "153fdbefe537"].indexOf(result.edgeKey) > -1){
-          console.log(" found result")
-          console.log(result)
-        }
-        console.log("saving");
+        const result = file[index];
         // console.log(result);
 
         let headers = Object.keys(result);
@@ -2454,10 +2548,7 @@ async araxCategoryGroup(){
           } catch (err) {
             console.error(err);
           }
-          // if(n == 0){
-          //   text = this.geneInfo.prowl_symbol + ','
 
-          // }
           if (n != headers.length - 1) {
             text = text + cell + ",";
           } else {
@@ -2466,8 +2557,8 @@ async araxCategoryGroup(){
         }
       }
 
-      let filename = nametag + "_ars_results.csv"
-        // this.concept_search + "-" + nametag + " two hop results.csv";
+      let filename =
+        this.concept_search + "-" + nametag + " two hop results.csv";
       let element = document.createElement("a");
       element.setAttribute(
         "href",
@@ -2483,23 +2574,20 @@ async araxCategoryGroup(){
       console.log("file saved!!");
     },
 
-
+    // @remind saveFile_ArrayJSONtoTable
     saveFile_ArrayJSONtoTable(data, name) {
       name = name + this.queryName
       let text = "";
-      console.log("saveFile result");
+      console.log("saveFile saveFile_ArrayJSONtoTable result");
       // let counter = 0
-
+      console.log("saveFile_ArrayJSONtoTable data")
+      // console.log(data)
       for (let index = 0; index < data.length; index++) {
         // const result = this.groupedResultsTable[index];
         const result = {...data[index]}
         // console.log(result);
 
         let headers = Object.keys(result);
-        // console.log({headers})
-        // if(counter % 100 == 0){
-        //   console.log("saved 1000 rows")
-        // }
         
         if (index == 0) {
           console.log("headers index == 0");
@@ -2523,9 +2611,11 @@ async araxCategoryGroup(){
           // }
           for (let n = 0; n < headers.length; n++) {
             let header = headers[n];
-            let cell = JSON.stringify(result[header]);
-            // let cell = result[header]
-            // console.log("cell = ", cell);
+
+            let cell = ""
+            if(Object.prototype.hasOwnProperty.call(result, header)){
+              cell = JSON.stringify(result[header]);
+            }
 
             try {
               cell = cell.replace(/,/gi, ";");
@@ -2536,11 +2626,14 @@ async araxCategoryGroup(){
             //   text = this.geneInfo.prowl_symbol + ','
 
             // }
-            if (n != headers.length - 1) {
-              text = text + cell + ",";
-            } else {
-              text = text + cell + "\r\n";
+            if(text.length < 2000000000){
+              if (n != headers.length - 1) {
+                text = text + cell + ",";
+              } else {
+                text = text + cell + "\r\n";
+              }              
             }
+
           }
         // }
       }

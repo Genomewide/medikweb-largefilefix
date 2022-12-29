@@ -13,9 +13,10 @@ import home from './components/geneToDrug.vue';
 // import svgtest from './components/svgtest.vue';
 // import conceptExplorePlus from './components/conceptExplorePlus.vue';
 // import geneAllSynToDrugs from './components/geneAllSynToDrugs.vue';
-// import geneAllSynToDrugsv2 from './components/geneAllSynToDrugsv2.vue';
+// import geneAllSynToDrugsv2 from './components/geneAllSynToDrugsv2.vue'; 
 import geneAllSynToDrugsARS from './components/geneAllSynToDrugsARS.vue';
 import retrieveARSResults from './components/retrieveARSResults.vue';
+import geneAllSynToDrugsARS2 from './components/geneAllSynToDrugsARS2.vue';
 // import conceptExploreTextMatch from './components/conceptExploreTextMatch.vue';
 // import conceptConnect from './components/conceptConnect.vue';
 // import xml from './components/XDM-220618-012821/IHE_XDM/CE001/DOC00001.XML';
@@ -23,7 +24,7 @@ import retrieveARSResults from './components/retrieveARSResults.vue';
 // client/src/components/conceptExplorePlus.vue geneAllSynToDrugs geneAllSynToDrugsv2 conceptExploreTextMatch conceptConnect
 
 Vue.use(Router)
-// arsexplorer
+// arsexplorer 
 // export function createRouter () {
 //   return new Router({
   export default new Router({
@@ -44,7 +45,12 @@ Vue.use(Router)
         path: '/retrieveARSResults', 
         name: 'retrieveARSResults', 
         component: retrieveARSResults 
-      },      
+      },   
+      { 
+        path: '/geneAllSynToDrugsARS2', 
+        name: 'geneAllSynToDrugsARS2', 
+        component: geneAllSynToDrugsARS2 
+      },
       // { 
       //   path: '/apiexplorer', 
       //   name: 'apiexplorer', 

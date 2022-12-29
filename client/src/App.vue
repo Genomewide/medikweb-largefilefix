@@ -60,10 +60,11 @@
     <b-nav-item ><router-link to="/geneAllSynToDrugs">geneAllSynToDrugs</router-link></b-nav-item> -->
     <b-nav-item active><router-link to="/geneAllSynToDrugsARS">geneAllSynToDrugsARS</router-link></b-nav-item>
     <b-nav-item ><router-link to="/retrieveARSResults">retrieveARSResults</router-link></b-nav-item>
+    <b-nav-item ><router-link to="/geneAllSynToDrugsARS2">geneAllSynToDrugsARS2</router-link></b-nav-item>
     <!-- <b-nav-item ><router-link to="/conceptExploreTextMatch">conceptExploreTextMatch</router-link></b-nav-item>
     <b-nav-item ><router-link to="/conceptConnect">conceptConnect</router-link></b-nav-item>
     <b-nav-item ><router-link to="/xml">xml</router-link></b-nav-item> -->
-    <!-- <div>svgtest conceptExplorePlus geneAllSynToDrugs geneAllSynToDrugsARS conceptConnect
+    <!-- <div>svgtest conceptExplorePlus geneAllSynToDrugs geneAllSynToDrugsARS conceptConnect geneAllSynToDrugsARS2
       <svg width = "100" height = "100">
         <circle cx = "50" cy = "50" r= "40" stroke = "deeppink" stroke-width="2" fill = "#ffe6ee" />
         </svg>

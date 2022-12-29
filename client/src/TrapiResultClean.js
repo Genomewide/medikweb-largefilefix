@@ -3,6 +3,196 @@ class TrapiResultClean {
 
   static TrapiResultClean(TrapiResults, agent) {
     // console.log("started PubCleanService");
+    console.log(agent)
+    return new Promise(async (resolve, reject) => { // eslint-disable-line
+      console.log("########## Start TrapiResultClean")
+      // console.log("TrapiResults")
+      // console.log(TrapiResults)
+      // console.log(prResults.length)
+      let clenaedData = []
+      let edgeCheck = ""
+      let nodeCheck = ""
+      let nodesCheck = ""
+
+      try {
+        console.log(TrapiResults)
+        let results = TrapiResults.message.results
+        let nodes = TrapiResults.message.knowledge_graph.nodes
+        let edges = TrapiResults.message.knowledge_graph.edges 
+        let edgeKeys = Object.keys(edges)
+        nodesCheck = nodes
+        // let nodeKeys = Object.keys(nodes)
+        console.log("edges")
+        // console.log(edges)
+
+        // console.log("length = ", edgeKeys.length)
+
+        if(edgeKeys.length > 0){
+          
+          for (let x = 0; x < results.length; x++) {
+            // FOR EACH RESULT
+            const resultData = results[x];
+            let resultEdges = resultData.edge_bindings
+            // GET THE EDGES THAT ARE BOUND AND 
+            let boundEdgeKeyArray = Object.keys(resultEdges)
+            for (let index = 0; index < boundEdgeKeyArray.length; index++) {
+              // LOOP THROUGH ALL EDGES
+              // console.log("geting info clean")
+              let data = {}
+              
+              let edgeKey = boundEdgeKeyArray[index];
+              // console.log("edgeKey")
+              // console.log(edgeKey)
+              // console.log("key = ", edgeKey)
+              let edge = {...resultEdges[edgeKey]}
+              edgeCheck = edge
+              let secondaryEdgeKeys = Object.keys(edge)
+
+              // if(x < 10){
+                // console.log(x, "=", index)
+                // console.log("edgeKey = ", edgeKey)
+                // console.log()
+                // console.log("edge")
+                // console.log(edge)
+                // console.log("data")
+                // console.log(data)
+                // console.log("secondaryEdgeKeys")
+                // console.log(secondaryEdgeKeys)
+                for (let q = 0; q < secondaryEdgeKeys.length; q++) {
+                  const secondEdge = secondaryEdgeKeys[q];
+                  // if(q < 10){
+                    // console.log("secondEdge")
+                    // console.log(secondEdge)
+                    // console.log(edge[secondEdge].id)
+                    let id = edge[secondEdge].id
+                    // console.log("edges[id]")
+                    // console.log(edges[id])
+                    let secondEdgeData = {...edges[id]}
+                    let subject = secondEdgeData.subject
+                    let object = secondEdgeData.object
+                    // data.edgeGroup = ""
+                    data.ResultGroupID = ""
+                    data.edgeKey = ""
+                    data.edgeId = ""
+                    data.agent = ""
+                    data.edgeinfo = ""
+                    data.object = ""
+                    data.predicate = ""
+                    // data.relation = edge.relation
+                    data.subject = ""
+                    nodeCheck = ""
+                    data.subjectName = ""
+                    data.subjectCats = ""
+                    data.subjectCat = ""
+                    nodeCheck = ""
+                    data.objectName = ""
+                    data.objectCats = ""
+                    data.objectCat = ""
+                    data.objectAtt = ""
+                    data.subjectAtt = ""    
+                    try {
+                      data.edgeKey = edgeKey
+                      data.ResultGroupID = x
+                      data.ResultGroup = x + '-' + agent
+                      data.agent = agent
+                      data.edgeinfo = secondEdgeData 
+                      data.edgeId = id 
+                      data.object = secondEdgeData.object
+                      data.predicate = secondEdgeData.predicate
+                      // data.relation = edge.relation
+                      data.subject = secondEdgeData.subject
+                      nodeCheck = nodes[subject]
+                      // console.log("nodes[subject]")
+                      // console.log(nodes[subject])
+                      if(nodes[subject].name != null){
+                        data.subjectName = nodes[subject].name
+                      }
+                      
+                      data.subjectCats = nodes[subject].categories
+                      data.subjectCat = nodes[subject].categories[nodes[subject].categories.length - 1]
+                      nodeCheck = nodes[object]
+
+                      if(nodes[object].name != null){
+                        data.objectName = nodes[object].name
+                      }
+                      
+                      data.objectCats = nodes[object].categories
+                      data.objectCat = nodes[object].categories[nodes[object].categories.length - 1]
+
+                      if(nodes[object].attributes != null){
+                        data.objectAtt = nodes[object].attributes
+                      }
+                      
+                      if(nodes[subject].attributes != null){
+                        data.subjectAtt = nodes[subject].attributes
+                      }
+                      // console.log("data no error")
+                      // console.log(data)
+
+                      clenaedData.push({...data})
+                      
+
+                    } catch (error){
+                      console.error(error)
+                      console.log("data")
+                      console.log(data)
+                      console.log("subject")
+                      console.log(subject)
+                      console.log("nodes[subject]")
+                      console.log(nodes[subject])
+
+                    }                
+                  // }
+                  
+                }
+              // }
+
+                // if(n == data.edgeinfo.attributes.length - 1){
+                //   // withDrugHits[i].geneToGeneResultShown.push(result)
+                //   clenaedData.push(data)
+                // } 
+                
+              // }
+              
+              // console.log("data = ", data)
+    
+              if(x == results.length -1){
+                // console.log({clenaedData})
+                resolve(clenaedData)
+              }
+              
+            }
+            // console.log(x)
+            if(x == results.length -1){
+              // console.log({clenaedData})
+              resolve(clenaedData)
+            }
+            
+          }
+          
+
+        } else{
+          // console.log("no results")
+          resolve(clenaedData)
+        }
+
+      //  resolve(nodes)
+      } catch (err) {
+        console.error("ERROR IN TrapiResultClean")
+        // console.log("nodes = ", nodes)
+        console.log("nodeCheck = ", nodeCheck)
+        console.log("nodesCheck = ", nodesCheck)
+        console.log("edgeCheck = ", edgeCheck)
+        // console.log("current cleaned data = ",  data)        
+        console.error(err)
+        reject({});
+      }
+    });
+
+  }
+
+  static TrapiResultClean_old(TrapiResults, agent) {
+    // console.log("started PubCleanService");
     
     return new Promise(async (resolve, reject) => { // eslint-disable-line
       console.log("########## Start TrapiResultClean")
@@ -15,13 +205,15 @@ class TrapiResultClean {
       let nodesCheck = ""
 
       try {
+        console.log(TrapiResults)
+        // let results = TrapiResults.message.results
         let nodes = TrapiResults.message.knowledge_graph.nodes
         let edges = TrapiResults.message.knowledge_graph.edges 
         let edgeKeys = Object.keys(edges)
         nodesCheck = nodes
         // let nodeKeys = Object.keys(nodes)
-        // console.log("nodeKeys")
-        // console.log(nodeKeys)
+        console.log("edges")
+        console.log(edges)
 
         // console.log("length = ", edgeKeys.length)
 
@@ -37,13 +229,8 @@ class TrapiResultClean {
             // console.log("edge = ", edge)
   
             let subject = edge.subject
-            // if(subject == "PR:000010162"){
-            //   console.log("nodes[subject]")
-            //   console.log(nodes[subject])
-            // }
             let object = edge.object
-            // console.log("nodes[subject]") 
-            // console.log(nodes[subject])
+
             data.edgeKey = ""
             data.agent = ""
             data.edgeinfo = ""
@@ -71,15 +258,29 @@ class TrapiResultClean {
             // data.relation = edge.relation
             data.subject = edge.subject
             nodeCheck = nodes[subject]
-            data.subjectName = nodes[subject].name
+            if(nodes[subject].name != null){
+              data.subjectName = nodes[subject].name
+            }
+            
             data.subjectCats = nodes[subject].categories
             data.subjectCat = nodes[subject].categories[nodes[subject].categories.length - 1]
             nodeCheck = nodes[object]
-            data.objectName = nodes[object].name
+
+            if(nodes[object].name != null){
+              data.objectName = nodes[object].name
+            }
+            
             data.objectCats = nodes[object].categories
             data.objectCat = nodes[object].categories[nodes[object].categories.length - 1]
-            data.objectAtt = nodes[object].attributes
-            data.subjectAtt = nodes[subject].attributes
+
+            if(nodes[object].attributes != null){
+              data.objectAtt = nodes[object].attributes
+            }
+            
+            if(nodes[subject].attributes != null){
+              data.subjectAtt = nodes[subject].attributes
+            }
+            
 
           } catch (error){
             console.error(error)
@@ -92,8 +293,11 @@ class TrapiResultClean {
             data.edgepublications= []
 
 
-            for (let index = 0; index < data.edgeinfo.attributes.length; index++) {
-              const att = data.edgeinfo.attributes[index];
+            for (let n = 0; n < data.edgeinfo.attributes.length; n++) {
+              const att = data.edgeinfo.attributes[n];
+              // if(att.attribute_type_id == "biolink:original_knowledge_source" && att.value == "infores:text-mining-provider-targeted"){
+              //   console.log(edge)
+              // }
               if(att.name == "provided_by"){
                 data.edgeprovider = att.value
               }
@@ -109,49 +313,47 @@ class TrapiResultClean {
     
               }
 
-              else if(att.name == "publications_info"){
+              // else if(att.name == "publications_info"){
                 
-
-
-                let pubInfotext = att.value.replace(/"/g, "'")
-                pubInfotext = pubInfotext.replace(/'object score': '/g, '"object score": "')
-                pubInfotext = pubInfotext.replace(/'object score': /g, '"object score": ')
-                pubInfotext = pubInfotext.replace(/, 'subject score': '/g, '", "subject score": "')
-                pubInfotext = pubInfotext.replace(/, 'subject score': /g, '", "subject score": ')
-                pubInfotext = pubInfotext.replace(/{'PMID/g, '{"PMID')
-                pubInfotext = pubInfotext.replace(/': {'publication date': '/g, '": {"publication date": "')
-                pubInfotext = pubInfotext.replace(/': {'publication date': /g, '": {"publication date": ')
-                pubInfotext = pubInfotext.replace(/', 'sentence': '/g, '", "sentence": "')
-                pubInfotext = pubInfotext.replace(/'sentence': '/g, '"sentence":')
-                pubInfotext = pubInfotext.replace(/'PMID/g, '"PMID')
-                pubInfotext = pubInfotext.replace(/ None,/g, ' "None",')
-                pubInfotext = pubInfotext.replace(/ None",/g, ' "None",')
-                pubInfotext = pubInfotext.replace(/'}}/g, '"}}')
-                pubInfotext = pubInfotext.replace(/'CHEMBL/g, '"CHEMBL')
-                pubInfotext = pubInfotext.replace(/\\/g, "")
-                pubInfotext = pubInfotext.replace(/'sentence'/g, '"sentence"')
-                // data.edgepublicationsText = JSON.parse(att.value) 
+              //   let pubInfotext = att.value.replace(/"/g, "'")
+              //   pubInfotext = pubInfotext.replace(/'object score': '/g, '"object score": "')
+              //   pubInfotext = pubInfotext.replace(/'object score': /g, '"object score": ')
+              //   pubInfotext = pubInfotext.replace(/, 'subject score': '/g, '", "subject score": "')
+              //   pubInfotext = pubInfotext.replace(/, 'subject score': /g, '", "subject score": ')
+              //   pubInfotext = pubInfotext.replace(/{'PMID/g, '{"PMID')
+              //   pubInfotext = pubInfotext.replace(/': {'publication date': '/g, '": {"publication date": "')
+              //   pubInfotext = pubInfotext.replace(/': {'publication date': /g, '": {"publication date": ')
+              //   pubInfotext = pubInfotext.replace(/', 'sentence': '/g, '", "sentence": "')
+              //   pubInfotext = pubInfotext.replace(/'sentence': '/g, '"sentence":')
+              //   pubInfotext = pubInfotext.replace(/'PMID/g, '"PMID')
+              //   pubInfotext = pubInfotext.replace(/ None,/g, ' "None",')
+              //   pubInfotext = pubInfotext.replace(/ None",/g, ' "None",')
+              //   pubInfotext = pubInfotext.replace(/'}}/g, '"}}')
+              //   pubInfotext = pubInfotext.replace(/'CHEMBL/g, '"CHEMBL')
+              //   pubInfotext = pubInfotext.replace(/\\/g, "")
+              //   pubInfotext = pubInfotext.replace(/'sentence'/g, '"sentence"')
+              //   // data.edgepublicationsText = JSON.parse(att.value) 
                 
-              try{
-                // console.log(JSON.parse(pubInfotext)) att.value
-                data.pubInfo = JSON.parse(pubInfotext)
-              } catch(err){
+              // try{
+              //   // console.log(JSON.parse(pubInfotext)) att.value
+              //   data.pubInfo = JSON.parse(pubInfotext)
+              // } catch(err){
                 
-                console.log("att.value = ", att.value)
-                console.log("pubInfotext = ", pubInfotext)
-                console.log("/'PMID:/g found = ", pubInfotext.includes("'PMID:"))
-                console.log("/PMID/g found = ", pubInfotext.includes("PMID"))
-                let sentenceindex = pubInfotext.indexOf('"sentence": ')
-                console.log(pubInfotext.substring(0,sentenceindex))
-                console.log("sentenceindex = ", sentenceindex)
-                // console.log(pubInfotext.includes(/PMID/g))
-                console.log(err)
-              }
+              //   console.log("att.value = ", att.value)
+              //   console.log("pubInfotext = ", pubInfotext)
+              //   console.log("/'PMID:/g found = ", pubInfotext.includes("'PMID:"))
+              //   console.log("/PMID/g found = ", pubInfotext.includes("PMID"))
+              //   let sentenceindex = pubInfotext.indexOf('"sentence": ')
+              //   console.log(pubInfotext.substring(0,sentenceindex))
+              //   console.log("sentenceindex = ", sentenceindex)
+              //   // console.log(pubInfotext.includes(/PMID/g))
+              //   console.log(err)
+              // }
 
-              }
-              if(index == data.edgeinfo.attributes.length - 1){
+              // }
+              if(n == data.edgeinfo.attributes.length - 1){
                 // withDrugHits[i].geneToGeneResultShown.push(result)
-                clenaedData.push(data)
+                clenaedData.push({...data})
               } 
               
             }
@@ -183,7 +385,429 @@ class TrapiResultClean {
     });
 
   }
+  static flattenGetPublications(cleanTrapiResults) {
+    // console.log("started PubCleanService");
+    // ["agent","aggKS","knowledgeSource" ,"primaryKS","originalKS", "PMID_PMCID", "sentence"]
 
+    let flatResults = []
+    let flatResultsPUBS = []
+    let flatResults_textminer = []
+    let flatResults_semmeddb = []
+    let flatResults_Other = []
+    let flatResults_pfocr = []
+
+    return new Promise(async (resolve, reject) => { // eslint-disable-line
+      for (let i = 0; i < cleanTrapiResults.length; i++) {
+        const res = {...cleanTrapiResults[i]}
+
+        let checPubEdge = []
+        let edgeAtts = res["edgeinfo"]["attributes"]
+        let objectAtts = res["objectAtt"]
+        let subjectAtts = res["subjectAtt"]
+
+        res.KSagg = ""
+        res.KSaggAll = ""
+        res.KS = ""
+        res.KSprimary = ""
+        res.KSoriginal = ""
+        // res.KSprimary = ""
+        res.KSoriginal = ""
+        res.pubSentence = ""
+        res.pubID = ""
+        res.pubSubject = ""
+        res.pubObject = ""
+        res.pubUrl = ""
+        res.pubSentLocation = ""
+        res.pubSubjectCoord = ""
+        res.pubObjectCoord = ""
+        res.pubSemmedPredicate = ""
+        
+        res.objectDescription = ""
+        res.subjectDescription = ""
+        res.group = ""
+        res.figureLink = ""
+        res.figureTitle = ""
+
+        res.pvalue = ""
+        res.zscore = ""
+        
+        // ################# pfocr
+        // GET KNOWLEDGE SOURCE INFO FROM EDGE
+        // ################# 
+        let attAggregattorAll = edgeAtts.filter(x =>  x.attribute_type_id == "biolink:aggregator_knowledge_source" )
+        res.KSaggAll = attAggregattorAll.map(x => x.value)
+        // res.KSaggAllnew = res.KSaggAll.toString()
+        res.KSaggAll = res.KSaggAll.toString().replace(/[[\]]+/g,'').split(',')
+        // res.KSaggAllreplace = res.KSaggAllstring.replace(/[[\]]+/g,'') 
+        // res.KSaggAllstring = 
+        // res.KSaggAllnew = res.KSaggAll.split( ";")
+        // res.KSaggAllnew = res.KSaggAllreplace.split(',')
+        // console.log("res.KSaggAllnew")
+        // console.log(res.KSaggAllnew)
+        
+        let attAggregattor = edgeAtts.filter(x =>  x.attribute_type_id == "biolink:aggregator_knowledge_source" && ["infores:aragorn","infores:arax", "infores:biothings-explorer"].indexOf(x.value) == -1)
+        res.KSagg = attAggregattor.map(x => x.value)
+        res.KSagg = res.KSagg.toString().replace(/[[\]]+/g,'').split(',')
+
+
+        let attPrimaryKS = edgeAtts.filter(x =>  x.attribute_type_id == "biolink:primary_knowledge_source" )
+        res.KSprimary = attPrimaryKS.map(x => x.value)
+        res.KSprimary = res.KSprimary.toString().replace(/[[\]]+/g,'').split(',')
+
+        
+        let attKS = edgeAtts.filter(x =>  x.attribute_type_id == "biolink:knowledge_source" )
+        res.KS = attKS.map(x => x.value)
+        res.KS = res.KS.toString().replace(/[[\]]+/g,'').split(',')
+
+
+        let attOriginalKS = edgeAtts.filter(x =>  x.attribute_type_id == "biolink:original_knowledge_source" )
+        res.KSoriginal = attOriginalKS.map(x => x.value)
+        res.KSoriginal = res.KSoriginal.toString().replace(/[[\]]+/g,'').split(',')
+
+        // #################
+        // GET DESCRPTION FROM SUBJECT AND OBJECT
+        // ################# 
+        try {
+          if(Array.isArray(subjectAtts)){
+            let subjectDesAtt = subjectAtts.filter(x => x.attribute_type_id == "biolink:description")
+            if(subjectDesAtt.length > 0){
+              res.subjectDescription = subjectDesAtt[0].value
+            }
+          }
+          if(Array.isArray(objectAtts)){
+            let objectDesAtt = objectAtts.filter(x => x.attribute_type_id == "biolink:description")
+            if(objectDesAtt.length > 0){
+              res.objectDescription = objectDesAtt[0].value
+            } 
+          }
+ 
+        } catch (err){
+          console.log("res")
+          console.log(res)
+          console.error(err)
+          console.log("subjectAtts != null")
+          console.log(subjectAtts != null)
+          console.log(subjectAtts)
+          console.log("objectAtts != null")
+          console.log(objectAtts != null)
+          console.log(objectAtts)
+        }
+      
+
+
+        let attPublicationID = edgeAtts.filter(x => ["biolink:Publication","biolink:publication", "biolink:supporting_document"].indexOf(x.attribute_type_id) > -1)
+
+
+        // ################# 
+        // GET RESULS WITH SEMMED PROVIDER DATA
+        // ################# 
+        if(Array.isArray(res.KSprimary)){
+          // if(Array.isArray(res.KSprimary[0])){
+            if(res.KSprimary[0] == "infores:semmeddb"){
+              // if(res.KSprimary[0][0] == "infores:semmeddb"){
+                // console.log("res infores:semmeddb")
+              // console.log(res)
+              res.group = "semmeddb"
+              flatResults_semmeddb.push({...res})
+              checPubEdge.push(res.edgeId)
+            }
+          // }
+        } 
+        // ################# 
+        // GET RESULTS WITH TEXT MINING PROVIDER DATA
+        // ################# 
+        if(Array.isArray(res.KSoriginal)){
+          // console.log("Array.isArray(res.attOriginalKS)")
+          
+          if(res.KSoriginal[0] == "infores:text-mining-provider-targeted"){
+            res.group = "text-miner"
+            flatResults_textminer.push({...res})
+            checPubEdge.push(res.edgeId)
+          }
+        } 
+        // ################# pfocr
+        // CHECK TO SEE IF THE SET OF ATTRIBUTES INCLUDES PUBLICATION INFORMATION
+        // ################# 
+        if(attPublicationID.length > 0){
+          res.pubID = attPublicationID.map(x => x.value)
+          res.group = "otherPub"
+          if(  checPubEdge.indexOf(res.edgeId) == -1){
+            flatResultsPUBS.push({...res})
+          } 
+          
+
+        } else {
+          res.group = "noPub"
+          flatResults_Other.push({...res})
+        }
+        // ################# 
+        // GET THE infores:pfocr SO THE IMAGES AND LINKS CAN BE PULLED OUT
+        // ################# 
+        let checkpfocr = res.KSprimary.toString()
+        if(checkpfocr.includes("pfocr")){
+          flatResults_pfocr.push({...res}) 
+        }
+        // if(res.KSprimary.indexOf("infores:pfocr") > -1){
+        //   flatResults_pfocr.push({...res}) 
+        // }
+
+
+        flatResults.push({...res})
+
+        if(i == cleanTrapiResults.length - 1){
+          // #################
+          // REMOVE NODE ATTRIBUTES BC THEY ARE TOO LONG FOR EXCEL SOMETIMES AND BREAK THE FORMAT
+          // ################# 
+          for (let n = 0; n < flatResults.length; n++) {
+
+            // const flatResult = flatResults[n];
+            // flatResults[n].objectAtt = null
+            // flatResults[n].subjectAtt = null
+            // flatResults[n].edgeinfo = null
+            if(n == flatResults.length - 1){
+              resolve({"flatResults": flatResults, "flatResultsPUBS": flatResultsPUBS, "flatResults_semmeddb": flatResults_semmeddb, "flatResults_textminer" : flatResults_textminer, "flatResults_pfocr": flatResults_pfocr,"flatResults_Other" : flatResults_Other})
+            }
+          }
+          
+        }
+
+
+      }
+    });
+
+  }
+
+//infores:pfocr
+static fixPublicationspfocr(TrapiResults) {
+  console.log("started fixPublicationspfocr");
+  return new Promise(async (resolve, reject) => { // eslint-disable-line
+    let resultPerPub = []
+    for (let i = 0; i < TrapiResults.length; i++) {
+      const res = {...TrapiResults[i]}
+      // res.pubSentence = ""
+      // res.pubID = ""
+      // res.pubSubject = ""
+      // res.pubObject = ""
+      // res.pubUrl = ""
+      // res.pubSentLocation = ""
+      let pubAttsArray = res.edgeinfo.attributes
+      // let pubAttsArray = edgeAtts.filter(x => x.attribute_type_id == "biolink:supporting_study_result")
+      try{
+        for (let n = 0; n < pubAttsArray.length; n++) {
+          // const pubAtt = pubAttsArray[n].attributes
+  
+          // for (let x = 0; x < pubAtt.length; x++) {
+            const pubData = {...pubAttsArray[n]}
+  
+            switch(pubData.attribute_type_id){
+              case "figure_download_url":
+                res.figureLink = pubData.value
+              break;
+              case "figure_title":
+                res.figureTitle = pubData.value
+                // res.pubUrl = pubData.value_url
+              break;
+              case "pmc_reference":
+                res.pubID = pubData.value
+              break;
+            }
+  
+            if(n == pubAttsArray.length - 1){
+              // console.log("results processed = ", i)
+              try{
+                // const pubID = pubs[n];
+                // res.pubID = pubID
+                // let pubUrlID = pubID.split("|")
+                res.pubUrl = "https://pubmed.ncbi.nlm.nih.gov/" + res.pubID +"/"
+                resultPerPub.push({...res})
+              } catch (err) {
+                console.log(res)
+              }
+  
+            }
+  
+            
+          // }
+  
+          
+        }
+      } catch(err) {
+        console.log("pubAttsArray")
+        console.log(pubAttsArray)
+      }
+      
+      if(i == TrapiResults.length - 1){
+        console.log("pfocr - resultPerPub")
+        // console.log(resultPerPub)
+        resolve(resultPerPub)
+      }
+    }
+  })
+}
+  static fixPublicationsTextminer(TrapiResults) {
+    console.log("started PubCleanService");
+    return new Promise(async (resolve, reject) => { // eslint-disable-line
+      let resultPerPub = []
+      for (let i = 0; i < TrapiResults.length; i++) {
+        
+        let resCheck = TrapiResults[i]
+        const res = {...resCheck}
+        
+        // res.pubSentence = ""
+        // res.pubID = ""
+        // res.pubSubject = ""
+        // res.pubObject = ""
+        // res.pubUrl = ""
+        // res.pubSentLocation = ""
+        let edgeAtts = res.edgeinfo.attributes
+        let pubAttsArray = edgeAtts.filter(x => x.attribute_type_id == "biolink:supporting_study_result")
+        // if(i < 5){console.log(pubAttsArray)}
+        for (let n = 0; n < pubAttsArray.length; n++) {
+          const pubAtt = pubAttsArray[n].attributes
+
+          for (let x = 0; x < pubAtt.length; x++) {
+            const pubDataAtt = pubAtt[x]
+            const pubData = {...pubDataAtt}
+            // if(i < 5){console.log("pubDataAtt")}
+            // if(i < 5){console.log(pubDataAtt)}
+            // if(i < 5){console.log("pubData")}
+            // if(i < 5){console.log(pubData)}
+            switch(pubData.attribute_type_id){
+              case "biolink:supporting_text":
+                res.pubSentence = pubData.value
+              break;
+              case "biolink:supporting_document":
+                res.pubID = pubData.value
+                res.pubUrl = pubData.value_url
+              break;
+              case "biolink:supporting_text_located_in":
+                res.pubSentLocation = pubData.value
+              break;
+              case "biolink:subject_location_in_text":
+                res.pubSubjectCoord = pubData.value
+              break;
+              case "biolink:object_location_in_text":
+                res.pubObjectCoord = pubData.value
+              break;
+            }
+
+            if(x == pubAtt.length - 1){
+              // console.log("results processed = ", i)
+              try{
+                let resSplit = {...res}
+                let subCoord = resSplit.pubSubjectCoord.split("|")
+                res.pubSubject = resSplit.pubSentence.substring(subCoord[0], subCoord[1])
+                let objCoord = resSplit.pubObjectCoord.split("|")
+                res.pubObject = resSplit.pubSentence.substring(objCoord[0], objCoord[1])
+                // if(res.ResultGroup == 25){
+                //   console.log("res 25")
+                //   console.log(res)
+                // }
+                // if(i < 25){ console.log(res)}
+                resultPerPub.push({...res})
+              } catch (err) {
+                console.log(res)
+              }
+
+            }
+
+            
+          }
+
+          
+        }
+        if(i == TrapiResults.length - 1){
+          console.log("text mine - resultPerPub")
+          // console.log(resultPerPub)
+          resolve(resultPerPub)
+        }
+      }
+    })
+  }
+
+  static fixPublicationsSemmeddb(TrapiResults) {
+    console.log("started fixPublicationsSemmeddb");
+    console.log(TrapiResults)
+    return new Promise(async (resolve, reject) => { // eslint-disable-line
+      let resultPerPub = []
+      for (let i = 0; i < TrapiResults.length; i++) {
+        const res = {...TrapiResults[i]}
+        // res.pubSentence = ""
+        // res.pubID = ""
+        // res.pubSubject = ""
+        // res.pubObject = ""
+        // res.pubUrl = ""
+        // res.pubSentLocation = ""
+        let edgeAtts = res.edgeinfo.attributes
+        
+        let pubArray = edgeAtts.filter(x => x.attribute_type_id == "biolink:publications") // GETS ARRAY WITH PMIDS
+        let pubs = pubArray[0].value
+        // for (let n = 0; n < pubAttsArray.length; n++) {
+        //   const pubAtt = pubAttsArray[n].attributes
+
+          for (let x = 0; x < edgeAtts.length; x++) {
+            const pubData = {...edgeAtts[x]}
+
+            switch(pubData.attribute_type_id){
+              case "original_object_name":
+                res.pubObject = pubData.value
+              break;
+              case "original_subject_name":
+                res.pubSubject = pubData.value
+                // res.pubUrl = pubData.value_url
+              break;
+              case "biolink:original_predicate":
+                res.pubSemmedPredicate = pubData.value
+              break;
+        
+            }
+
+            if(x == edgeAtts.length - 1){
+              try{
+                for (let n = 0; n < pubs.length; n++) {
+                  const pubID = pubs[n];
+                  res.pubID = pubID
+                  let pubUrlID = pubID.split("|")
+                  res.pubUrl = "https://pubmed.ncbi.nlm.nih.gov/" + pubUrlID[pubUrlID.length - 1] +"/"
+                  resultPerPub.push({...res})
+  
+                  if(i == TrapiResults.length - 1){
+                    console.log("semmeddb done")
+                    // console.log(resultPerPub)
+                    resolve(resultPerPub)
+                  }
+                  
+                }
+              } catch (err) {
+                console.log("semmeddb error doing res")
+                if( i < 10){
+                  console.error(err)
+                  console.log(res)
+                  console.log(pubArray) // pubArray
+                  console.log(pubs) // pubArray
+                }
+                
+              }
+
+
+            }
+
+            
+          }
+          if(i == TrapiResults.length - 1){
+            console.log("semmeddb done")
+            // console.log(resultPerPub)
+            resolve(resultPerPub)
+          }
+          
+        // }
+        // if(i == TrapiResults.length - 1){
+        //   console.log("text mine - resultPerPub")
+        //   console.log(resultPerPub)
+        // }
+      }
+    })
+  }
 
   static ARAXResultClean(TrapiResults) {
     // console.log("started PubCleanService");
@@ -263,7 +887,7 @@ class TrapiResultClean {
            
               if(index == data.edgeinfo.attributes.length - 1){
                 // withDrugHits[i].geneToGeneResultShown.push(result)
-                clenaedData.push(data)
+                clenaedData.push({...data})
               } 
               // if(typeof result.publications == 'undefined'){
               //   result.publications = []

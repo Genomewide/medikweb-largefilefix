@@ -6,9 +6,10 @@ yarn-debug.log*
 yarn-error.log*
 lerna-debug.log*
 
-# cliient folder
+# client folder
 /client/node_modules/
 /client/src/assets
+/client/src/assets/treatdiabetesCleaned.json
 # /client/
 # DON'T PUBLISH THE BUILD
 /sever/public/
