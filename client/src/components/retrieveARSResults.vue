@@ -116,7 +116,7 @@
 
       <b-container style="margin-top: 20px" :key="componentKey" fluid>
         <b-row>
-                          <b-card
+                <b-card
                   header="featured"
                   header-tag="header"
                   :key="componentKey"
@@ -221,23 +221,22 @@
                   ARSResults Subject Object Predicate length = {{ARSResults.length}}
                 </h6>
                 <b-form-group
-          label="Filter"
-          label-for="filter-input"
-          label-cols-sm="3"
-          label-align-sm="right"
-          label-size="sm"
-          class="mb-0"
-        >
-          <b-input-group size="sm">
-            <b-form-input
-              id="filter-input"
-              v-model="filter"
-              type="search"
-              placeholder="Type to Search"
-            ></b-form-input>
+                  label="Filter"
+                  label-for="filter-input"
+                  label-cols-sm="3"
+                  label-align-sm="right"
+                  label-size="sm"
+                  class="mb-0"
+                >
+              <b-input-group size="sm">
+                <b-form-input
+                  id="filter-input"
+                  v-model="filter"
+                  type="search"
+                  placeholder="Type to Search"
+                ></b-form-input>
 
-          
-          </b-input-group>
+              </b-input-group>
         </b-form-group>
               </template>
               <b-pagination
@@ -801,9 +800,10 @@ export default {
       // ARSrequestID: "1c711ee9-2014-4208-b84a-53aa24e09ecd", 
       // ARSrequestID: "08baba0c-8ca1-4a51-8937-8e5c46415f0a", 
       // ARSrequestID: "4d220c57-4d02-425c-aa9e-2e283948b977", // 2 hop rhobtb2 // 
-      ARSrequestID: "9094f579-ded4-4ad0-8b7f-7d4d43fe3c9e", // treats diabetes with unsecret and aragorn// 
+      // ARSrequestID: "9094f579-ded4-4ad0-8b7f-7d4d43fe3c9e", // treats diabetes with unsecret and aragorn// 
       // 5c87c928-3b7b-4879-90ca-17508352384a 2 hop DLG4
       // 2fe9efb8-d677-4215-bb5d-eb805d667672 //pfocr
+      ARSrequestID: "6bc8da41-cd85-4d72-a09a-c24d9dc99da9", // large number single hop - drug gene results
       resultSetIDs: [],
       ARSResultStatus: {},
       ARSJobId: "bc32c185-6a97-4aff-b467-aa2fac22e275",
@@ -970,9 +970,14 @@ export default {
 // ####################################################
 // UNCOMMMENT OUT BELOW
 // ####################################################
+  // GET TIME STAMP FOR FILE NAME
     let hour = new Date().getHours()
     let min = new Date().getMinutes()
-    let date = hour + " " + min
+    let date = hour+"hr-" + min + "min"
+  // SET UP ARRAY TO CATCH TEXT MINE, SEMMED AND PFCOR EDGE IDS 
+  // SO THAT THEY CAN BE EXCLUDED TO GET REMAINING PUB EDGES
+    let usedPubEdges = []
+
     // TEST NEW FLAT METHOD 
     console.log("start cleanedFlatResults")
     let cleanedFlatResults = await TrapiResultClean.flattenGetPublications(this.ARSResults)
@@ -990,6 +995,12 @@ export default {
       let cleanedFlatResults_textminer = await TrapiResultClean.fixPublicationsTextminer(cleanedFlatResults.flatResults_textminer)
       console.log("cleanedFlatResults_textminer")
       console.log(cleanedFlatResults_textminer)
+      
+      // GET EDGE IDS TO ALL TEXTMINE EDGES TO CHECK FOR OTHER TYPES IN flatResultsPUBS
+      let textMineEdgeIds = cleanedFlatResults_textminer.map(x => x.edgeId)
+      usedPubEdges = [usedPubEdges, ...textMineEdgeIds]
+      console.log("usedPubEdges - textmine")
+      console.log(usedPubEdges)
 
       let flatTitleTM = "Flatened - text mine Pubs - " + date + " " + this.ARSrequestID 
       this.saveFile_ArrayJSONtoTable(cleanedFlatResults_textminer, flatTitleTM)      
@@ -1006,6 +1017,13 @@ export default {
       console.log("cleanedFlatResults_semmeddb")
       console.log(cleanedFlatResults_semmeddb)
 
+      // GET EDGE IDS TO ALL SEMMED EDGES TO CHECK FOR OTHER TYPES IN flatResultsPUBS
+      let semmmeddbEdgeIds = cleanedFlatResults_semmeddb.map(x => x.edgeId)
+      usedPubEdges = [usedPubEdges, ...semmmeddbEdgeIds]
+      console.log("usedPubEdges - SEMMED")
+      console.log(usedPubEdges)
+
+      // SAVE THE FILE
       let flatTitleSemmed = "Flatened - semmeddb Pubs - " + date + " " + this.ARSrequestID 
       this.saveFile_ArrayJSONtoTable(cleanedFlatResults_semmeddb, flatTitleSemmed)
     } else {
@@ -1014,18 +1032,58 @@ export default {
 
     console.log("start cleanedFlatResults_pfocr")
     console.log(cleanedFlatResults.flatResults_pfocr)
-    if(cleanedFlatResults.flatResults_semmeddb.length > 0){
+    if(cleanedFlatResults.flatResults_pfocr.length > 0){
 
       let cleanedFlatResults_pfocr = await TrapiResultClean.fixPublicationspfocr(cleanedFlatResults.flatResults_pfocr)
       console.log("cleanedFlatResults_pfocr")
       console.log(cleanedFlatResults_pfocr)
 
+      // GET EDGE IDS TO ALL PFOCR EDGES TO CHECK FOR OTHER TYPES IN flatResultsPUBS
+      let pfocrEdgeIds = cleanedFlatResults_pfocr.map(x => x.edgeId)
+      usedPubEdges = [usedPubEdges, ...pfocrEdgeIds]
+      console.log("usedPubEdges - pfocr")
+      console.log(usedPubEdges)
+
+      // SAVE THE FILE
       let flatTitlePfocr = "Flatened - pfocr Pubs - " + date + " " + this.ARSrequestID 
       this.saveFile_ArrayJSONtoTable(cleanedFlatResults_pfocr, flatTitlePfocr)
     } else {
       console.log("0 cleanedFlatResults_pfocr RESULTS")
     }
-// ####################################################
+
+  // GET ALL RESULTS THAT HAVE PUBLICATION AND ARE NOT IN THE GROUPS YET
+    cleanedFlatResults.flatResults_remainingPubs = []
+    for (let i = 0; i < cleanedFlatResults.flatResultsPUBS.length; i++) {
+      const edge = cleanedFlatResults.flatResultsPUBS[i];
+      // console.log("checking for other pub edges")
+      if(usedPubEdges.indexOf(edge.edgeId) == -1){
+        cleanedFlatResults.flatResults_remainingPubs.push(edge)
+        console.log("found one - other  unclaimed pub!")
+      }
+
+      if(i == cleanedFlatResults.flatResultsPUBS.length - 1){
+      let flatTitle_remainingPubs = "Flatened - flatResults_remainingPubs edges - " + date + " " + this.ARSrequestID 
+      this.saveFile_ArrayJSONtoTable(cleanedFlatResults.flatResults_remainingPubs, flatTitle_remainingPubs)
+      }
+      
+    }
+
+    if(cleanedFlatResults.flatResults_remainingPubs.length > 0){
+
+      let cleanedFlatResults_remainingPubs = await TrapiResultClean.fixPublicationsRemainingPubs(cleanedFlatResults.flatResults_remainingPubs)
+      console.log("cleanedFlatResults_remainingPubs")
+      console.log(cleanedFlatResults_remainingPubs)
+
+      // SAVE THE FILE
+      let flatTitleRemainingPubs = "Flatened - flatTitleRemainingPubs - " + date + " " + this.ARSrequestID 
+      this.saveFile_ArrayJSONtoTable(cleanedFlatResults_remainingPubs, flatTitleRemainingPubs)
+    } else {
+      console.log("0 cleanedFlatResults_remainingPubs RESULTS")
+    }
+
+    console.log("cleanedFlatResults DONE")
+    console.log(cleanedFlatResults)
+// #################################################### flattenGetPublications
 // END -- UNCOMMMENT OUT BELOW
 // ####################################################
 

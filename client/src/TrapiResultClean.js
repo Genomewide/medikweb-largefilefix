@@ -385,6 +385,7 @@ class TrapiResultClean {
     });
 
   }
+
   static flattenGetPublications(cleanTrapiResults) {
     // console.log("started PubCleanService");
     // ["agent","aggKS","knowledgeSource" ,"primaryKS","originalKS", "PMID_PMCID", "sentence"]
@@ -413,6 +414,7 @@ class TrapiResultClean {
         // res.KSprimary = ""
         res.KSoriginal = ""
         res.pubSentence = ""
+        res.pubType = ""
         res.pubID = ""
         res.pubSubject = ""
         res.pubObject = ""
@@ -577,73 +579,116 @@ class TrapiResultClean {
 
   }
 
-//infores:pfocr
-static fixPublicationspfocr(TrapiResults) {
-  console.log("started fixPublicationspfocr");
-  return new Promise(async (resolve, reject) => { // eslint-disable-line
-    let resultPerPub = []
-    for (let i = 0; i < TrapiResults.length; i++) {
-      const res = {...TrapiResults[i]}
-      // res.pubSentence = ""
-      // res.pubID = ""
-      // res.pubSubject = ""
-      // res.pubObject = ""
-      // res.pubUrl = ""
-      // res.pubSentLocation = ""
-      let pubAttsArray = res.edgeinfo.attributes
-      // let pubAttsArray = edgeAtts.filter(x => x.attribute_type_id == "biolink:supporting_study_result")
-      try{
-        for (let n = 0; n < pubAttsArray.length; n++) {
-          // const pubAtt = pubAttsArray[n].attributes
-  
-          // for (let x = 0; x < pubAtt.length; x++) {
-            const pubData = {...pubAttsArray[n]}
-  
-            switch(pubData.attribute_type_id){
-              case "figure_download_url":
-                res.figureLink = pubData.value
+//infores:pfocr flatTitle_remainingPubs
+  static fixPublicationsRemainingPubs(TrapiResults) {
+    console.log("started fixPublicationspfocr");
+    return new Promise(async (resolve, reject) => { // eslint-disable-line
+      let resultPerPub = []
+      for (let i = 0; i < TrapiResults.length; i++) {
+        const res = {...TrapiResults[i]}
+
+        let pubs = res.pubID
+        if(pubs.length >0){
+          for (let n = 0; n < pubs.length; n++) {
+            const pub = pubs[n];
+            res.pubID = pub
+            let checkPubType = pub.substring(0,3)
+            switch(checkPubType){
+              case "htt":
+                res.pubUrl = pub
               break;
-              case "figure_title":
-                res.figureTitle = pubData.value
+              case "PMI":
+                
+              res.pubUrl = "https://pubmed.ncbi.nlm.nih.gov/" + pub.split(":")[1] +"/"
+              // res.pubUrl = "https://pubmed.ncbi.nlm.nih.gov/" + pub.split("|")[1] +"/"
+              // res.figureTitle = pubData.value
                 // res.pubUrl = pubData.value_url
               break;
-              case "pmc_reference":
-                res.pubID = pubData.value
+              case "PMC":
+                res.pubUrl = "https://www.ncbi.nlm.nih.gov/pmc/articles/" + pub +"/"
               break;
-            }
-  
-            if(n == pubAttsArray.length - 1){
-              // console.log("results processed = ", i)
-              try{
-                // const pubID = pubs[n];
-                // res.pubID = pubID
-                // let pubUrlID = pubID.split("|")
-                res.pubUrl = "https://pubmed.ncbi.nlm.nih.gov/" + res.pubID +"/"
-                resultPerPub.push({...res})
-              } catch (err) {
-                console.log(res)
-              }
-  
-            }
-  
-            
-          // }
-  
-          
+            }   
+            resultPerPub.push(res)
+          }
         }
-      } catch(err) {
-        console.log("pubAttsArray")
-        console.log(pubAttsArray)
+        
+        if(i == TrapiResults.length - 1){
+          console.log("pfocr - resultPerPub")
+          // console.log(resultPerPub)
+          resolve(resultPerPub)
+        }
       }
-      
-      if(i == TrapiResults.length - 1){
-        console.log("pfocr - resultPerPub")
-        // console.log(resultPerPub)
-        resolve(resultPerPub)
+    })
+  }
+
+
+  static fixPublicationspfocr(TrapiResults) {
+    console.log("started fixPublicationspfocr");
+    return new Promise(async (resolve, reject) => { // eslint-disable-line
+      let resultPerPub = []
+      for (let i = 0; i < TrapiResults.length; i++) {
+        const res = {...TrapiResults[i]}
+        // res.pubSentence = ""
+        // res.pubID = ""
+        // res.pubSubject = ""
+        // res.pubObject = ""
+        // res.pubUrl = ""
+        // res.pubSentLocation = ""
+        let pubAttsArray = res.edgeinfo.attributes
+        // let pubAttsArray = edgeAtts.filter(x => x.attribute_type_id == "biolink:supporting_study_result")
+        try{
+          for (let n = 0; n < pubAttsArray.length; n++) {
+            // const pubAtt = pubAttsArray[n].attributes
+    
+            // for (let x = 0; x < pubAtt.length; x++) {
+              const pubData = {...pubAttsArray[n]}
+    
+              switch(pubData.attribute_type_id){
+                case "figure_download_url":
+                  res.figureLink = pubData.value
+                break;
+                case "figure_title":
+                  res.figureTitle = pubData.value
+                  // res.pubUrl = pubData.value_url
+                break;
+                case "pmc_reference":
+                  res.pubID = pubData.value
+                break;
+              }
+    
+              if(n == pubAttsArray.length - 1){
+                // console.log("results processed = ", i)
+                try{
+                  // const pubID = pubs[n];
+                  // res.pubID = pubID
+                  // let pubUrlID = pubID.split("|")
+                  res.pubUrl = "https://pubmed.ncbi.nlm.nih.gov/" + res.pubID +"/"
+                  resultPerPub.push({...res})
+                } catch (err) {
+                  console.log(res)
+                }
+    
+              }
+    
+              
+            // }
+    
+            
+          }
+        } catch(err) {
+          console.log("pubAttsArray")
+          console.log(pubAttsArray)
+        }
+        
+        if(i == TrapiResults.length - 1){
+          console.log("pfocr - resultPerPub")
+          // console.log(resultPerPub)
+          resolve(resultPerPub)
+        }
       }
-    }
-  })
-}
+    })
+  }
+
   static fixPublicationsTextminer(TrapiResults) {
     console.log("started PubCleanService");
     return new Promise(async (resolve, reject) => { // eslint-disable-line
@@ -732,6 +777,7 @@ static fixPublicationspfocr(TrapiResults) {
       let resultPerPub = []
       for (let i = 0; i < TrapiResults.length; i++) {
         const res = {...TrapiResults[i]}
+        
         // res.pubSentence = ""
         // res.pubID = ""
         // res.pubSubject = ""
