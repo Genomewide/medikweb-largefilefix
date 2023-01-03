@@ -125,13 +125,13 @@
           <b-button size="sm" :class="visible ? null : 'collapsed'" :aria-expanded="visibleDrug ? 'true' : 'false'" aria-controls="drugPKProgress" @click="visibleDrug = !visibleDrug" style="margin-left:20px">
             Drug-Gene ARS Progress
           </b-button> -->
-          <b-button size="sm" variant="primary" @click="visibleSynonyms = !visibleSynonyms" style="margin-left:20px">
+          <b-button v-if="targetGeneSynonyms.length > 1" size="sm" variant="primary" @click="visibleSynonyms = !visibleSynonyms" style="margin-left:20px">
             Show Synonyms
           </b-button> 
-          <b-button size="sm" variant="primary" @click="visibleGene = !visibleGene" style="margin-left:20px">
+          <b-button v-if="GGResultStatus.length > 0" size="sm" variant="primary" @click="visibleGene = !visibleGene" style="margin-left:20px">
             Show Gene-Gene ARS Progress
           </b-button> 
-          <b-button size="sm" variant="primary" @click="visibleDrug = !visibleDrug" style="margin-left:20px">
+          <b-button v-if="DGResultStatus.length > 0" size="sm" variant="primary" @click="visibleDrug = !visibleDrug" style="margin-left:20px">
             Show Drug-Gene ARS Progress
           </b-button> 
 
@@ -167,7 +167,7 @@
         <!-- <b-row v-if="genePk.length > 2"> -->
           @remind transition
           <transition name="slide"> 
-        <b-row style="width:100%" v-if="visibleGene" >
+        <b-row style="width:100%" v-if="visibleGene && GGResultStatus.length > 0" >
           <!-- <a class="font-weight-lighter" v-b-toggle href="#genePKProgress" @click.prevent>Toggle Collapse</a> -->
           <!-- <a class="clickTextLight secondary" v-b-toggle.genePKProgress  @click.prevent>Toggle Collapse</a> -->
           <!-- <a style="text-decoration: none; color: grey;" v-b-toggle.genePKProgress >Toggle Collapse</a> -->
@@ -240,9 +240,7 @@
         <br />
         <!-- <b-row v-if="drugPk != {}"> -->
         <transition name="slide"> 
-        <b-row style="width:100%" v-if="visibleDrug">
-          <!-- <b-collapse id="drugPKProgress" v-model="visible"  style="width:100%"> -->
-
+        <b-row style="width:100%" v-if="visibleDrug  && DGResultStatus.length > 0">
           <b-card
             header="featured"
             header-tag="header"
@@ -254,7 +252,16 @@
             </template>
             <br />
           <b-card-text>
-            <h5>drugPk: {{drugPk}}</h5></b-card-text
+            <h5>drugPk: {{drugPk}}</h5>
+            <b-button
+              v-if="drugPk.length > 2"
+              size="sm"
+              style="margin-left: 20px"
+              variant="secondary"
+              v-on:click="openInNewTab('http://localhost:8081/retrieveARSResults?pkid=' + drugPk)"
+              >Send to download page
+            </b-button> 
+            </b-card-text
           >
           <table class="table table-striped table-bordered" :key="componentKey">
             <thead>
@@ -288,16 +295,14 @@
             <br />
 
           </b-card>
-          <!-- </b-collapse> -->
         </b-row>
         </transition>
         
-        <b-row style="margin-top: 20px">
-          <!-- <b-col> -->
+        <b-row style="margin-top: 20px" v-if="geneResults.length > 0">
             <b-card :key="componentKey + 1000">
               <template #header>
                 <h6 class="mb-0">
-                  geneResults Subject Object Predicate length = {{geneResults.length}}
+                Gene - Gene Results  = {{geneResults.length}}
                 </h6>
               </template>
                 <b-pagination
@@ -324,27 +329,14 @@
                   :filter-include-fields="[]"
                   @filtered="onFiltered"
                 ></b-table>
-              <!-- <b-table
-                bordered
-                striped
-                hover
-                ref="timepersteptable"
-                table-layout:
-                fixed
-                :items="ARSResults"
-                :fields="resultFields"
-              >
-              </b-table> -->
             </b-card>
-          <!-- </b-col> -->
         </b-row>
 
-        <b-row style="margin-top: 20px">
-          <!-- <b-col> -->
+        <b-row style="margin-top: 20px" v-if="drugResults.length > 0">
             <b-card :key="componentKey + 1000">
               <template #header>
                 <h6 class="mb-0">
-                  drugResults Subject Object Predicate length = {{drugResults.length}}
+                  Drug - Gene Results = {{drugResults.length}}
                 </h6>
               </template>
                 <b-pagination
@@ -1208,7 +1200,7 @@ export default {
           // ################
           // CHECK STATUS OF RESULTS
           // ################          
-          if(ARSStatusCheck.agentFinished == 0 && ARSStatusCheck.agentCount >13){
+          if(ARSStatusCheck.agentFinished == 0 && ARSStatusCheck.agentCount >15){
             i = 10
             // console.log("finish before looping to 10!")
             // console.log("this.ARSResultStatus")
@@ -1422,7 +1414,7 @@ export default {
 
                 // this.showARS = true
 
-                // if(resInfo.status == "Running" && resInfo.agent != "ara-unsecret"){
+                // if(resInfo.status == "Running" && resInfo.agent  "ara-unsecret"){
                 //   recheck.push(agent)
                 // }
 
@@ -1534,9 +1526,8 @@ export default {
                     console.log("this.ARSResults")
                     console.log(this.ARSResults)
 
-                    // NEW FLATTENING CLEAN
-                    console.log("this.geneResults")
-                    console.log(this.geneResults)
+                    // NEW FLATTENING CLEAN @remind send gene results for flatten
+
                     let cleanedFlatResults = await TrapiResultClean.flattenGetPublications(this.ARSResults)
                     console.log("cleanedFlatResults")
                     console.log(cleanedFlatResults)
@@ -1547,6 +1538,8 @@ export default {
                     // NEW FLATTENING CLEAN - END
                     this.geneResults = this.ARSResults
                     this.ggTotalRows = this.geneResults.length
+                    console.log("this.geneResults")
+                    console.log(this.geneResults)
                     this.componentKey++
                     resolve()
                     return
@@ -1554,8 +1547,23 @@ export default {
                   if(this.resultGroup == "drug"){
                     console.log("DRUG run done - return")
                     
+                    // NEW FLATTENING CLEAN @remind send gene results for flatten drugResults
+                    console.log("this.drugResults")
+                    console.log(this.drugResults)
+                    let cleanedFlatResults = await TrapiResultClean.flattenGetPublications(this.ARSResults)
+                    console.log("cleanedFlatResults")
+                    console.log(cleanedFlatResults)
+                   
+                    
+                    let fileName = this.concept_search + "_drug_gene"
+                    this.saveThisFile(cleanedFlatResults, fileName)
+
+                    // NEW FLATTENING CLEAN - END
+
                     this.drugResults = this.ARSResults
                     this.dgTotalRows = this.drugResults.length
+                    console.log("this.drugResults")
+                    console.log(this.drugResults) 
                     this.componentKey++
                     resolve()
                     return
