@@ -9,9 +9,14 @@ import store from './store/index.js' // INDEX.JS IS NOT NECCESARY BUT I PUT IT S
 // import HighchartsVue from 'highcharts-vue'
 // import { application } from 'express'
 
-import JsonExcel from "vue-json-excel";
+// import JsonExcel from "vue-json-excel";
  
-Vue.component("downloadExcel", JsonExcel);
+// Vue.component("downloadExcel", JsonExcel);
+
+import VueCytoscape from 'vue-cytoscape'
+
+Vue.use(VueCytoscape)
+
 
 Vue.config.productionTip = false
 
@@ -23,7 +28,6 @@ new Vue({
   router,
   Vuex,
   store,
-  // HighchartsVue,
   render: h => h(App)
 }).$mount('#app')
 
