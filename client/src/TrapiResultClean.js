@@ -40,6 +40,29 @@ class TrapiResultClean {
               // console.log("geting info clean")
               let data = {}
               
+              data.diseaseKey = ""
+              data.drugKey = ""
+              data.resNodeCount = 0
+              try{
+                data.diseaseKey = resultData.node_bindings.disease[0].id
+                data.drugKey = resultData.node_bindings.drug[0].id
+                let nodeBindingKeys = Object.keys(resultData.node_bindings)
+                data.resNodeCount = nodeBindingKeys.length
+              } catch {
+                data.diseaseKey = "NA"
+                data.drugKey =  "NA"
+                resultData.node_bindings = 0
+              }
+              // if(x <10){
+              //   console.log("resultData")
+              //   console.log(resultData)
+              //   console.log(resultData.node_bindings)
+              //   console.log(resultData.node_bindings.disease)
+              //   console.log(resultData.node_bindings.disease[0].id)
+              //   // console.log(resultData)
+              // }
+
+
               let edgeKey = boundEdgeKeyArray[index];
               // console.log("edgeKey")
               // console.log(edgeKey)
@@ -47,6 +70,8 @@ class TrapiResultClean {
               let edge = {...resultEdges[edgeKey]}
               edgeCheck = edge
               let secondaryEdgeKeys = Object.keys(edge)
+
+
 
               // if(x < 10){
                 // console.log(x, "=", index)

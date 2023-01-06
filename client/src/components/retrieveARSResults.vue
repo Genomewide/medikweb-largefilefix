@@ -803,7 +803,8 @@ export default {
       // ARSrequestID: "9094f579-ded4-4ad0-8b7f-7d4d43fe3c9e", // treats diabetes with unsecret and aragorn// 
       // 5c87c928-3b7b-4879-90ca-17508352384a 2 hop DLG4
       // 2fe9efb8-d677-4215-bb5d-eb805d667672 //pfocr
-      ARSrequestID: "6bc8da41-cd85-4d72-a09a-c24d9dc99da9", // large number single hop - drug gene results
+      // ARSrequestID: "6bc8da41-cd85-4d72-a09a-c24d9dc99da9", // large number single hop - drug gene results
+       ARSrequestID:"812e1299-2768-4ea8-b013-f7d887b5b730",
       resultSetIDs: [],
       ARSResultStatus: {},
       ARSJobId: "bc32c185-6a97-4aff-b467-aa2fac22e275",
@@ -1087,46 +1088,48 @@ export default {
 // END -- UNCOMMMENT OUT BELOW
 // ####################################################
 
-// flatResults_pfocr
     // let flatTitle = "Flatened - Pubs - " + this.ARSrequestID fixPublicationsSemmeddb
     // this.saveFile_ArrayJSONtoTable(cleanedFlatResults.flatResults, flatTitle)
 
-    // await this.resultEdgeGroupTable()
-    // console.log("CHECK THIS  ---  resultEdgeGroupTable")
-    // this.saveFile_ArrayJSONtoTable(this.allResultsEdgeTable, "edgeTable")
+// #################################################### flattenGetPublications
+// START -- GET CYTOSCAPE FILES
+// ####################################################
+    await this.resultEdgeGroupTable()
+    console.log("CHECK THIS  ---  resultEdgeGroupTable")
+    this.saveFile_ArrayJSONtoTable(this.allResultsEdgeTable, "edgeTable")
 
 
-    // await this.resultNodeGroupTable()
-    // console.log("CHECK ITHIS  ---  resultNodeGroupTable")
-    // console.log("this.allResultsNodeTable")
-    // console.log(this.allResultsNodeTable)
-    // this.saveFile_ArrayJSONtoTable(this.allResultsNodeTable, "nodeTable")
-    // console.log("this.ARSResults DONE")
-    // // console.log(this.ARSResults) 
-    // // this.componentKey++
+    await this.resultNodeGroupTable()
+    console.log("CHECK ITHIS  ---  resultNodeGroupTable")
+    console.log("this.allResultsNodeTable")
+    console.log(this.allResultsNodeTable)
+    this.saveFile_ArrayJSONtoTable(this.allResultsNodeTable, "nodeTable")
+    console.log("this.ARSResults DONE")
+    // console.log(this.ARSResults) 
+    // this.componentKey++
     
 
-    // let uniqueNodes = await this.getUniqueNodeIDs()
-    // console.log("uniqueNodes")
-    // console.log(uniqueNodes)
-    // this.SRINodeData = await ARSService.getARAXSynonymsArray(uniqueNodes)
+    let uniqueNodes = await this.getUniqueNodeIDs()
+    console.log("uniqueNodes")
+    console.log(uniqueNodes)
+    this.SRINodeData = await ARSService.getARAXSynonymsArray(uniqueNodes)
 
-    // console.log("this.SRINodeData")
-    // console.log(this.SRINodeData)
+    console.log("this.SRINodeData")
+    console.log(this.SRINodeData)
 
-    // // this.getDrugSynonyms()
+    // this.getDrugSynonyms()
 
   
 
-    // console.log("this.ARSResults")
-    // console.log(this.ARSResults)
+    console.log("this.ARSResults")
+    console.log(this.ARSResults)
 
 
 
-    // await this.araxCategoryGroup()
-    // console.log("getting categories")
+    await this.araxCategoryGroup()
+    console.log("getting categories")
 
-    // this.saveThisFile2(this.ARSResults, this.ARSrequestID)
+    this.saveThisFile2(this.ARSResults, this.ARSrequestID)
 
 // ################ - COOCURRANCE CAN STAY COMMENTED OUT
   // MAKE THE NODES AND EDGES FOR THE COOCURRANCE
