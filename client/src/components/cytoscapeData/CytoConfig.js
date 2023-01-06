@@ -40,7 +40,8 @@ const CytoConfig = {
         }
       }
     ],
-    layout: { name: "grid", rows: 1 }
+    // layout: { name: "grid", rows: 1 }
+    layout: { name: "klay" }
   };
   
   export default CytoConfig;
