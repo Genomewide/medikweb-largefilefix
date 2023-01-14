@@ -1892,7 +1892,7 @@ async araxCategoryGroup(){
 
     async makeARSStatusTable(){
       return new Promise(async (resolve, reject) => { // eslint-disable-line
-        let loopCount = 100
+        let loopCount = 10
         for (let i = 0; i < loopCount; i++) {
         // for (let i = 0; i < 5; i++) {
           let ARSStatusCheck = await this.ARSStatusTable()
@@ -1918,7 +1918,9 @@ async araxCategoryGroup(){
           // ################     resultCount   
           // let ARSStatusCheckArray = Object.entries(ARSStatusCheck)
           // let checkForAnyResults = ARSStatusCheckArray.filter(x => x.resultCount > 0)
-          if(ARSStatusCheck.agentFinished < 3 && ARSStatusCheck.agentCount >13){
+          console.log("ARSStatusCheck")
+          console.log(ARSStatusCheck)
+          if(ARSStatusCheck.agentFinished < 3 && ARSStatusCheck.agentCount >10){
           // if(ARSStatusCheck.agentFinished < 3){
           // if(checkForAnyResults.length != 0){
             i = loopCount

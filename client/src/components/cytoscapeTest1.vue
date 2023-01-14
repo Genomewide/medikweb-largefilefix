@@ -3,9 +3,9 @@
     <h1 class="text-center">CYTOSCAPE TESTING</h1>
     <div >
       <!-- <cytoscape ref="cyRef" :config="config" v-on:mousedown="addNode" v-on:cxttapstart="updateNode"> -->
-      <cytoscape :key="keyCounter" ref="cyto" :config="config" :preConfig="preConfig" :afterCreated="updateGraph">
-      <!-- <cytoscape :key="keyCounter" ref="cyRef" :config="config" :preConfig="preConfig" > -->
-      <!-- <cytoscape :key="keyCounter" ref="cyRef" :config="config"  > -->
+      <!-- <cytoscape :key="keyCounter" ref="cyto" :config="config" :preConfig="preConfig" :afterCreated="updateGraph"> -->
+      <cytoscape :key="keyCounter" ref="cyto" :config="config" :preConfig="preConfig" >
+      <!-- <cytoscape :key="keyCounter" ref="cyto" :config="config"  > -->
         <cy-element
           ref="cy"
           v-for="def in elements"
@@ -23,12 +23,12 @@
       </cytoscape>
     </div>
     <div>
-    <b-button class="mt-3" variant="primary" block @click="selectResult">CHEMBL.COMPOUND:CHEMBL408 </b-button>
-    <!-- <b-button class="mt-3" variant="primary" block @click="selectResult2">CHEMBL.COMPOUND:CHEMBL408  - 2</b-button> -->
+    <!-- <b-button class="mt-3" variant="primary" block @click="selectResult">CHEMBL.COMPOUND:CHEMBL408 </b-button> -->
+    <b-button class="mt-3" variant="primary" block @click="selectResult2">CHEMBL.COMPOUND:CHEMBL408  - 2</b-button>
     <!-- <br> -->
     <b-button class="mt-3" variant="primary" block @click="consoleStuff">console stuff </b-button>
     <!-- <br>  -->
-    <!-- <b-button class="mt-3" variant="primary" block @click="updateGraph">updateGraph </b-button> -->
+    <b-button class="mt-3" variant="primary" block @click="updateGraph">updateGraph </b-button>
     <!-- <br>  -->
     <b-button class="mt-3" variant="primary" block @click="klayLayout">klayLayout </b-button>
     <br> 
@@ -99,7 +99,7 @@ center
 <script>
 import klay from "cytoscape-klay";
 import config from "./cytoscapeData/CytoConfig";
-import config2 from "./cytoscapeData/CytoConfig2";
+// import config2 from "./cytoscapeData/CytoConfig2";
 import cytoData from "../assets/diabetesTreatsCleaned.json";
 import cytoscape from 'cytoscape';
 
@@ -110,6 +110,9 @@ const elements = [...config.elements];
 delete config.elements;
 console.log("cytoData");
 console.log(cytoData);
+
+
+
 
 // ADDED TO CHECK ON CENTER AND UPDATE LAYOUT
 // let resolveCy = null
@@ -164,15 +167,16 @@ export default {
           tdClass: "colwidth",
         },
       ],
-      gotNodes:[]
+      gotNodes:[],
+      nodeToSelect: ""
     };
   },
   methods: {
      selectResult(){
       console.log("this.keyCounter")
       console.log(this.keyCounter)
-      console.log("config2")
-      console.log(config2)
+      // console.log("config2")
+      // console.log(config2)
       // CHEMBL.COMPOUND:CHEMBL408
       let filterCytoData = cytoData.filter(x => x.drugKey == "CHEMBL.COMPOUND:CHEMBL408")
       console.log("filterCytoData")
@@ -183,21 +187,69 @@ export default {
       this.elements = [...nodes, ...edges]
       console.log("elements")
       console.log(this.elements)
-      // await this.updateGraph() 
-      // this.keyCounter = this.keyCounter + 1
-      // this.config.elements = this.elements
-      // console.log(this.config)
-      // console.log("this.keyCounter")
-      // console.log(this.keyCounter)
+
+      // this.cyInstance.makeLayout({ name: "klay" }).run();
+
+      // console.log("about to update graph")
+      
+      // console.log("graph updated")
+
       this.updateGraph()
-      console.log("this.elements")
-      console.log(this.elements)
+      this.keyCounter++
+
+      // // ####################################################################
+      // // SET THE LAYOUT OF THE GRAPH
+      // // ####################################################################
+      // console.log("about to update layou")
+
+      //   this.cyInstance.makeLayout({ name: "klay" }).run();
+      //   this.cyInstance.fit()
+      //   console.log("layout updated")
+      //   this.updateGraph()
+      // // ####################################################################
+
+
+      // // ####################################################################
+      // // MOVE DRUG AND DISEASE AFTER THE LAYOUT IS RENDERED
+      // // ####################################################################
+      //   let renderedBoundingBox = this.cyInstance.elements().renderedBoundingBox()
+      //   let boundingBox = this.cyInstance.elements().boundingBox()
+      //   let zoomGet = this.cyInstance.zoom()
+      //   let panGet = this.cyInstance.pan()
+      //   console.log("boundingBox  = ", boundingBox)
+      //   console.log("renderedBoundingBox  = ", renderedBoundingBox)
+      //   // console.log("boundingBox Options = ", boundingBoxOptions)
+      //   console.log("zoomGet = ", zoomGet)
+      //   console.log("panGet = ", panGet)
+
+      //   let x2nDisease = renderedBoundingBox.x2 + renderedBoundingBox.w/4
+      //   let x2nDrug = renderedBoundingBox.x1 - renderedBoundingBox.w/4 
+      //   let y2n = (renderedBoundingBox.y1 + renderedBoundingBox.y2)/2
+      //   // console.log("x2n = ", x2n)
+      //   // console.log("y2n = ", y2n)
+      //   this.cyInstance.$('#type_2_diabetes_mellitus').renderedPosition('y', y2n)
+      //   this.cyInstance.$('#type_2_diabetes_mellitus').renderedPosition('x', x2nDisease)
+      //   this.cyInstance.$('#TROGLITAZONE').renderedPosition('y', y2n)
+      //   this.cyInstance.$('#TROGLITAZONE').renderedPosition('x', x2nDrug)
+
+      //   console.log("new position = ", this.cyInstance.$('#type_2_diabetes_mellitus').position())
+
+      //   // ####################################################################
+
+
     },
+
      selectResult2(){
+
+      this.cyInstance.selectionType('additive')
+      // Set the selection type.
+      // type The selection type string; one of 'single' (default) or 'additive'.
+
+
       console.log("this.keyCounter")
       console.log(this.keyCounter)
-      console.log("config2")
-      console.log(config2)
+      // console.log("config2")
+      // console.log(config2)
       // CHEMBL.COMPOUND:CHEMBL408
       let filterCytoData = cytoData.filter(x => x.drugKey == "CHEMBL.COMPOUND:CHEMBL408")
       console.log("filterCytoData")
@@ -206,39 +258,92 @@ export default {
       let nodes =  this.genNodes(filterCytoData)
       let edges =  this.genEdges(filterCytoData)
       let addElements = [...nodes, ...edges]
+      console.log("addElements = ", addElements)
+      this.cyInstance.add(addElements)
 
-      for (let i = 0; i < addElements.length; i++) {
-        const addEl = addElements[i];
-        this.cyInstance.add(addEl)
-      }
+      console.log("this.elements")
+      console.log(this.elements)
       this.cyInstance.remove(this.cyInstance.$('#a'))
       this.cyInstance.remove(this.cyInstance.$('#b'))
       this.cyInstance.remove(this.cyInstance.$('#c'))
-      console.log("elements")
-      console.log(this.elements)
       
-      this.cyInstance.$('#a')
-      this.cyInstance.makeLayout({ name: "klay" }).run()
+      this.elements = [...nodes, ...edges]
+      console.log("this.elements")
+      console.log(this.elements)
       // this.updateGraph()
-      // console.log("this.cyInstance.data()")
-      // console.log(this.cyInstance.data())
-      // console.log(this.cyInstance)
+      // console.log("nodes before = ", this.cyInstance.nodes())
+      // 
+      // console.log("nodes after addElements = ", this.cyInstance.nodes())
+      // this.updateGraph()
+      // console.log("nodes after addElements = ", this.cyInstance.nodes())
+      
+      console.log("TROGLITAZONE node")
+      console.log(this.cyInstance.$('#TROGLITAZONE').data())
+      console.log(this.cyInstance.$('#TROGLITAZONE').style())
+      console.log(this.cyInstance.$('#TROGLITAZONE').classes())
 
+      console.log("diabetes node")
+      console.log(this.cyInstance.$('#type_2_diabetes_mellitus').data())
+      console.log(this.cyInstance.$('#type_2_diabetes_mellitus').style())
+      console.log(this.cyInstance.$('#type_2_diabetes_mellitus').classes())
 
+      console.log("after adding elements")
+      console.log(this.elements)
+      this.updateGraph()
+      // console.log(this.cyInstance.$('#a'))
+      this.cyInstance.makeLayout({ name: "klay" }).run()
+      // console.log("type_2_diabetes_mellitus data = ", this.cyInstance.$('#type_2_diabetes_mellitus').data())
+      // console.log("type_2_diabetes_mellitus classes = ", this.cyInstance.$('#type_2_diabetes_mellitus').classes())
+      // this.updateGraph()
+    
 
     },
-     genNodes(filterCytoData){
+    genNodes(filterCytoData){
       // return new Promise(async (resolve, reject) => { // eslint-disable-line
         let nodes = []
         let nodeCheck = []
+        let catCheck = []
+        let sricatCheck = []
         let x = 100
         let y = 100
         for (let i = 0; i < filterCytoData.length; i++) {
           const res = filterCytoData[i];
           let fixSubjectName = res.subjectName.split(' ').join('_')
           let fixObjectName = res.objectName.split(' ').join('_')
+          // console.log(res)
 
-          // if(nodeCheck.indexOf(res.subjectName) == -1){
+          // 
+          if(sricatCheck.indexOf(res.objectSRICat) == -1){
+            sricatCheck.push(res.objectSRICat)
+          }
+          if(sricatCheck.indexOf(res.subjectSRICat) == -1){
+            sricatCheck.push(res.subjectSRICat)
+          }
+          // GET LIST OF ALL CATS TO LOOK AT HOW TO SET FORMATS
+          // console.log(res.objectCats)
+          for (let oc = 0; oc < res.objectCats.length; oc++) {
+            const cat = res.objectCats[oc];
+            // console.log(cat)
+            if(catCheck.indexOf(cat) == -1){
+              catCheck.push(cat)
+            }
+            
+          }
+          // console.log("######### catCheck")
+          // console.log(catCheck)
+          // console.log(res.subjectCats)
+          for (let sc = 0; sc < res.subjectCats.length; sc++) {
+            // console.log(cat)
+            const cat = res.subjectCats[sc];
+            if(catCheck.indexOf(cat) == -1){
+              catCheck.push(cat)
+            }
+            
+          }
+
+          // #################################################
+          // GET SUBJECT NODES
+          // #################################################
           if(nodeCheck.indexOf(fixSubjectName) == -1){
             x = x + 50
             if(x % 500 == 0){
@@ -250,19 +355,43 @@ export default {
             el.position = {}
 
             el.data.id = fixSubjectName
+            el.data.sriCat = res.subjectSRICat
+
             el.position = { x: x, y: y}
+            el.group = "nodes"
+
+            console.log("res.subjectCats")
+            console.log(res.subjectCats) // "biolink:Pathway"
 
             if(res.diseaseKey == res.subject){
-              el.classes = "disease"
+              el.classes = ["thedisease"]
               el.position = {x: 900, y: 300}
+              console.log("FOUND DISEASE")
+              console.log(res)
               // el.locked = true
+            } 
+            else if (res.subjectSRICat == "biolink:SmallMolecule") {
+              console.log("res small mol")
+              console.log(res)
+              el.classes = ["smallmolecule"]
+            }
+            else if (res.subjectSRICat == "biolink:Disease") {
+              console.log("res disease")
+              console.log(res)
+              el.classes = ["disease"]
+            }
+            else if (res.subjectSRICat == "biolink:Protein") {
+              console.log("res protein")
+              console.log(res)
+              el.classes = ["protein"]
             }
 
-            el.group = "nodes"
-            // nodes = [nodes, ...el]
+            
+            // nodes = [nodes, ...el] "biolink:DiseaseOrPhenotypicFeature"
             nodes.push(el)
             nodeCheck.push(fixSubjectName)
           }
+
           if(nodeCheck.indexOf(fixObjectName) == -1){
             x = x + 50
             if(x % 500 == 0){
@@ -273,15 +402,34 @@ export default {
             el.data = {}
 
             el.data.id = fixObjectName
+            el.data.sriCat = res.objectSRICat
             el.position = { x: x, y: y}
+            el.group = "nodes"
+
             if(res.drugKey == res.object){
-              el.classes = "drug"
+              el.classes = ["drug"]
               el.position = {x: 200, y: 300}
+              console.log("FOUND DRUG")
+              console.log(res)
               // el.locked = true
             }
-    
+            else if (res.objectSRICat == "biolink:SmallMolecule") {
+              console.log("res small mol")
+              console.log(res)
+              el.classes = ["smallmolecule"]
+            }
+            else if (res.objectSRICat == "biolink:Disease") {
+              console.log("res disease")
+              console.log(res)
+              el.classes = ["disease"]
+            }
+            else if (res.objectSRICat == "biolink:Protein") {
+              console.log("res protein")
+              console.log(res)
+              el.classes = ["protein"]
+            }
                    // nodes = [nodes, ...el]
-            el.group = "nodes"
+            
             nodes.push(el)
             nodeCheck.push(fixObjectName)
 
@@ -289,6 +437,10 @@ export default {
           if(i == filterCytoData.length -1){
             console.log("nodes")
             console.log(nodes)
+            console.log("catCheck")
+            console.log(catCheck)
+            console.log("sricatCheck")
+            console.log(sricatCheck)
             // resolve(nodes)
             return(nodes)
           }
@@ -346,21 +498,28 @@ export default {
     preConfig(cytoscape) {
       console.log("preConfig")
       // console.log("cytoscape")
-      // console.log(cytoscape)
-      console.log('this.$refs["cy-element"]')
-      console.log(this.$refs["cy-element"])
-      console.log("this.$refs.cy")
-      console.log(this.$refs.cy)
-      console.log("document.getElementById('cytoscape-div')")
-      console.log(document.getElementById('cytoscape-div').clientHeight)
-      console.log(document.getElementById('cytoscape-div').clientWidth)
-      // cy-element
-      console.log("this.$refs.cy.instance")
-      console.log(this.$refs.cy.instance)
+      // // console.log(cytoscape)
+      // console.log('this.$refs["cy-element"]')
+      // console.log(this.$refs["cy-element"])
+      // console.log("this.$refs.cy")
+      // console.log(this.$refs.cy)
+      // console.log("document.getElementById('cytoscape-div')")
+      // console.log(document.getElementById('cytoscape-div').clientHeight)
+      // console.log(document.getElementById('cytoscape-div').clientWidth)
+      // // cy-element
+      // console.log("this.$refs.cy.instance")
+      // console.log(this.$refs.cy.instance)
       cytoscape.use(this.klay);
     },
 
     consoleStuff(){
+      console.log("#############################")
+      console.log("SELECTED")
+      console.log( this.cyInstance.$(':selected').jsons() );
+
+      // this.cyInstance.cy()
+      console.log("this.cyInstance.data() = ", this.cyInstance.data())
+
       // this.cyInstance.remove(this.cyInstance.$('#type_2_diabetes_mellitus'))
       let pos = this.cyInstance.$('#type_2_diabetes_mellitus').position()
       // let posX = this.cyInstance.$('#type_2_diabetes_mellitus').position('x')
@@ -375,18 +534,24 @@ export default {
       let renderedBoundingBox = this.cyInstance.elements().renderedBoundingBox()
       let boundingBox = this.cyInstance.elements().boundingBox()
       let zoomGet = this.cyInstance.zoom()
+      let panGet = this.cyInstance.pan()
       console.log("boundingBox  = ", boundingBox)
       console.log("renderedBoundingBox  = ", renderedBoundingBox)
       // console.log("boundingBox Options = ", boundingBoxOptions)
       console.log("zoomGet = ", zoomGet)
+      console.log("panGet = ", panGet)
 
-      let x2n = boundingBox.w/2 + boundingBox.x2
-      let y2n = (boundingBox.y1 + boundingBox.y2)/2
-      console.log("x2n = ", x2n)
-      console.log("y2n = ", y2n)
-      this.cyInstance.$('#type_2_diabetes_mellitus').position('y', x2n)
-      this.cyInstance.$('#type_2_diabetes_mellitus').position('x', y2n)
-      console.log("new position = ", this.cyInstance.$('#type_2_diabetes_mellitus').position())
+      let x2nDisease = renderedBoundingBox.x2 + renderedBoundingBox.w/4
+      let x2nDrug = renderedBoundingBox.x1 - renderedBoundingBox.w/4 
+      let y2n = (renderedBoundingBox.y1 + renderedBoundingBox.y2)/2
+      // console.log("x2n = ", x2n)
+      // console.log("y2n = ", y2n)
+      this.cyInstance.$('#type_2_diabetes_mellitus').renderedPosition('y', y2n)
+      this.cyInstance.$('#type_2_diabetes_mellitus').renderedPosition('x', x2nDisease)
+      this.cyInstance.$('#TROGLITAZONE').renderedPosition('y', y2n)
+      this.cyInstance.$('#TROGLITAZONE').renderedPosition('x', x2nDrug)
+
+      // console.log("new position = ", this.cyInstance.$('#type_2_diabetes_mellitus').position())
       // "type_2_diabetes_mellitus"
       // var a = 
       // this.cyInstance.nodes().layout({
@@ -406,7 +571,7 @@ export default {
       //   }
       // }).run();
       // this.cyInstance.remove(this.cyInstance.$('#a'))
-      this.updateGraph()
+      // this.updateGraph()
       // console.log("*** consoleStuff")
       // console.log("this.$refs.cy")
       // console.log(this.$refs.cy)
@@ -418,6 +583,7 @@ export default {
       // console.log(this.$refs.cyto)
 
     },
+    
     // async updateGraph(cy) {
     async updateGraph() {
       console.log("updateGraph")
@@ -427,6 +593,20 @@ export default {
       // this.cyInstance.makeLayout({ name: "klay" }).run();
 
       console.log("after makeLayout")
+
+      // console.log("this.cyInstance$(':selected')")
+      // console.log(this.cyInstance$(':selected'))
+      console.log("this.cyInstance.elements(':selected')")
+      console.log(this.cyInstance.elements(':selected'))
+      // this.cyInstance.$(this.nodeToSelect).select()
+      console.log("selected = ")
+      console.log(this.nodeToSelect)
+
+      // for (let x = 0; x < this.element.length; x++) {
+      //   const node = this.element[x];
+
+        
+      // }
 
       // console.log("this.$refs.cy")
       // console.log(this.$refs.cy)
@@ -447,6 +627,14 @@ export default {
       console.log("node clicked def", def);
       console.log("node clicked data", data);
       console.log("node clicked id", id);
+      console.log(id);
+      console.log("position = ", this.cyInstance.$(id.id).position())
+      console.log("renderedPosition = ", this.cyInstance.$(id.id).renderedPosition())
+      console.log("id.id")
+      console.log(id.id)
+
+      // this.cyInstance.$(id.id).select()
+      this.nodeToSelect = id.id
       // console.log("elements = " ,this.elements)
       // console.log("config = ", this.config)
       // console.log("definition = ", definition)
