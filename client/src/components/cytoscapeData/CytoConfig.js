@@ -32,11 +32,11 @@ const CytoConfig = {
         style: { "background-color": "#61952c", label: "data(id)" }
       },
       {
-        selector: ".drug",
+        selector: ".thedrug",
         style: { "background-color": "#318201", label: "data(id)" }
       },
       {
-        selector: ".pathway",
+        selector: ".Pathway",
         style: { "background-color": "#ff7d00", label: "data(id)" }
       },
       {
@@ -44,11 +44,19 @@ const CytoConfig = {
         style: { "background-color": "#62942d", label: "data(id)" }
       },
       {
-        selector: ".disease",
+        selector: ".Disease",
         style: { "background-color": "#008c95", label: "data(id)" }
       },
       {
-        selector: ".protein",
+        selector: ".DiseaseOrPhenotypicFeature",
+        style: { "background-color": "#ff7d00", label: "data(id)" }
+      },
+      {
+        selector: ".ThingWithTaxon",
+        style: { "background-color": "#f6c9b6", label: "data(id)" }
+      },
+      {
+        selector: ".Protein",
         style: { "background-color": "#ff7d00", label: "data(id)" }
       },
       {
@@ -56,7 +64,7 @@ const CytoConfig = {
         style: { "background-color": "#8cd164", label: "data(id)" }
       },
       {
-        selector: ".smallmolecule",
+        selector: ".SmallMolecule",
         style: { "background-color": "#5daadc", label: "data(id)" }
       },
       {
@@ -70,14 +78,19 @@ const CytoConfig = {
       },
       {
         selector: ':selected',
+        // style: {
+        //   width: 5,
+          
+        // },
         css: {
           // 'background-color': 'SteelBlue',
-          'line-color': 'black',
-          'target-arrow-color': 'black',
-          'source-arrow-color': 'black',
+          'line-width': 3,
+          'line-color': '#008c95',
+          'target-arrow-color': '#008c95',
+          'source-arrow-color': '#008c95',
           'border-width' : '5px',
           'border-color' : 'yellow',
-          'border-opacity' : '0.5'
+          'border-opacity' : '0.3'
         }
       }
     ],

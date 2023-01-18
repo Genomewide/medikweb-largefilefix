@@ -42,20 +42,20 @@
     <div>
       <!-- <b-button class="mt-3" variant="primary" block @click="selectResult">CHEMBL.COMPOUND:CHEMBL408 </b-button> -->
       <b-button class="mt-3" variant="primary" block @click="selectResult2"
-        >selectResult2</b-button
+        >CHEMBL.COMPOUND:CHEMBL408 - 2</b-button
       >
       <!-- <br> -->
       <b-button class="mt-3" variant="primary" block @click="consoleStuff"
         >console stuff
       </b-button>
       <!-- <br>  -->
-      <!-- <b-button class="mt-3" variant="primary" block @click="groupSecondDiseases"
+      <b-button class="mt-3" variant="primary" block @click="groupSecondDiseases"
         >groupSecondDiseases
-      </b-button> -->
+      </b-button>
       <!-- <br>  -->
-      <!-- <b-button class="mt-3" variant="primary" block @click="klayLayout"
+      <b-button class="mt-3" variant="primary" block @click="klayLayout"
         >klayLayout
-      </b-button> -->
+      </b-button>
       <br />
       <!-- <b-button class="mt-3" variant="primary" block @click="center">center </b-button> -->
 
@@ -259,11 +259,8 @@ export default {
       // console.log("type_2_diabetes_mellitus data = ", this.cyInstance.$('#type_2_diabetes_mellitus').data())
       // console.log("type_2_diabetes_mellitus classes = ", this.cyInstance.$('#type_2_diabetes_mellitus').classes())
       // this.updateGraph()
-      // #####################################################################
-      // GO AHEAD AND START THE REST
-      // #####################################################################
 
-        this.consoleStuff()
+      
     },
 
     // @remind genNodes
@@ -330,26 +327,16 @@ export default {
           el.group = "nodes";
 
           console.log("res.subjectCats");
-          console.log(res.subjectCats); 
+          console.log(res.subjectCats); // "biolink:Pathway"
 
           if (res.diseaseKey == res.subject) {
-            this.theDisease = fixSubjectName
+            
             el.classes = ["thedisease"];
             el.position = { x: 900, y: 300 };
-            console.log("FOUND subject DISEASE")
-            console.log(res)
+            // console.log("FOUND DISEASE")
+            // console.log(res)
             // el.locked = true
-          } 
-          
-          else if(res.drugKey == res.subject){
-            this.theDrug = fixSubjectName
-            el.classes = ["thedrug"];
-            el.position = { x: 200, y: 300 };
-            console.log("FOUND subject DRUG")
-
-          }
-
-          else {
+          } else {
             el.classes = [res.subjectSRICat.split(":")[1]]
           }
           // else if (res.subjectSRICat == "biolink:SmallMolecule") {
@@ -391,21 +378,12 @@ export default {
           el.group = "nodes";
 
           if (res.drugKey == res.object) {
-            this.theDrug = fixObjectName
             el.classes = ["thedrug"];
             el.position = { x: 200, y: 300 };
-            console.log("FOUND object DRUG")
+            // console.log("FOUND DRUG")
             // console.log(res)
             // el.locked = true
-          } 
-          else if(res.diseaseKey == res.object){
-            this.theDisease = fixObjectName
-            el.classes = ["thedisease"];
-            el.position = { x: 900, y: 300 };
-            console.log("FOUND object DISEASE")
-
-          }
-          else {
+          } else {
             el.classes = [res.objectSRICat.split(":")[1]]
           }
           
@@ -449,9 +427,8 @@ export default {
 
         let edgeCheck = res.subjectName + "_" + res.objectName;
         edgeCheck = edgeCheck.split(" ").join("_");
-        let primaryEdge = this.theDrug + "_" + this.theDisease
 
-        if (edgesCheck.indexOf(edgeCheck) == -1 && primaryEdge != edgeCheck) {
+        if (edgesCheck.indexOf(edgeCheck) == -1) {
           let el = {};
           el.data = {};
           el.data.id = edgeCheck;
@@ -472,19 +449,19 @@ export default {
       }
       // })
     },
-    // removeDrugDiseaseEdge(){
-    //   let nodeData = this.cyInstance.nodes().jsons()
+    removeDrugDiseaseEdge(){
+      let nodeData = this.cyInstance.nodes().jsons()
 
-    // },
+    },
     onFiltered(filteredItems) {
       // Trigger pagination to update the number of buttons/pages due to filtering
       this.totalRows = filteredItems.length;
       this.currentPage = 1;
     },
-    // klayLayout() {
-    //   console.log("klayLayout");
-    //   this.cyInstance.makeLayout({ name: "klay" }).run();
-    // },
+    klayLayout() {
+      console.log("klayLayout");
+      this.cyInstance.makeLayout({ name: "klay" }).run();
+    },
     center() {
       console.log("center");
       this.cyInstance.center();
@@ -518,49 +495,55 @@ export default {
 
       this.movePrimaryNodestoSide()
 
-      let primaryMap = this.getDiseaseNeighborInfo()
-      this.moveSecondaryNodes(primaryMap)
+      this.groupSecondDiseases()
+
+      // // this.cyInstance.remove(this.cyInstance.$('#type_2_diabetes_mellitus'))
+      // let pos = this.cyInstance.$("#type_2_diabetes_mellitus").position();
+      // // let posX = this.cyInstance.$('#type_2_diabetes_mellitus').position('x')
+      // // let posY = this.cyInstance.$('#type_2_diabetes_mellitus').position('y')
+
+      // console.log("pos of diabet = ", pos);
+      // // console.log("posX of diabet = ", posX)
+      // // console.log("posY of diabet = ", posY)
+
+      // // let bBoxOptions = {includeNodes: true}
+      // // let boundingBoxOptions = this.cyInstance.elements().renderedBoundingBox(bBoxOptions)
+      // let renderedBoundingBox = this.cyInstance
+      //   .elements()
+      //   .renderedBoundingBox();
+      // let boundingBox = this.cyInstance.elements().boundingBox();
+      // // let zoomGet = this.cyInstance.zoom();
+      // // let panGet = this.cyInstance.pan();
+      // console.log("boundingBox  = ", boundingBox);
+      // console.log("renderedBoundingBox  = ", renderedBoundingBox);
+      // // console.log("boundingBox Options = ", boundingBoxOptions)
+      // // console.log("zoomGet = ", zoomGet);
+      // // console.log("panGet = ", panGet);
+
+      // let x2nDisease = renderedBoundingBox.x2 + renderedBoundingBox.w / 4;
+      // let x2nDrug = renderedBoundingBox.x1 - renderedBoundingBox.w / 4;
+      // let y2n = (renderedBoundingBox.y1 + renderedBoundingBox.y2) / 2;
+      // console.log("x2n = ", x2n)
+      // console.log("y2n = ", y2n)
+
+      // this.cyInstance.$("#type_2_diabetes_mellitus").renderedPosition("y", y2n);
+      // this.cyInstance
+      //   .$("#type_2_diabetes_mellitus")
+      //   .renderedPosition("x", x2nDisease);
+      // this.cyInstance.$("#TROGLITAZONE").renderedPosition("x", x2nDrug);
+      // this.cyInstance.$("#TROGLITAZONE").renderedPosition("y", y2n);
+
+      // console.log("this.cyInstance.nodes('name = TROGLITAZONE')")
+      // console.log(this.cyInstance.nodes('[name = TROGLITAZONE]'))
+
 
     },
 
-    moveSecondaryNodes(primaryMap){
-      console.log(primaryMap)
-    },
-    makeParents (primaryMap){
-      console.log("start moveSecondaryNodes")
-      console.log(primaryMap)
-      // primaryMap
-      let cats = Object.keys(primaryMap.firstRow)
-      console.log(cats)
-      for (let i = 0; i < cats.length; i++) {
-        const cat = cats[i];
-        console.log(primaryMap.firstRow[cat])
-        
-      }
-      let pparaArray = ["lipoatrophic_diabetes", "hypoglycemia", "hypertensive_disorder", "arteriosclerosis_disorder"]
-      let ppargArray = ["lipoatrophic_diabetes", "metabolic_syndrome", "somatization_disorder", "obstructive_sleep_apnea_syndrome"]
-      // "PPARA" - "lipoatrophic_diabetes" "hypoglycemia" "hypertensive_disorder" "arteriosclerosis_disorder"
-      // "PPARG" - "lipoatrophic_diabetes" "metabolic_syndrome" "somatization_disorder" "obstructive_sleep_apnea_syndrome"
-      for (let n = 0; n < pparaArray.length; n++) {
-        const nodeName =  "#" + pparaArray[n];
-        console.log(this.cyInstance.nodes(nodeName).json())
-        this.cyInstance.nodes(nodeName).move({parent: 'PPARA'})
-        
-      }
-      for (let n = 0; n < ppargArray.length; n++) {
-        const nodeName =  "#" + ppargArray[n];
-        console.log(this.cyInstance.nodes(nodeName).json())
-        this.cyInstance.nodes(nodeName).move({parent: 'PPARG'})
-        
-      }
-      
-
-    },
-    getDiseaseNeighborInfo(){
+    groupSecondDiseases(){
       let diseaseNeighbors = this.cyInstance.$("#type_2_diabetes_mellitus").neighborhood()
       console.log("diseaseNeighbors.jsons()")
       console.log(diseaseNeighbors.jsons())
-      // diseaseNeighbors.select()
+      diseaseNeighbors.select()
       console.log("nodes")
       console.log(diseaseNeighbors.nodes().jsons())
 
@@ -569,66 +552,20 @@ export default {
       let nodeTypeCheck = []
       let neighborData = diseaseNeighbors.nodes().jsons()
       primaryMap.countAll = neighborData.length
-      primaryMap.firstRow = {}
-      let allNodes = []
 
       for (let i = 0; i < neighborData.length; i++) {
-        console.log("##############################")
         const data = neighborData[i];
-        let nodeInfo = {}
-        nodeInfo.id = data.data.id
-        console.log("this.cyInstance.$(data.data.id)")
-        console.log(data.data.id)
-        let getID = "#" + data.data.id
-        console.log(this.cyInstance.$(getID).renderedPosition())
-        // console.log(this.cyInstance.$("#type_2_diabetes_mellitus").renderedPosition())
-        let location = this.cyInstance.$(getID).renderedPosition()
-        nodeInfo.location = {...location}
-        let degree = this.cyInstance.$(getID).degree()
-        let neighbors = this.cyInstance.$(getID).neighborhood().nodes().jsons()
-        nodeInfo.neighbors = neighbors
-        console.log("degree # ", i)
-        console.log(degree)
-        nodeInfo.degree = degree
-        nodeInfo.elbowGroup = "none"
-        if(degree == 2){
-          let elbowNeighbor = neighbors.filter(x => x.data.id != this.disease)
-          nodeInfo.elbowGroup = elbowNeighbor[0].data.id
-        }
-        // allNodes.push(...nodeInfo)
-        let transferNodeInfo = {...nodeInfo}
-        // allNodes = [...allNodes, {...transferNodeInfo}]
-        allNodes.push({...transferNodeInfo}) 
-        console.log(data.data.id)
-        console.log("nodeInfo")
-        console.log(nodeInfo)
         
-        if(nodeTypeCheck.indexOf(data.classes) == -1){
-          // primaryMap.firstRow[data.classes].ids = []
-          // primaryMap.firstRow[data.classes].ids.push(data.data.id)
-          primaryMap.firstRow[data.classes] = {}
-          primaryMap.firstRow[data.classes].count = 1
-          primaryMap.firstRow[data.classes].nodes = []
-          primaryMap.firstRow[data.classes].nodes.push(nodeInfo)
-          nodeTypeCheck.push(data.classes)
+        if(nodeTypeCheck.indexOf(data.data.sriCat) == -1){
           
-        } else {
-          primaryMap.firstRow[data.classes].count++
-          primaryMap.firstRow[data.classes].nodes.push(nodeInfo)
+          // primaryMap
         }
         
       }
-      console.log("allNodes")
-      console.log(allNodes)
-      let elbows = allNodes.filter(x => x.degree = 2)
-      console.log("elbows = ", elbows)
-      console.log("primaryMap")
-      console.log(primaryMap)
-      return primaryMap
       
+
+
     },
-
-
     movePrimaryNodestoSide(){
       // ####################################################################
       // MOVE THE DISEASE AND DRUG TO THE OPPOSITE SIDES
@@ -659,6 +596,10 @@ export default {
                 }, {
                   duration: 1000
                 })
+              // .delay( 1000 )
+              // .animate({
+              //   style: { 'background-color': 'yellow' }
+              // })
         }
         if( ele.id() == "TROGLITAZONE"){
           console.log("y2n = ", y2n)
