@@ -68,6 +68,14 @@ const CytoConfig = {
         style: { "background-color": "#5daadc", label: "data(id)" }
       },
       {
+        selector: ".parentGroup",
+        style: { "background-color": "#b0d4eb", label: "data(id)" }
+      }, 
+      {
+        selector: ".grandParentGroup",
+        style: { "background-color": "##379bdb", label: "data(id)" }
+      }, 
+      {
         selector: "edge",
         style: {
           width: 3,

@@ -231,7 +231,7 @@ export default {
       // USE THIS TO ADD 
       // ###############################################################
       // ###############################################################
-      // this.elements = [...nodes, ...edges];
+      this.elements = [...nodes, ...edges];
       // console.log("this.elements");
       // console.log(this.elements);
       // this.updateGraph()
@@ -324,6 +324,7 @@ export default {
 
           el.data.id = fixSubjectName;
           el.data.sriCat = res.subjectSRICat.split(":")[1];
+          el.data.classDefault = res.subjectSRICat.split(":")[1];
           el.data.name = fixSubjectName;
 
           el.position = { x: x, y: y };
@@ -336,6 +337,7 @@ export default {
             this.theDisease = fixSubjectName
             el.classes = ["thedisease"];
             el.position = { x: 900, y: 300 };
+            el.data.classDefault = "thedisease"
             console.log("FOUND subject DISEASE")
             console.log(res)
             // el.locked = true
@@ -344,6 +346,7 @@ export default {
           else if(res.drugKey == res.subject){
             this.theDrug = fixSubjectName
             el.classes = ["thedrug"];
+            el.data.classDefault = "thedrug"
             el.position = { x: 200, y: 300 };
             console.log("FOUND subject DRUG")
 
@@ -384,7 +387,8 @@ export default {
           el.classes = [];
 
           el.data.id = fixObjectName;
-          el.data.sriCat = res.objectSRICat;
+          el.data.sriCat = res.objectSRICat.split(":")[1]
+          el.data.classDefault = res.objectSRICat.split(":")[1]
           el.data.name = fixObjectName;
 
           el.position = { x: x, y: y };
@@ -392,6 +396,8 @@ export default {
 
           if (res.drugKey == res.object) {
             this.theDrug = fixObjectName
+            el.data.classDefault = "thedrug"
+
             el.classes = ["thedrug"];
             el.position = { x: 200, y: 300 };
             console.log("FOUND object DRUG")
@@ -401,6 +407,7 @@ export default {
           else if(res.diseaseKey == res.object){
             this.theDisease = fixObjectName
             el.classes = ["thedisease"];
+            el.data.classDefault = "thedisease"
             el.position = { x: 900, y: 300 };
             console.log("FOUND object DISEASE")
 
@@ -472,22 +479,11 @@ export default {
       }
       // })
     },
-    // removeDrugDiseaseEdge(){
-    //   let nodeData = this.cyInstance.nodes().jsons()
 
-    // },
     onFiltered(filteredItems) {
       // Trigger pagination to update the number of buttons/pages due to filtering
       this.totalRows = filteredItems.length;
       this.currentPage = 1;
-    },
-    // klayLayout() {
-    //   console.log("klayLayout");
-    //   this.cyInstance.makeLayout({ name: "klay" }).run();
-    // },
-    center() {
-      console.log("center");
-      this.cyInstance.center();
     },
     // @remind preConfig
     preConfig(cytoscape) {
@@ -520,11 +516,61 @@ export default {
 
       let primaryMap = this.getDiseaseNeighborInfo()
       this.moveSecondaryNodes(primaryMap)
+      this.makeParents(primaryMap)
+      console.log("this.cyInstance.data() = ", this.cyInstance.nodes().jsons())
+
+
+      // this.cyInstance.nodes().forEach((ele) => {
+      //   console.log("#############################")
+      //   console.log(ele.id())
+      //   // console.log(ele.json().data.id)
+      //   console.log(ele.isNode())
+      //   console.log("IS CHILD? = ", ele.isChild())
+      //   console.log(ele.parent().id())
+
+      // })
 
     },
 
     moveSecondaryNodes(primaryMap){
+      console.log("moveSecondaryNodes")
       console.log(primaryMap)
+      let renderedBoundingBox = this.cyInstance
+        .elements()
+        .renderedBoundingBox(); 
+      
+      console.log("renderedBoundingBox = ", renderedBoundingBox)
+      let xUnit = (renderedBoundingBox.x2 - renderedBoundingBox.x1)/3
+      let xRow1 = renderedBoundingBox.x2 - xUnit
+
+      let groupKeys = Object.keys(primaryMap.firstRow)
+      let yUnit =  (renderedBoundingBox.y2 - renderedBoundingBox.y1) / (primaryMap.countAll + 3*groupKeys.length)
+
+      let yPos = renderedBoundingBox.y1
+      for (let i = 0; i < groupKeys.length; i++) {
+        const group = groupKeys[i];
+
+        let groupNodes = primaryMap.firstRow[group].nodes
+        for (let n = 0; n < groupNodes.length; n++) {
+          const node = groupNodes[n];
+          let nodeID = "#" + node.id
+          if(node.id != this.theDrug){
+            this.cyInstance.nodes(nodeID).animate({
+                renderedPosition: { x: xRow1, y: yPos }
+              }, {
+                duration: 1000
+              })
+            yPos = yPos + yUnit
+            }
+        }
+        yPos = yPos +3*yUnit
+      }
+
+
+
+
+
+
     },
     makeParents (primaryMap){
       console.log("start moveSecondaryNodes")
@@ -534,25 +580,37 @@ export default {
       console.log(cats)
       for (let i = 0; i < cats.length; i++) {
         const cat = cats[i];
+        console.log("primaryMap.firstRow[cat]")
         console.log(primaryMap.firstRow[cat])
+        // let nodes = primaryMap.firstRow[cat].nodes
+
+        // if(primaryMap.firstRow[cat].count > 1){
+
+        // }
+
         
       }
-      let pparaArray = ["lipoatrophic_diabetes", "hypoglycemia", "hypertensive_disorder", "arteriosclerosis_disorder"]
-      let ppargArray = ["lipoatrophic_diabetes", "metabolic_syndrome", "somatization_disorder", "obstructive_sleep_apnea_syndrome"]
-      // "PPARA" - "lipoatrophic_diabetes" "hypoglycemia" "hypertensive_disorder" "arteriosclerosis_disorder"
-      // "PPARG" - "lipoatrophic_diabetes" "metabolic_syndrome" "somatization_disorder" "obstructive_sleep_apnea_syndrome"
-      for (let n = 0; n < pparaArray.length; n++) {
-        const nodeName =  "#" + pparaArray[n];
-        console.log(this.cyInstance.nodes(nodeName).json())
-        this.cyInstance.nodes(nodeName).move({parent: 'PPARA'})
+
+
+
+      // ###########################################################
+      // FORCE GROUPS
+      // let pparaArray = ["lipoatrophic_diabetes", "hypoglycemia", "hypertensive_disorder", "arteriosclerosis_disorder"]
+      // let ppargArray = ["lipoatrophic_diabetes", "metabolic_syndrome", "somatization_disorder", "obstructive_sleep_apnea_syndrome"]
+      // // "PPARA" - "lipoatrophic_diabetes" "hypoglycemia" "hypertensive_disorder" "arteriosclerosis_disorder"
+      // // "PPARG" - "lipoatrophic_diabetes" "metabolic_syndrome" "somatization_disorder" "obstructive_sleep_apnea_syndrome"
+      // for (let n = 0; n < pparaArray.length; n++) {
+      //   const nodeName =  "#" + pparaArray[n];
+      //   console.log(this.cyInstance.nodes(nodeName).json())
+      //   this.cyInstance.nodes(nodeName).move({parent: 'PPARA'})
         
-      }
-      for (let n = 0; n < ppargArray.length; n++) {
-        const nodeName =  "#" + ppargArray[n];
-        console.log(this.cyInstance.nodes(nodeName).json())
-        this.cyInstance.nodes(nodeName).move({parent: 'PPARG'})
+      // }
+      // for (let n = 0; n < ppargArray.length; n++) {
+      //   const nodeName =  "#" + ppargArray[n];
+      //   console.log(this.cyInstance.nodes(nodeName).json())
+      //   this.cyInstance.nodes(nodeName).move({parent: 'PPARG'})
         
-      }
+      // }
       
 
     },
@@ -573,35 +631,123 @@ export default {
       let allNodes = []
 
       for (let i = 0; i < neighborData.length; i++) {
-        console.log("##############################")
+        // console.log("##############################")
         const data = neighborData[i];
         let nodeInfo = {}
         nodeInfo.id = data.data.id
-        console.log("this.cyInstance.$(data.data.id)")
-        console.log(data.data.id)
+        // console.log("this.cyInstance.$(data.data.id)")
+        // console.log(data.data.id)
         let getID = "#" + data.data.id
-        console.log(this.cyInstance.$(getID).renderedPosition())
+        // console.log(this.cyInstance.$(getID).renderedPosition())
         // console.log(this.cyInstance.$("#type_2_diabetes_mellitus").renderedPosition())
         let location = this.cyInstance.$(getID).renderedPosition()
         nodeInfo.location = {...location}
         let degree = this.cyInstance.$(getID).degree()
         let neighbors = this.cyInstance.$(getID).neighborhood().nodes().jsons()
         nodeInfo.neighbors = neighbors
-        console.log("degree # ", i)
-        console.log(degree)
+        // console.log("this.cyInstance.$(getID).isNode")
+        // console.log(this.cyInstance.$(getID).isNode())
         nodeInfo.degree = degree
         nodeInfo.elbowGroup = "none"
-        if(degree == 2){
-          let elbowNeighbor = neighbors.filter(x => x.data.id != this.disease)
-          nodeInfo.elbowGroup = elbowNeighbor[0].data.id
-        }
+        nodeInfo.elbowGroupText = "none"
+        if(degree == 2 || degree == 3){
+          let elbowNeighbor = neighbors.filter(x => x.data.id != this.theDisease)
+          nodeInfo.elbowGroup = elbowNeighbor.map(x => x.data.id)
+          // nodeInfo.elbowGroup = elbowNeighbor[0].data.id
+
+          // ####################################################
+          // CHECK IF THE PARENT ALREADY EXISTS - CREATE IF NOT - ASSIGN THS NODE AS CHILD
+          // ####################################################
+            nodeInfo.elbowGroupText = JSON.stringify(nodeInfo.elbowGroup)
+            // console.log(this.cyInstance$(checkParentID))
+            // console.log("this.cyInstance.$(getID).degree()")
+            // console.log(this.cyInstance.$(getID).degree())
+            
+
+            let checkParentID = "" 
+            let checkGrandParentID = "" 
+            for (let x = 0; x < nodeInfo.elbowGroup.length; x++) {
+              const element = nodeInfo.elbowGroup[x];
+              checkParentID = element + "_" + checkParentID
+              if(x == nodeInfo.elbowGroup.length -1){
+                checkGrandParentID = checkParentID + "elbow"
+                checkParentID = checkParentID + "_" + data.data.sriCat.split(":")[1]
+                
+              }
+              
+            }
+            console.log(checkGrandParentID)
+            // let useParentNodeID = 
+            // console.log(this.cyInstance.$("#" + checkParentID).isNode())
+            console.log('this.cyInstance.$("#" + checkGrandParentID).isNode()')
+            console.log(this.cyInstance.$("#" + checkGrandParentID).isNode())
+            
+            if(this.cyInstance.$("#" + checkGrandParentID).isNode() == false){
+              let newGrandParent = {
+                  group: 'nodes',
+                  data: { 
+                    id: checkGrandParentID
+                    
+                  },
+                  classes: ["grandParentGroup"]
+                }
+              this.cyInstance.add(newGrandParent)
+            }
+
+            if(this.cyInstance.$("#" + checkParentID).isNode() == false){
+              let newParent = {
+                group: 'nodes',
+                data: { 
+                  id: checkParentID,
+                  grandPar: checkGrandParentID
+                },
+                parent: checkGrandParentID,
+                classes: ["parentGroup"]
+              }
+
+              
+              this.cyInstance.add(newParent).move({parent: checkGrandParentID})
+              this.cyInstance.$("#" + checkParentID)
+              this.cyInstance.nodes(getID).data('par', checkParentID)
+              // this.cyInstance.nodes(getID).data('parGrand', checkGrandParentID)
+              this.cyInstance.nodes(getID).move({parent: checkParentID})
+            }
+            else {
+              this.cyInstance.nodes(getID).move({parent: checkParentID})
+            }
+            // try{
+            //   console.log("ADDING PARENT")
+            //   console.log(nodeInfo.elbowGroupText)
+            //   let newParent = {
+            //     group: 'nodes',
+            //     data: { id: nodeInfo.elbowGroupText},
+            //     classes: ["parentGroup"]
+            //   }
+            //   this.cyInstance.add(newParent)              
+            // } catch(err){
+
+            //   console.log("already NODE")
+            //   console.error(err)
+            // }
+          }
+
+
+
+
+
+
+        // if(degree == 3){
+        //   let elbowNeighbor = neighbors.filter(x => x.data.id != this.theDisease)
+        //   // nodeInfo.elbowGroup = elbowNeighbor[0].data.id
+        //   nodeInfo.elbowGroup = elbowNeighbor.map(x => x.data.id)
+        // }
         // allNodes.push(...nodeInfo)
         let transferNodeInfo = {...nodeInfo}
         // allNodes = [...allNodes, {...transferNodeInfo}]
         allNodes.push({...transferNodeInfo}) 
-        console.log(data.data.id)
-        console.log("nodeInfo")
-        console.log(nodeInfo)
+        // console.log(data.data.id)
+        // console.log("nodeInfo")
+        // console.log(nodeInfo)
         
         if(nodeTypeCheck.indexOf(data.classes) == -1){
           // primaryMap.firstRow[data.classes].ids = []
@@ -618,12 +764,12 @@ export default {
         }
         
       }
-      console.log("allNodes")
-      console.log(allNodes)
-      let elbows = allNodes.filter(x => x.degree = 2)
-      console.log("elbows = ", elbows)
-      console.log("primaryMap")
-      console.log(primaryMap)
+      // console.log("allNodes")
+      // console.log(allNodes)
+      // let elbows = allNodes.filter(x => x.degree = 2)
+      // console.log("elbows = ", elbows)
+      // console.log("primaryMap")
+      // console.log(primaryMap)
       return primaryMap
       
     },
