@@ -204,7 +204,8 @@ export default {
       theDisease: "",
       startingNodeData: {},
       startOrTarget: "",
-      parentGroup: "target"
+      parentGroupPrefix: "target",
+      // parentGroup: parentGroupPrefix + "parentGroup"
     };
   },
   methods: {
@@ -500,6 +501,11 @@ export default {
       cytoscape.use(this.klay);
     },
     klayLayout(){
+      this.cyInstance.makeLayout({ name: "klay", animate: true, fit: true }).run();
+      this.cyInstance.center()
+    },
+    klayLayout2(){
+
       this.cyInstance.makeLayout({ name: "klay", animate: true, fit: true }).run();
       this.cyInstance.center()
     },
@@ -803,11 +809,18 @@ export default {
     },
 
     // @remind getNodeParentGrandparentData
-    getNodeParentGrandparentData(){
+    getNodeParentGrandparentData(focusNode){
       this.startingNodeData = this.cyInstance.nodes().jsons()
       console.log("this.startingNodeData")
       console.log(this.startingNodeData)
-      let diseaseNeighbors = this.cyInstance.$("#type_2_diabetes_mellitus").neighborhood()
+      // let focusNode = "#" + this.theDisease
+      // if(this.parentGroup == "target"){
+      //   focusNode = "#" + this.theDisease
+      // } else {
+      //   focusNode = "#" + this.theDrug
+      // }
+
+      let diseaseNeighbors = this.cyInstance.$(focusNode).neighborhood()
       console.log("diseaseNeighbors.jsons()")
       console.log(diseaseNeighbors.jsons())
       // diseaseNeighbors.select()
@@ -847,6 +860,9 @@ export default {
         nodeInfo.degree = degree
         nodeInfo.elbowGroup = "none"
         nodeInfo.elbowGroupText = "none"
+
+
+
         this.cyInstance.$(getID).data("parentGroup", null)
         this.cyInstance.$(getID).data("grandParentGroup", null)
         this.cyInstance.$(getID).data("elbowDegree", null)
@@ -1298,43 +1314,8 @@ export default {
               this.cyInstance.nodes(getID).move({parent: checkParentID})
             }
 
-            // this.cyInstance.$(getID).animate({
-            //       style: {display: 'none'}
-            //     }, {
-            //       duration: 1000
-            //     })
-            // MAKE THEM INVISABLE
-            // this.cyInstance.$(getID).classes('hidden')            
-            
-            
-            // try{
-            //   console.log("ADDING PARENT")
-            //   console.log(nodeInfo.elbowGroupText)
-            //   let newParent = {
-            //     group: 'nodes',
-            //     data: { id: nodeInfo.elbowGroupText},
-            //     classes: ["parentGroup"]
-            //   }
-            //   this.cyInstance.add(newParent)              
-            // } catch(err){
-
-            //   console.log("already NODE")
-            //   console.error(err)
-            // }
-
           }
 
-
-
-
-
-
-        // if(degree == 3){
-        //   let elbowNeighbor = neighbors.filter(x => x.data.id != this.theDisease)
-        //   // nodeInfo.elbowGroup = elbowNeighbor[0].data.id
-        //   nodeInfo.elbowGroup = elbowNeighbor.map(x => x.data.id)
-        // }
-        // allNodes.push(...nodeInfo)
         let transferNodeInfo = {...nodeInfo}
         // allNodes = [...allNodes, {...transferNodeInfo}]
         allNodes.push({...transferNodeInfo}) 
@@ -1410,6 +1391,7 @@ export default {
                 })
         }  
       });
+      this.cyInstance.center()
     },
 
     // @remind updateGraph
