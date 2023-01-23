@@ -1,18 +1,18 @@
 const CytoConfig = {
     elements: [
       {
-        data: { id: "a" },
+        data: { id: "a" , name : "a node"},
         position: { x: 589, y: 182 },
         group: "nodes",
         classes: "test"
       },
       {
-        data: { id: "b" },
+        data: { id: "b" , name : "b node"},
         position: { x: 689, y: 282 },
         group: "nodes"
       },
       {
-        data: { id: "c" },
+        data: { id: "c", name : "c node"},
         position: { x: 10, y: 100 },
         group: "nodes"
       },
@@ -25,65 +25,100 @@ const CytoConfig = {
       {
         selector: "node",
         // style: { "background-color": "#4287f5", label: "data(id)" }
-        style: { "background-color": "#4287f5", label: "data(id)" }
+        // style: { "background-color": "#4287f5", label: "data(name)" , height: function(ele){ return ele.degree() * 10 }, width: function(ele){ return ele.degree() * 10 }}
+        style: { "background-color": "#4287f5", label: "data(name)" , height: 50, width: 50}
       },
       {
-        selector: ".thedisease",
-        style: { "background-color": "#61952c", label: "data(id)" }
+        selector: "node[[degree = 2]]",
+        style: { "background-color": "#4287f5", label: "data(name)" , height: 50, width: 50}
+
       },
       {
-        selector: ".thedrug",
-        style: { "background-color": "#318201", label: "data(id)" }
-      },
-      {
-        selector: ".Pathway",
-        style: { "background-color": "#ff7d00", label: "data(id)" }
-      },
-      {
-        selector: ".phenotype",
-        style: { "background-color": "#62942d", label: "data(id)" }
-      },
-      {
-        selector: ".Disease",
-        style: { "background-color": "#008c95", label: "data(id)" }
-      },
-      {
-        selector: ".DiseaseOrPhenotypicFeature",
-        style: { "background-color": "#ff7d00", label: "data(id)" }
-      },
-      {
-        selector: ".ThingWithTaxon",
-        style: { "background-color": "#f6c9b6", label: "data(id)" }
-      },
-      {
-        selector: ".Protein",
-        style: { "background-color": "#ff7d00", label: "data(id)" }
-      },
-      {
-        selector: ".test",
-        style: { "background-color": "#8cd164", label: "data(id)" }
-      },
-      {
-        selector: ".SmallMolecule",
-        style: { "background-color": "#5daadc", label: "data(id)" }
+        selector: ':parent',
+        css: {
+          //shape: 'rectangle',
+          // shape: 'cutrectangle',
+          shape: 'roundrectangle',
+        }
       },
       {
         selector: ".parentGroup",
-        style: { "background-color": "#b0d4eb", label: "data(id)" }
+        style: { "background-color": "#b0d4eb" }
       }, 
       {
         selector: ".grandParentGroup",
-        style: { "background-color": "##379bdb", label: "data(id)" }
+        style: { "background-color": "#db37d3", shape: 'ellipse'}
       }, 
+      {
+        selector: ".thedisease",
+        style: { "background-color": "#61952c" }
+      },
+      {
+        selector: ".thedrug",
+        style: { "background-color": "#318201"}
+      },
+      {
+        selector: ".Pathway",
+        style: { "background-color": "#ff7d00"}
+      },
+      {
+        selector: ".phenotype",
+        style: { "background-color": "#62942d"}
+      },
+      {
+        selector: ".Disease",
+        style: { "background-color": "#008c95"}
+      },
+      {
+        selector: ".DiseaseOrPhenotypicFeature",
+        style: { "background-color": "#ff7d00" }
+      },
+      {
+        selector: ".ThingWithTaxon",
+        style: { "background-color": "#f6c9b6" }
+      },
+      {
+        selector: ".Protein",
+        style: { "background-color": "#ff7d00"}
+      },
+      {
+        selector: ".test",
+        style: { "background-color": "#8cd164"}
+      },
+      {
+        selector: ".SmallMolecule",
+        style: { "background-color": "#5daadc"}
+      },
+
+      {
+        selector: ".hidden",
+        style: { display: 'none'}
+      }, 
+      // 
       {
         selector: "edge",
         style: {
           width: 3,
+          "curve-style": "bezier",
           "line-color": "#cccccc",
-          "target-arrow-color": "#ccc",
-          "target-arrow-shape": "triangle"
+          "target-arrow-color": "#cccccc",
+          // "target-arrow-shape": "vee",
+          // "arrow-scale": 2
+          // "curve-style": "taxi"
         }
       },
+      {
+        selector: ".parentEdge",
+        style: {
+          width: 3,
+          "curve-style": "bezier",
+          "line-color": "#379bdb",
+          "target-arrow-color": "#379bdb",
+          // "target-arrow-shape": "vee",
+          // "arrow-scale": 2
+          // "curve-style": "taxi"
+        }
+      }, 
       {
         selector: ':selected',
         // style: {
@@ -91,11 +126,11 @@ const CytoConfig = {
           
         // },
         css: {
-          // 'background-color': 'SteelBlue',
-          'line-width': 3,
+          'background-color': '#f44336',
+          // 'width': 3,
           'line-color': '#008c95',
-          'target-arrow-color': '#008c95',
-          'source-arrow-color': '#008c95',
+          // 'target-arrow-color': '#008c95',
+          // 'source-arrow-color': '#008c95',
           'border-width' : '5px',
           'border-color' : 'yellow',
           'border-opacity' : '0.3'

@@ -1,0 +1,85 @@
+curl -X 'POST' \
+  'https://molepro-trapi.transltr.io/molepro/trapi/v1.3/query' \
+  -H 'accept: application/json' \
+  -H 'Content-Type: application/json' \
+  -d '{
+    "message": {
+        "knowledge_graph": {
+            "edges": {},
+            "nodes": {
+                "CHEBI:15365": {
+                    "attributes": [],
+                    "categories": [
+                        "biolink:SmallMolecule"
+                    ],
+                    "name": "Insulin"
+                }
+            }
+        }
+    },
+    "workflow": [
+        {
+            "id": "annotate_nodes",
+            "parameters": {
+                "attributes": [
+
+                    "biolink:description",
+                    "route of administration",
+                    "availability_type",
+                    "therapeutic_flag",
+                    "biolink:highest_FDA_approval_status",
+                    "ChEMBL:atc_classification",
+                    "biolink:chemical_role",
+                    "black_box_warning",
+                    "drug_warning",
+                    "indication_class",
+                    "molecule_type",
+                    "ChEMBL:atc_classification"
+                ]
+            }
+        }
+    ],
+    "submitter": "annotate_nodes"
+}'
+
+
+curl -X 'POST' \
+  'https://molepro-trapi.transltr.io/molepro/trapi/v1.3/query' \
+  -H 'accept: application/json' \
+  -H 'Content-Type: application/json' \
+  -d '{
+    "message": {
+        "knowledge_graph": {
+            "edges": {},
+            "nodes": {
+                "ChEMBL:CHEMBL1201631": {
+                    "attributes": [],
+                 
+                    "name": "Insulin"
+                }
+            }
+        }
+    },
+    "workflow": [
+        {
+            "id": "annotate_nodes",
+            "parameters": {
+                "attributes": [
+
+                    "biolink:description",
+                    "route of administration",
+                    "availability_type",
+                    "therapeutic_flag",
+                    "ChEMBL:atc_classification",
+                    "biolink:chemical_role",
+                    "black_box_warning",
+                    "drug_warning",
+                    "indication_class",
+                    "molecule_type",
+                    "ChEMBL:atc_classification"
+                ]
+            }
+        }
+    ],
+    "submitter": "annotate_nodes"
+}'

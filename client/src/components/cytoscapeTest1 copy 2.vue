@@ -201,10 +201,7 @@ export default {
       gotNodes: [],
       nodeToSelect: "",
       theDrug: "",
-      theDisease: "",
-      startingNodeData: {},
-      startOrTarget: "",
-      parentGroup: "target"
+      theDisease: ""
     };
   },
   methods: {
@@ -241,21 +238,55 @@ export default {
 
       // ###############################################################
       // ###############################################################
-      // USE THIS TO ADD SO THAT CLICKING ON NODES WORKS - WILL SHOW ERROR IN CONSOLE BUT WORKS
+      // USE THIS TO ADD 
       // ###############################################################
       // ###############################################################
       // this.elements = [...nodes, ...edges];
+      // console.log("this.elements");
+      // console.log(this.elements);
+      // this.updateGraph()
+      // console.log("nodes  = ", this.cyInstance.nodes())
+      //
+      // console.log("nodes after addElements = ", this.cyInstance.nodes())
+      // this.updateGraph()
+      // console.log("nodes after addElements = ", this.cyInstance.nodes())
+
+      console.log("TROGLITAZONE node");
+      console.log(this.cyInstance.$("#TROGLITAZONE").data());
+      console.log(this.cyInstance.$("#TROGLITAZONE").style());
+      console.log(this.cyInstance.$("#TROGLITAZONE").classes());
+
+      console.log("diabetes node");
+      console.log(this.cyInstance.$("#type_2_diabetes_mellitus").data());
+      console.log(this.cyInstance.$("#type_2_diabetes_mellitus").style());
+      console.log(this.cyInstance.$("#type_2_diabetes_mellitus").classes());
 
       console.log("after adding elements");
       console.log(this.elements);
       this.updateGraph();
       // console.log(this.cyInstance.$('#a'))
       this.cyInstance.makeLayout({ name: "klay", animate: true }).run();
-
+      // console.log("type_2_diabetes_mellitus data = ", this.cyInstance.$('#type_2_diabetes_mellitus').data())
+      // console.log("type_2_diabetes_mellitus classes = ", this.cyInstance.$('#type_2_diabetes_mellitus').classes())
+      // this.updateGraph()
       // #####################################################################
       // GET PARENT AND GRANPARENT DATA AND TAG NODES WITH IT
       // #####################################################################
-      this.getNodeParentGrandparentData()
+        this.getNodeParentGrandparentData()
+        
+
+        // let nodesToDelete = await this.collapseChildNodes()
+        // console.log("after collapseChildNodes")
+        // console.log(nodesToDelete)
+        // for (let i = 0; i < nodesToDelete.length; i++) {
+        //   const node = nodesToDelete[i];
+        //   let nodeID = "#" + node
+        //   this.cyInstance.$(nodeID).remove()
+
+          
+        // }
+
+
 
     },
 
@@ -511,6 +542,34 @@ export default {
       this.cyInstance.makeLayout({ name: "breadthfirst", animate: true , fit: true}).run();
       this.cyInstance.center()
     }, 
+
+    // consoleStuff() {
+    //   console.log("#############################");
+    //   console.log("SELECTED");
+    //   console.log(this.cyInstance.$(":selected").jsons());
+
+    //   // this.cyInstance.cy()
+    //   console.log("this.cyInstance.data() = ", this.cyInstance.data());
+
+    //   this.movePrimaryNodestoSide()
+
+    //   let primaryMap = this.getDiseaseNeighborInfo()
+    //   this.moveSecondaryNodes(primaryMap)
+    //   this.makeParents(primaryMap)
+    //   console.log("this.cyInstance.data() = ", this.cyInstance.nodes().jsons())
+
+
+    //   // this.cyInstance.nodes().forEach((ele) => {
+    //   //   console.log("#############################")
+    //   //   console.log(ele.id())
+    //   //   // console.log(ele.json().data.id)
+    //   //   console.log(ele.isNode())
+    //   //   console.log("IS CHILD? = ", ele.isChild())
+    //   //   console.log(ele.parent().id())
+
+    //   // })
+
+    // },
 
     collapseChildNodes(){
 
@@ -804,9 +863,6 @@ export default {
 
     // @remind getNodeParentGrandparentData
     getNodeParentGrandparentData(){
-      this.startingNodeData = this.cyInstance.nodes().jsons()
-      console.log("this.startingNodeData")
-      console.log(this.startingNodeData)
       let diseaseNeighbors = this.cyInstance.$("#type_2_diabetes_mellitus").neighborhood()
       console.log("diseaseNeighbors.jsons()")
       console.log(diseaseNeighbors.jsons())
