@@ -9,7 +9,9 @@ import axios from 'axios';
 let getARAXSynonyms = (searchterm) => {
   // console.log("**** started getARAXSynonyms  - seatrchterm = ", searchterm)
   return new Promise(async (resolve, reject) => { // eslint-disable-line
-    let url = "https://arax.ncats.io/api/arax/v1.2/entity?q=" + searchterm
+    // arax.transltr.io/api/arax/v1.3/
+    let url = "https://arax.transltr.io/api/arax/v1.3/entity?q=" + searchterm
+    // let url = "https://arax.ncats.io/api/arax/v1.2/entity?q=" + searchterm
     try {
       const res = await axios.get(url);
 
@@ -33,6 +35,8 @@ let getSynonyms = (searchterm) => {
       const res = await axios.get(url);
 
       const data = res.data;
+      console.log("getSynonyms data")
+      console.log(data)
 
       resolve(data);
     } catch (err) {
@@ -101,7 +105,7 @@ class synonymService {
   }
 
   static chemSynonyms = (searchterm) => {
-    console.log("started allSynonyms - seatrchterm ");
+    console.log("started chemSynonyms - seatrchterm ");
     return new Promise(async (resolve, reject) => { // eslint-disable-line
       try {
         getARAXSynonyms(searchterm)

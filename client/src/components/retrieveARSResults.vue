@@ -380,7 +380,7 @@ import PubCleanService from "../PubCleanService";
 import TrapiResultClean from "../TrapiResultClean";
 import ARSService from "../ARSService";
 // import searchResult1 from "../assets/searchResult1.json"
-import araxResult from "../assets/araxResult.json"
+// import araxResult from "../assets/araxResult.json"
 
 // import excel from 'vue-excel-export'
 // import ARAXService from "../ARAXService";
@@ -391,6 +391,7 @@ import NodeService from "../NodeService";
 // import importResultWithDrugs from "/Users/andycrouse/Downloads/resultWithDrugsWithFDA.json"
 import synonymService from "../synonymService";
 // import twohopdata from "../../../datafiles/twohopggd.json"
+import test from "../assets/test.json"
 
 
 var parser = require("fast-xml-parser");
@@ -804,7 +805,10 @@ export default {
       // 5c87c928-3b7b-4879-90ca-17508352384a 2 hop DLG4
       // 2fe9efb8-d677-4215-bb5d-eb805d667672 //pfocr
       // ARSrequestID: "6bc8da41-cd85-4d72-a09a-c24d9dc99da9", // large number single hop - drug gene results
-       ARSrequestID:"812e1299-2768-4ea8-b013-f7d887b5b730",
+      // fbd67d01-ab6b-4107-a592-7f77a765184f to get the cohd
+      // 3791007a-33d4-4c00-8609-86c758964eff
+      //  ARSrequestID:"fbd67d01-ab6b-4107-a592-7f77a765184f",
+       ARSrequestID:"3791007a-33d4-4c00-8609-86c758964eff",
       resultSetIDs: [],
       ARSResultStatus: {},
       ARSJobId: "bc32c185-6a97-4aff-b467-aa2fac22e275",
@@ -879,7 +883,7 @@ export default {
       allResutlDrugDiseaseTable:[],
       synData: [],
       cooccurrenceNodeData: [],
-       noveltyTable: [],
+      noveltyTable: [],
       coocurrenceQuery: {
           "message": {
             "query_graph": {
@@ -913,17 +917,123 @@ export default {
   },
   methods: {
 
+
     async testClean(){
-      console.log("this.routPK before")
-      console.log(this.routPK)
-      this.routPK = this.$route.query
-      console.log("this.routPK")
-      console.log(this.routPK)
-      console.log("araxResult")
-      console.log(araxResult)
-      // let cleanedResults = await TrapiResultClean.TrapiResultClean(araxResult)
-      // console.log("finished cleanedResults")
-      // console.log(cleanedResults)
+      console.log("test.json")
+      console.log(test)
+      let cleanedResults = await TrapiResultClean.TrapiResultClean(test, "ICEES")
+      console.log("cleanedResults")
+      console.log(cleanedResults)
+      
+      // FOR EACH EDGE IN CLEANEDRESULTS CHECK THE EDGEINFO ATTRIBUTES FOR THE original_attribute_name AND GET THE VALUE
+      for (let i = 0; i < cleanedResults.length; i++) {
+        const element = cleanedResults[i];
+        // check each attribute
+        cleanedResults[i].logOddsRatio95ConfIntLow = ""
+        cleanedResults[i].logOddsRatio95ConfIntHigh = ""
+        // cleanedResults[i].pValue = ""
+        // cleanedResults[i].oddsRatio = ""
+        // cleanedResults[i].confidenceInterval = ""
+        cleanedResults[i].totalSampleSize = ""
+        cleanedResults[i].logOddsRatio = ""
+        cleanedResults[i].chiSquareDOF = ""
+        cleanedResults[i].fisherExactOddsRatio = ""
+        cleanedResults[i].objectFeatureName = ""
+        cleanedResults[i].subjectFeatureName = ""
+        cleanedResults[i].chiSquaredStatistic = ""
+        cleanedResults[i].chiSquaredP = ""
+        cleanedResults[i].iceesCohortId = ""
+        // "total_sample_size"
+
+        console.log("element")
+        console.log(element)
+        console.log(element.edgeinfo)
+        console.log(element.edgeinfo.attributes)
+        for (let j = 0; j < element.edgeinfo.attributes.length; j++) {
+          const attribute = element.edgeinfo.attributes[j];
+
+          if(attribute.original_attribute_name == "log_odds_ratio_95_confidence_interval"){
+            cleanedResults[i].logOddsRatio95ConfIntLow = attribute.value[0]
+            cleanedResults[i].logOddsRatio95ConfIntHigh = attribute.value[1]
+            // console.log("log_odds_ratio_95_confidence_interval")
+            // console.log(attribute.value)
+          }
+          if(attribute.original_attribute_name == "object_feature_name"){
+            cleanedResults[i].objectFeatureName = attribute.value
+            // console.log("object_feature_name")
+            // console.log(attribute.value)
+          }
+          if(attribute.original_attribute_name == "total_sample_size"){
+            cleanedResults[i].totalSampleSize = attribute.value
+            // console.log("total_sample_size")
+            // console.log(attribute.value)
+          }
+          if(attribute.original_attribute_name == "log_odds_ratio"){
+            cleanedResults[i].logOddsRatio = attribute.value
+            // console.log("log_odds_ratio")
+            // console.log(attribute.value)
+          }
+
+          if(attribute.original_attribute_name == "chi_squared_dof"){
+            cleanedResults[i].chiSquareDOF = attribute.value
+            // console.log("chi_squared_dof")
+            // console.log(attribute.value)
+          }
+
+          if(attribute.original_attribute_name == "fisher_exact_odds_ratio"){
+            cleanedResults[i].fisherExactOddsRatio = attribute.value
+            // console.log("fisher_exact_odds_ratio")
+            // console.log(attribute.value)
+          }
+
+          if(attribute.original_attribute_name == "subject_feature_name"){
+            cleanedResults[i].subjectFeatureName = attribute.value
+            // console.log("subject_feature_name")
+            // console.log(attribute.value)
+          }
+          if(attribute.original_attribute_name == "chi_squared_statistic"){
+            cleanedResults[i].chiSquaredStatistic = attribute.value
+            // console.log("chi_squared_statistic")
+            // console.log(attribute.value)
+          }
+          if(attribute.original_attribute_name == "chi_squared_p"){
+            cleanedResults[i].chiSquaredP = attribute.value
+            // console.log("chi_squared_p")
+            // console.log(attribute.value)
+          }
+          if(attribute.original_attribute_name == "icees_cohort_identifier"){
+            cleanedResults[i].iceesCohortId = attribute.value
+            // console.log("icees_cohort_identifier")
+            // console.log(attribute.value)
+          }
+          if(attribute.original_attribute_name == "fisher_exact_p"){
+            cleanedResults[i].fisherExactP = attribute.value
+            // console.log("fisher_exact_p")
+            // console.log(attribute.value)
+          }
+          if(attribute.original_attribute_name == "p_value"){
+            cleanedResults[i].pValue = attribute.value
+            // console.log("p_value")
+            // console.log(attribute.value)
+          }
+          if(attribute.original_attribute_name == "odds_ratio"){
+            cleanedResults[i].oddsRatio = attribute.value
+            // console.log("odds_ratio")
+            // console.log(attribute.value)
+          }
+
+        }
+        
+      }
+
+      console.log("cleanedResults")
+      console.log(cleanedResults)
+      this.saveFile_ArrayJSONtoTable(cleanedResults, "cleanedResults")
+
+
+
+
+      
     },
 
     async ARSToTable(){
@@ -959,8 +1069,8 @@ export default {
     await this.ARSCleanResults() 
     console.log("ARSCleanResults")
 
-    console.log("this.ARSResults")
-    console.log(this.ARSResults)
+    // console.log("this.ARSResults")
+    // console.log(this.ARSResults)
 
     // var dt = new Date();
     // let year = new Date().getFullYear()
@@ -984,24 +1094,24 @@ export default {
     let cleanedFlatResults = await TrapiResultClean.flattenGetPublications(this.ARSResults)
     // let cleanedFlatResults = await TrapiResultClean.flattenGetPublications(cleanedDiabetesResults)
     console.log("cleanedFlatResults")
-    console.log(cleanedFlatResults)
+    // console.log(cleanedFlatResults)
     let flatTitle_flat = "Flatened - ALL - " + date + " " + this.ARSrequestID 
     this.saveFile_ArrayJSONtoTable(cleanedFlatResults.flatResults, flatTitle_flat)
     // 
 
 
     console.log("start cleanedFlatResults_textminer")
-    console.log(cleanedFlatResults.flatResults_textminer)
+    // console.log(cleanedFlatResults.flatResults_textminer)
     if(cleanedFlatResults.flatResults_textminer.length > 0){
       let cleanedFlatResults_textminer = await TrapiResultClean.fixPublicationsTextminer(cleanedFlatResults.flatResults_textminer)
       console.log("cleanedFlatResults_textminer")
-      console.log(cleanedFlatResults_textminer)
+      // console.log(cleanedFlatResults_textminer)
       
       // GET EDGE IDS TO ALL TEXTMINE EDGES TO CHECK FOR OTHER TYPES IN flatResultsPUBS
       let textMineEdgeIds = cleanedFlatResults_textminer.map(x => x.edgeId)
       usedPubEdges = [usedPubEdges, ...textMineEdgeIds]
       console.log("usedPubEdges - textmine")
-      console.log(usedPubEdges)
+      // console.log(usedPubEdges)
 
       let flatTitleTM = "Flatened - text mine Pubs - " + date + " " + this.ARSrequestID 
       this.saveFile_ArrayJSONtoTable(cleanedFlatResults_textminer, flatTitleTM)      
@@ -1012,17 +1122,17 @@ export default {
 
 
     console.log("start cleanedFlatResults_semmeddb")
-    console.log(cleanedFlatResults.flatResults_semmeddb)
+    // console.log(cleanedFlatResults.flatResults_semmeddb)
     if(cleanedFlatResults.flatResults_semmeddb.length > 0){
       let cleanedFlatResults_semmeddb = await TrapiResultClean.fixPublicationsSemmeddb(cleanedFlatResults.flatResults_semmeddb)
       console.log("cleanedFlatResults_semmeddb")
-      console.log(cleanedFlatResults_semmeddb)
+      // console.log(cleanedFlatResults_semmeddb)
 
       // GET EDGE IDS TO ALL SEMMED EDGES TO CHECK FOR OTHER TYPES IN flatResultsPUBS
       let semmmeddbEdgeIds = cleanedFlatResults_semmeddb.map(x => x.edgeId)
       usedPubEdges = [usedPubEdges, ...semmmeddbEdgeIds]
       console.log("usedPubEdges - SEMMED")
-      console.log(usedPubEdges)
+      // console.log(usedPubEdges)
 
       // SAVE THE FILE
       let flatTitleSemmed = "Flatened - semmeddb Pubs - " + date + " " + this.ARSrequestID 
@@ -1032,18 +1142,18 @@ export default {
     }
 
     console.log("start cleanedFlatResults_pfocr")
-    console.log(cleanedFlatResults.flatResults_pfocr)
+    // console.log(cleanedFlatResults.flatResults_pfocr)
     if(cleanedFlatResults.flatResults_pfocr.length > 0){
 
       let cleanedFlatResults_pfocr = await TrapiResultClean.fixPublicationspfocr(cleanedFlatResults.flatResults_pfocr)
       console.log("cleanedFlatResults_pfocr")
-      console.log(cleanedFlatResults_pfocr)
+      // console.log(cleanedFlatResults_pfocr)
 
       // GET EDGE IDS TO ALL PFOCR EDGES TO CHECK FOR OTHER TYPES IN flatResultsPUBS
       let pfocrEdgeIds = cleanedFlatResults_pfocr.map(x => x.edgeId)
       usedPubEdges = [usedPubEdges, ...pfocrEdgeIds]
       console.log("usedPubEdges - pfocr")
-      console.log(usedPubEdges)
+      // console.log(usedPubEdges)
 
       // SAVE THE FILE
       let flatTitlePfocr = "Flatened - pfocr Pubs - " + date + " " + this.ARSrequestID 
@@ -1073,7 +1183,7 @@ export default {
 
       let cleanedFlatResults_remainingPubs = await TrapiResultClean.fixPublicationsRemainingPubs(cleanedFlatResults.flatResults_remainingPubs)
       console.log("cleanedFlatResults_remainingPubs")
-      console.log(cleanedFlatResults_remainingPubs)
+      // console.log(cleanedFlatResults_remainingPubs)
 
       // SAVE THE FILE
       let flatTitleRemainingPubs = "Flatened - flatTitleRemainingPubs - " + date + " " + this.ARSrequestID 
@@ -1082,8 +1192,27 @@ export default {
       console.log("0 cleanedFlatResults_remainingPubs RESULTS")
     }
 
-    console.log("cleanedFlatResults DONE")
-    console.log(cleanedFlatResults)
+
+// #################################################### flattenGetPublications
+// ADD THE P VALUE INFO TO THE EDGE INFO
+// ####################################################
+
+    console.log("start cleanedFlatResults_cohd")
+    console.log(cleanedFlatResults.flatResults_COHD)
+    if(cleanedFlatResults.flatResults_COHD.length > 0){
+
+      let cleanedFlatResults_COHD = await TrapiResultClean.fixPublicationsCOHD(cleanedFlatResults.flatResults_COHD)
+      console.log("cleanedFlatResults_COHD")
+      console.log(cleanedFlatResults_COHD)
+
+      // SAVE THE FILE
+      let flatTitleCOHD = "Flatened - COHD w pvalue info - " + date + " " + this.ARSrequestID 
+      this.saveFile_ArrayJSONtoTable(cleanedFlatResults_COHD, flatTitleCOHD)
+    } else {
+      console.log("0 cleanedFlatResults_COHD RESULTS")
+    }
+
+
 // #################################################### flattenGetPublications
 // END -- UNCOMMMENT OUT BELOW
 // ####################################################
@@ -1157,11 +1286,19 @@ async getNameing (ARSStatus){
     for (let i = 0; i < nodeKeys.length; i++) {
       const node =nodeKeys[i];
       let nodeData  = {...nodes[node]}
+      console.log("nodeData")
       console.log(nodeData)
+      console.log("nodeData.ids")
+      console.log(nodeData.ids)
         if(Object.prototype.hasOwnProperty.call(nodeData, "name")){
           this.queryName = this.queryName + " " + node + "-" + nodeData.name
         } else if(Object.prototype.hasOwnProperty.call(nodeData, "ids")){
-          this.queryName = this.queryName + " " + node + "-" + nodeData.ids[0]
+          if(nodeData.ids != null){
+            this.queryName = this.queryName + " " + node + "-" + nodeData.ids[0]
+          } else {
+            this.queryName = "none "
+          }
+          
         } else if(Object.prototype.hasOwnProperty.call(nodeData, "categories")){
           this.queryName = this.queryName + " " + node + "-" + nodeData.categories[0]
         } else {
@@ -1536,11 +1673,11 @@ async resultEdgeGroupTable(){
     // for (let i = 0; i < 1; i++) {
       const res = this.allAnswerGraphArray[i].results.fields.data;
       let agent = this.allAnswerGraphArray[i].agent
-      console.log("-res")
-      console.log(res)
+      // console.log("-res")
+      // console.log(res)
       let results = res.message.results
-      console.log("--results")
-      console.log(results)
+      // console.log("--results")
+      // console.log(results)
       // GO THROUGH EACH RESULT
       for (let n = 0; n < results.length; n++) {
         const result = results[n];
@@ -1551,8 +1688,8 @@ async resultEdgeGroupTable(){
           const edgeKey = edgeKeys[x];
           let edge_bindingGroup = result.edge_bindings[edgeKey]
           // console.log(" ---------- node_bindingGroup and key = ", nodeKey)
-          // console.log(node_bindingGroup)
-          let tableRow = {"agent": agent, "resultGroup": n,  "key": edgeKey, "edgeID": ""}
+          console.log(result.normalizedScore)
+          let tableRow = {"agent": agent, "resultGroup": n, "agentResultGroup": agent + "-" + n  ,"key": edgeKey, "edgeID": "", normalizedScore: result.normalizedScore}
           //  EACH NODE IN ARRAY FOR EACH KEY
           for (let t = 0; t < edge_bindingGroup.length; t++) {
             // const element = array[t];
@@ -1618,7 +1755,8 @@ async resultNodeGroupTable(){
           //   console.log(node_bindingGroup.length)
           //   console.log("#########################")
           // }
-
+          
+          // let tableRow = {"agent": agent, "resultGroup": n, "agentResultGroup": agent + "-" + n  ,"key": edgeKey, "edgeID": "", normalizedScore: result.normalizedScore}
           let tableRow = {"agent": agent, "resultGroup": n,  "key": nodeKey, "nodeID": ""}
           //  EACH NODE IN ARRAY FOR EACH KEY
           for (let t = 0; t < node_bindingGroup.length; t++) {
@@ -1658,6 +1796,8 @@ async resultNodeGroupTable(){
 async araxCategoryGroup(){
 
     // ARSService.getARAXSynonyms
+    console.log("this.ARSResults")
+    console.log(this.ARSResults)
     for (let n = 0; n < this.ARSResults.length; n++) {
     // for (let n = 0; n < 10; n++) {
       console.log("GETTING araxCategoryGroup")
@@ -1996,17 +2136,17 @@ async araxCategoryGroup(){
                     if(Object.prototype.hasOwnProperty.call(result.fields.data, "message")){
                       // console.log("FOUND MESSAGE")
                       if(Object.prototype.hasOwnProperty.call(result.fields.data.message, "knowledge_graph")){
-                        // console.log("FOUND KNOWLEDGE GRAPH")
+                        console.log("FOUND KNOWLEDGE GRAPH")
                         // if(result.message.results.length > 0){
-                          console.log("MAY HAVE RESULTS - CHECKING")
-                          console.log(result.fields.data)
+                          // console.log("MAY HAVE RESULTS - CHECKING")
+                          // console.log(result.fields.data)
                           if(result.fields.data.message.results == null){
                             this.ARSResultStatus[agent].resultCount = 0
                             console.log("result.fields.data.message.results == null")
                           } else {
                             this.ARSResultStatus[agent].resultCount = result.fields.data.message.results.length
-                            console.log("result.fields.data.message.results.length")
-                            console.log(result.fields.data.message.results.length)
+                            // console.log("result.fields.data.message.results.length")
+                            // console.log(result.fields.data.message.results.length)
                           }
                           // this.ARSResultStatus[agent].resultCount = result.fields.data.message.results.length
                         
@@ -2054,6 +2194,7 @@ async araxCategoryGroup(){
       console.log("WENT TO NEXT STEP TO CLEAN RESULTS")
       this.ARSResults = []
       let keys = Object.keys(this.ARSResultStatus)
+      console.log("this.ARSResultStatus")
       console.log(this.ARSResultStatus)
       this.resultSetIDs = []
       // console.log(keys)
@@ -2098,7 +2239,7 @@ async araxCategoryGroup(){
 
                 // let cleanedResults = await TrapiResultClean.TrapiResultClean(this.ARSResultStatus[id].results.fields.data, id)
                 console.log("DATA GOING TO BE CLEANED")
-                // console.log(this.ARSResultStatus[id].results.fields.data)
+                console.log(this.ARSResultStatus[id].results.fields.data)
                 let cleanedResults = await TrapiResultClean.TrapiResultClean(this.ARSResultStatus[id].results.fields.data, id)
                 // console.log("cleanedResults")
                 // console.log(cleanedResults)
@@ -2117,7 +2258,7 @@ async araxCategoryGroup(){
               if (i == keys.length - 1){
                 console.log("this.ARSResults INSIDE IF CLAUSE")
                 console.log("this.ARSResults before")
-                console.log(this.ARSResults)    
+                // console.log(this.ARSResults)    
                 
                 // ### MAY NEED TO TURN BACK ON:
                 // if(this.filterSubject == true){
@@ -2681,7 +2822,13 @@ async araxCategoryGroup(){
             }
 
             try {
-              cell = cell.replace(/,/gi, ";");
+              //if cell is not undefined then replace commas with semicolons
+              if(cell){
+                cell = cell.replace(/,/gi, ";");
+              } else {
+                cell = ""
+              }
+
             } catch (err) {
               console.error(err);
             }

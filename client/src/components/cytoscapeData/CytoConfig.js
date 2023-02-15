@@ -101,9 +101,12 @@ const CytoConfig = {
           width: 3,
           "curve-style": "bezier",
           "line-color": "#cccccc",
-          "target-arrow-color": "#cccccc",
-          // "target-arrow-shape": "vee",
-          // "arrow-scale": 2
+          // "target-arrow-color": "#cccccc", 
+          // "target-arrow-color": "#FF0000",
+          "target-arrow-color": "#a9a9a9",
+          // "target-arrow-color": "",
+          "target-arrow-shape": "vee",
+          "arrow-scale": 2
           // "curve-style": "taxi"
         }
       },
@@ -113,12 +116,41 @@ const CytoConfig = {
           width: 3,
           "curve-style": "bezier",
           "line-color": "#379bdb",
-          "target-arrow-color": "#379bdb",
+          // "target-arrow-color": "#379bdb",
+          "target-arrow-color": "#FF0000",
           // "target-arrow-shape": "vee",
           // "arrow-scale": 2
           // "curve-style": "taxi"
         }
       }, 
+      {
+        selector: ".pathEdge",
+        style: {
+          width: 6,
+          "curve-style": "bezier",
+          "line-color": "#000000",
+          // "target-arrow-color": "#379bdb",
+          "target-arrow-color": "#FF0000",
+          // "target-arrow-shape": "vee",
+          // "arrow-scale": 2
+          // "curve-style": "taxi"
+        }
+      }, 
+      {
+        selector: ".pathNode",
+        // style: { "background-color": "#000000"}
+        css: {
+          // 'background-color': '#000000',
+          // 'width': 3,
+          'line-color': '#008c95',
+          // 'target-arrow-color': '#008c95',
+          // 'source-arrow-color': '#008c95',
+          'border-width' : '6px',
+          'border-color' : '#000000',
+          // 'border-opacity' : '0.3'
+        }
+      },
+
       {
         selector: ':selected',
         // style: {

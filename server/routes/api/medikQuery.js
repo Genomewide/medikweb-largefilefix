@@ -33,7 +33,7 @@ const queryurl = 'http://localhost:8080/v2/query'
 //         "n2": {
 //           "id": "UMLS:C1417026"
 //         },
- 
+
 //         "n4": {
 //           "category": "chem"
 //         }
@@ -58,7 +58,7 @@ const formData = {
         "n2": {
           "id": "UMLS:C1417026"
         },
- 
+
         "n4": {
           "category": "chem"
         }
@@ -206,7 +206,7 @@ function processDataset(result, terms) {
                   edgeInfo.publications = []
                   edgeInfo.pubLength = 0                 
                 }
-               
+              
                 }
               });
 

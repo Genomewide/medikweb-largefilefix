@@ -12,6 +12,7 @@
     "bootstrap": "^4.6.0",
     "bootstrap-vue": "^2.21.2",
     "core-js": "^3.6.5",
+    "cytoscape-all-paths": "^0.1.0",
     "cytoscape-klay": "^3.1.4",
     "d2b": "^1.0.12",
     "d3": "^7.0.1",

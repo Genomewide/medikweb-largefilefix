@@ -19,7 +19,7 @@ const formData =
     "query_graph": {
       "nodes": {
         "n1": { "category": "chem" },
-        "n2": { "id": "PR:0000queryjs10162" }
+        "n2": { "id": "PR:000010162" }
       },
       "edges": {
         "e0": {

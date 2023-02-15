@@ -43,6 +43,7 @@ class TrapiResultClean {
               data.diseaseKey = ""
               data.drugKey = ""
               data.resNodeCount = 0
+              data.normalizedScore = resultData.normalized_score
               try{
                 data.diseaseKey = resultData.node_bindings.disease[0].id
                 data.drugKey = resultData.node_bindings.drug[0].id
@@ -583,8 +584,16 @@ class TrapiResultClean {
 
         if(i == cleanTrapiResults.length - 1){
           // #################
+          // GET SET THAT IS FROM kp-cohd
+          // ################# 
+          let flatResults_COHD = flatResults.filter(x => x.agent == "kp-cohd")
+          console.log("flatResults_COHD")
+          console.log(flatResults_COHD)
+
+          // #################
           // REMOVE NODE ATTRIBUTES BC THEY ARE TOO LONG FOR EXCEL SOMETIMES AND BREAK THE FORMAT
           // ################# 
+
           for (let n = 0; n < flatResults.length; n++) {
 
             // const flatResult = flatResults[n];
@@ -592,7 +601,7 @@ class TrapiResultClean {
             // flatResults[n].subjectAtt = null
             // flatResults[n].edgeinfo = null
             if(n == flatResults.length - 1){
-              resolve({"flatResults": flatResults, "flatResultsPUBS": flatResultsPUBS, "flatResults_semmeddb": flatResults_semmeddb, "flatResults_textminer" : flatResults_textminer, "flatResults_pfocr": flatResults_pfocr,"flatResults_Other" : flatResults_Other})
+              resolve({"flatResults": flatResults, "flatResultsPUBS": flatResultsPUBS, "flatResults_semmeddb": flatResults_semmeddb, "flatResults_textminer" : flatResults_textminer, "flatResults_pfocr": flatResults_pfocr,"flatResults_Other" : flatResults_Other, "flatResults_COHD": flatResults_COHD})
             }
           }
           
@@ -603,6 +612,117 @@ class TrapiResultClean {
     });
 
   }
+
+// fixPublicationsCOHD
+static fixPublicationsCOHD(TrapiResults) {
+  console.log("started fixPublicationspfocr");
+  return new Promise(async (resolve, reject) => { // eslint-disable-line
+    let resultWithPvalueArray = []
+    for (let i = 0; i < TrapiResults.length; i++) {
+      const res = {...TrapiResults[i]}
+      res.dataSet = ""
+      res.concept_pair_count = ""
+      res.concept_count_subject = ""
+      res.concept_count_object = ""
+      res.dataset_id = ""
+      res.unadjusted_p_value = ""
+      res.bonferonni_adjusted_p_value = ""
+      res.supporting_data_set = ""
+      res.expected_count = ""
+      res.ln_ratio = ""
+      res.ln_ratio_confidence_interval = ""
+      res.relative_frequency_subject = ""
+      res.relative_frequency_subject_confidence_interval = ""
+      res.relative_frequency_object = ""
+      res.relative_frequency_object_confidence_interval = ""
+
+      let edgeinfoAtt = res.edgeinfo.attributes
+      // CONSOLE LOG RES IF I < 10
+      if(i < 10){
+        console.log("##### res")
+        console.log(res)
+      }
+
+
+      //CHECK EACH ATTRIBUTE TO LOOK FOR STUDY PVALUE INFORMATION
+      for (let x = 0; x < edgeinfoAtt.length; x++) {
+        const att = edgeinfoAtt[x];
+
+
+        if(att.attribute_type_id == "biolink:has_supporting_study_result"){
+          let attAtts = att.attributes
+          //GET ALL FIELDS ABOVE FROM ATTRIBUTES OF EDGEINFO
+          for (let n = 0; n < attAtts.length; n++) {
+            const attAtt = attAtts[n];
+            let attName = attAtt.attribute_type_id.split(":")[1]
+
+            if(i < 10){
+              console.log("attAtts")
+              console.log(attAtts)
+              console.log("attAtt")
+              console.log(attAtt)
+            }
+            
+            switch(attName){
+              case "dataset_id":
+                res.dataset_id = attAtt.value
+                break;
+              case "concept_pair_count":
+                res.concept_pair_count = attAtt.value
+                break;
+              case "concept_count_subject":
+                res.concept_count_subject = attAtt.value
+                break;
+              case "concept_count_object":
+                res.concept_count_object = attAtt.value
+                break;
+              case "unadjusted_p_value":
+                res.unadjusted_p_value = attAtt.value
+                break;
+              case "bonferonni_adjusted_p_value":
+                res.bonferonni_adjusted_p_value = attAtt.value
+                break;
+              case "supporting_data_set":
+                res.supporting_data_set = attAtt.value
+                break;
+              case "expected_count":
+                res.expected_count = attAtt.value
+                break;
+              case "ln_ratio":
+                res.ln_ratio = attAtt.value
+                break;
+              case "ln_ratio_confidence_interval":
+                res.ln_ratio_confidence_interval = attAtt.value
+                break;
+              case "relative_frequency_subject":
+                res.relative_frequency_subject = attAtt.value
+                break;
+              case "relative_frequency_subject_confidence_interval":
+                res.relative_frequency_subject_confidence_interval = attAtt.value
+                break;
+              case "relative_frequency_object":
+                res.relative_frequency_object = attAtt.value
+                break;
+              case "relative_frequency_object_confidence_interval":
+                res.relative_frequency_object_confidence_interval = attAtt.value
+                break;
+            }
+          }
+  
+        }
+        if(x == edgeinfoAtt.length - 1){
+          resultWithPvalueArray.push({...res})
+        }
+        
+      }
+      if(i == TrapiResults.length - 1){
+        resolve(resultWithPvalueArray)
+      }
+    }
+  })
+}
+
+
 
 //infores:pfocr flatTitle_remainingPubs
   static fixPublicationsRemainingPubs(TrapiResults) {

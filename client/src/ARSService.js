@@ -33,7 +33,65 @@ class ARSService {
     return new Promise(async (resolve, reject) => { // eslint-disable-line
       // ARAXquery_gg.message.query_graph.nodes.n00.ids = [searchterm]
       // console.log(ARAXquery_gg)
+      // let url = "https://ars.test.transltr.io/ars/api/messages/" + queryID + "?trace=y"
       let url = "https://ars-prod.transltr.io/ars/api/messages/" + queryID + "?trace=y"
+      // let url = 'https://arax.ncats.io/api/arax/v1.2/query'
+      console.log("ARSStatus url = ", url)
+      try {
+        const res = await axios.get(url);
+        const data = res.data;
+        // });
+  
+        // console.log("ARSStatus ran")
+        // console.log(data)
+        resolve(data);
+      } catch (err) {
+        reject(err);
+      }
+    });
+  }
+
+
+  // https://ars.test.transltr.io/ars/api/messages/4de7052a-51e8-4967-ab52-9d76ee1bf2c3?trace=y
+
+  static pkQueryDataTest = (queryID) => {
+    //https://arax.ncats.io/api/arax/v1.2/response/4423a078-f43e-4935-ad72-5938ab0bc7a5
+    // console.log(searchterm) 
+    // console.log(ARAXquery_gg) 
+    // console.log("started getSynonyms");
+    return new Promise(async (resolve, reject) => { // eslint-disable-line
+      // ARAXquery_gg.message.query_graph.nodes.n00.ids = [searchterm]
+      // console.log(ARAXquery_gg)
+      let url = "https://ars-prod.transltr.io/ars/api/messages/" + queryID
+      // let url = "https://ars.test.transltr.io/ars/api/messages/" + queryID
+      // let url = 'https://arax.ncats.io/api/arax/v1.2/query'
+      console.log("ARSStatus url = ", url)
+      try {
+        const res = await axios.get(url);
+        const data = res.data;
+        // });
+  
+        // console.log("ARSStatus ran")
+        // console.log(data)
+        resolve(data);
+      } catch (err) {
+        reject(err);
+      }
+    });
+  }
+
+  static pkQueryData = (queryID) => {
+    console.log("start pkQueryData")
+    //https://arax.ncats.io/api/arax/v1.2/response/4423a078-f43e-4935-ad72-5938ab0bc7a5
+    // console.log(searchterm) 
+    // console.log(ARAXquery_gg) 
+    // console.log("started getSynonyms");
+    return new Promise(async (resolve, reject) => { // eslint-disable-line
+      // ARAXquery_gg.message.query_graph.nodes.n00.ids = [searchterm]
+      // console.log(ARAXquery_gg)
+                //  https://ars.test.transltr.io/ars/api/messages/
+      // let url = "https://ars.test.transltr.io/ars/api/messages/" + queryID
+      let url = "https://ars-prod.transltr.io/ars/api/messages/" + queryID
       // let url = 'https://arax.ncats.io/api/arax/v1.2/query'
       console.log("ARSStatus url = ", url)
       try {
@@ -57,7 +115,8 @@ class ARSService {
     // console.log("started getSynonyms");
     return new Promise(async (resolve, reject) => { // eslint-disable-line
       // ARAXquery_gg.message.query_graph.nodes.n00.ids = [searchterm]
-      // console.log(ARAXquery_gg)
+      // console.log(ARAXquery_gg) 
+      // let url = "https://ars.test.transltr.io/ars/api/messages/" + queryID
       let url = "https://ars-prod.transltr.io/ars/api/messages/" + queryID
       // let url = 'https://arax.ncats.io/api/arax/v1.2/query'
       console.log("ARSStatus url = ", url)
@@ -83,6 +142,7 @@ class ARSService {
     return new Promise(async (resolve, reject) => { // eslint-disable-line
       // ARAXquery_gg.message.query_graph.nodes.n00.ids = [searchterm]
       // console.log(ARAXquery_gg)
+      // let url = "https://ars.test.transltr.io/ars/api/messages/" + queryID
       let url = "https://ars-prod.transltr.io/ars/api/messages/" + queryID
       // let url = 'https://arax.ncats.io/api/arax/v1.2/query'
       // console.log(ARAXquery_gg)
@@ -101,10 +161,12 @@ class ARSService {
   }
 
   static ARSResultCheck = (queryID) => {
+    console.log("start ARSResultCheck")
 
     return new Promise(async (resolve, reject) => { // eslint-disable-line
 
       let url = "https://arax.ncats.io/api/arax/v1.2/response/" + queryID
+      // let url = "https://arax.ncats.io/api/arax/v1.2/response/" + queryID
       // let url = 'https://arax.ncats.io/api/arax/v1.2/query'
       // console.log(ARAXquery_gg)
       try {

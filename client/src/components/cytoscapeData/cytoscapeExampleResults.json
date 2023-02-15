@@ -1,0 +1,296 @@
+[
+    {
+        "drugKey": "CHEMBL.COMPOUND:CHEMBL2103841",
+        "count": 133,
+        "text": "CANAGLIFLOZIN (133)",
+        "value": "CHEMBL.COMPOUND:CHEMBL2103841"
+    },
+    {
+        "drugKey": "CHEMBL.COMPOUND:CHEMBL408",
+        "count": 133,
+        "text": "TROGLITAZONE (133)",
+        "value": "CHEMBL.COMPOUND:CHEMBL408"
+    },
+    {
+        "drugKey": "CHEMBL.COMPOUND:CHEMBL1697838",
+        "count": 125,
+        "text": "GLYMIDINE (125)",
+        "value": "CHEMBL.COMPOUND:CHEMBL1697838"
+    },
+    {
+        "drugKey": "CHEMBL.COMPOUND:CHEMBL2018096",
+        "count": 119,
+        "text": "IPRAGLIFLOZIN (119)",
+        "value": "CHEMBL.COMPOUND:CHEMBL2018096"
+    },
+    {
+        "drugKey": "CHEMBL.COMPOUND:CHEMBL2104391",
+        "count": 101,
+        "text": "INSULIN DETEMIR (101)",
+        "value": "CHEMBL.COMPOUND:CHEMBL2104391"
+    },
+    {
+        "drugKey": "CHEMBL.COMPOUND:CHEMBL2107869",
+        "count": 99,
+        "text": "INSULIN DEGLUDEC (99)",
+        "value": "CHEMBL.COMPOUND:CHEMBL2107869"
+    },
+    {
+        "drugKey": "CHEMBL.COMPOUND:CHEMBL249263",
+        "count": 95,
+        "text": "(S)-NATEGLINIDE (95)",
+        "value": "CHEMBL.COMPOUND:CHEMBL249263"
+    },
+    {
+        "drugKey": "CHEMBL.COMPOUND:CHEMBL476960",
+        "count": 93,
+        "text": "VOGLIBOSE (93)",
+        "value": "CHEMBL.COMPOUND:CHEMBL476960"
+    },
+    {
+        "drugKey": "ATC:A10AB05",
+        "count": 91,
+        "text": "INSULIN ASPART (91)",
+        "value": "ATC:A10AB05"
+    },
+    {
+        "drugKey": "CHEMBL.COMPOUND:CHEMBL427216",
+        "count": 85,
+        "text": "GLICLAZIDE (85)",
+        "value": "CHEMBL.COMPOUND:CHEMBL427216"
+    },
+    {
+        "drugKey": "PUBCHEM.COMPOUND:4091",
+        "count": 43,
+        "text": "Metformin (43)",
+        "value": "PUBCHEM.COMPOUND:4091"
+    },
+    {
+        "drugKey": "PUBCHEM.COMPOUND:65064",
+        "count": 41,
+        "text": "(-)-Epigallocatechin gallate (41)",
+        "value": "PUBCHEM.COMPOUND:65064"
+    },
+    {
+        "drugKey": "PUBCHEM.COMPOUND:24812758",
+        "count": 39,
+        "text": "Canagliflozin (39)",
+        "value": "PUBCHEM.COMPOUND:24812758"
+    },
+    {
+        "drugKey": "PUBCHEM.COMPOUND:65981",
+        "count": 36,
+        "text": "Repaglinide (36)",
+        "value": "PUBCHEM.COMPOUND:65981"
+    },
+    {
+        "drugKey": "PUBCHEM.COMPOUND:5284627",
+        "count": 36,
+        "text": "Topiramate (36)",
+        "value": "PUBCHEM.COMPOUND:5284627"
+    },
+    {
+        "drugKey": "PUBCHEM.COMPOUND:444020",
+        "count": 34,
+        "text": "Voglibose (34)",
+        "value": "PUBCHEM.COMPOUND:444020"
+    },
+    {
+        "drugKey": "PUBCHEM.COMPOUND:24857286",
+        "count": 31,
+        "text": "Fasiglifam (31)",
+        "value": "PUBCHEM.COMPOUND:24857286"
+    },
+    {
+        "drugKey": "PUBCHEM.COMPOUND:977",
+        "count": 30,
+        "text": "oxygen (30)",
+        "value": "PUBCHEM.COMPOUND:977"
+    },
+    {
+        "drugKey": "PUBCHEM.COMPOUND:41781",
+        "count": 30,
+        "text": "Torsemide (30)",
+        "value": "PUBCHEM.COMPOUND:41781"
+    },
+    {
+        "drugKey": "PUBCHEM.COMPOUND:118984445",
+        "count": 29,
+        "text": "INSULIN ASPART (29)",
+        "value": "PUBCHEM.COMPOUND:118984445"
+    },
+    {
+        "drugKey": "PUBCHEM.COMPOUND:943",
+        "count": 29,
+        "text": "Nitrate (29)",
+        "value": "PUBCHEM.COMPOUND:943"
+    },
+    {
+        "drugKey": "PUBCHEM.COMPOUND:187",
+        "count": 28,
+        "text": "Acetylcholine (28)",
+        "value": "PUBCHEM.COMPOUND:187"
+    },
+    {
+        "drugKey": "PUBCHEM.COMPOUND:9871419",
+        "count": 28,
+        "text": "Ticagrelor (28)",
+        "value": "PUBCHEM.COMPOUND:9871419"
+    },
+    {
+        "drugKey": "PUBCHEM.COMPOUND:444",
+        "count": 28,
+        "text": "Bupropion (28)",
+        "value": "PUBCHEM.COMPOUND:444"
+    },
+    {
+        "drugKey": "PUBCHEM.COMPOUND:11953153",
+        "count": 27,
+        "text": "gemigliptin (27)",
+        "value": "PUBCHEM.COMPOUND:11953153"
+    },
+    {
+        "drugKey": "PUBCHEM.COMPOUND:25022354",
+        "count": 27,
+        "text": "evogliptin (27)",
+        "value": "PUBCHEM.COMPOUND:25022354"
+    },
+    {
+        "drugKey": "PUBCHEM.COMPOUND:92092",
+        "count": 27,
+        "text": "FRUCTOSE (27)",
+        "value": "PUBCHEM.COMPOUND:92092"
+    },
+    {
+        "drugKey": "PUBCHEM.COMPOUND:9564",
+        "count": 26,
+        "text": "carbutamide (26)",
+        "value": "PUBCHEM.COMPOUND:9564"
+    },
+    {
+        "drugKey": "PUBCHEM.COMPOUND:11949652",
+        "count": 26,
+        "text": "teneligliptin (26)",
+        "value": "PUBCHEM.COMPOUND:11949652"
+    },
+    {
+        "drugKey": "PUBCHEM.COMPOUND:46209133",
+        "count": 26,
+        "text": "omarigliptin (26)",
+        "value": "PUBCHEM.COMPOUND:46209133"
+    },
+    {
+        "drugKey": "PUBCHEM.COMPOUND:208901",
+        "count": 26,
+        "text": "Tesaglitazar (26)",
+        "value": "PUBCHEM.COMPOUND:208901"
+    },
+    {
+        "drugKey": "PUBCHEM.COMPOUND:3194",
+        "count": 26,
+        "text": "Ebselen (26)",
+        "value": "PUBCHEM.COMPOUND:3194"
+    },
+    {
+        "drugKey": "PUBCHEM.COMPOUND:2318",
+        "count": 26,
+        "text": "Benfluorex (26)",
+        "value": "PUBCHEM.COMPOUND:2318"
+    },
+    {
+        "drugKey": "PUBCHEM.COMPOUND:5437",
+        "count": 26,
+        "text": "THIAZOLIDINEDIONE (26)",
+        "value": "PUBCHEM.COMPOUND:5437"
+    },
+    {
+        "drugKey": "PUBCHEM.COMPOUND:44814423",
+        "count": 25,
+        "text": "ERTUGLIFLOZIN (25)",
+        "value": "PUBCHEM.COMPOUND:44814423"
+    },
+    {
+        "drugKey": "PUBCHEM.COMPOUND:11243969",
+        "count": 25,
+        "text": "SAXAGLIPTIN (25)",
+        "value": "PUBCHEM.COMPOUND:11243969"
+    },
+    {
+        "drugKey": "PUBCHEM.COMPOUND:3108",
+        "count": 25,
+        "text": "Dipyridamole (25)",
+        "value": "PUBCHEM.COMPOUND:3108"
+    },
+    {
+        "drugKey": "PUBCHEM.COMPOUND:15983988",
+        "count": 23,
+        "text": "Trelagliptin (23)",
+        "value": "PUBCHEM.COMPOUND:15983988"
+    },
+    {
+        "drugKey": "PUBCHEM.COMPOUND:4810",
+        "count": 23,
+        "text": "Moxonidine (23)",
+        "value": "PUBCHEM.COMPOUND:4810"
+    },
+    {
+        "drugKey": "PUBCHEM.COMPOUND:4008",
+        "count": 23,
+        "text": "Manidipine (23)",
+        "value": "PUBCHEM.COMPOUND:4008"
+    },
+    {
+        "drugKey": "PUBCHEM.COMPOUND:11226090",
+        "count": 22,
+        "text": "Taranabant (22)",
+        "value": "PUBCHEM.COMPOUND:11226090"
+    },
+    {
+        "drugKey": "PUBCHEM.COMPOUND:3652",
+        "count": 22,
+        "text": "hydroxychloroquine (22)",
+        "value": "PUBCHEM.COMPOUND:3652"
+    },
+    {
+        "drugKey": "PUBCHEM.COMPOUND:24083",
+        "count": 22,
+        "text": "Magnesium sulfate (22)",
+        "value": "PUBCHEM.COMPOUND:24083"
+    },
+    {
+        "drugKey": "PUBCHEM.COMPOUND:5939",
+        "count": 21,
+        "text": "biguanide (21)",
+        "value": "PUBCHEM.COMPOUND:5939"
+    },
+    {
+        "drugKey": "PUBCHEM.COMPOUND:44513473",
+        "count": 21,
+        "text": "ANAGLIPTIN (21)",
+        "value": "PUBCHEM.COMPOUND:44513473"
+    },
+    {
+        "drugKey": "PUBCHEM.COMPOUND:9826451",
+        "count": 21,
+        "text": "Lobeglitazone (21)",
+        "value": "PUBCHEM.COMPOUND:9826451"
+    },
+    {
+        "drugKey": "PUBCHEM.COMPOUND:5401",
+        "count": 21,
+        "text": "Terazosin (21)",
+        "value": "PUBCHEM.COMPOUND:5401"
+    },
+    {
+        "drugKey": "PUBCHEM.COMPOUND:25195624",
+        "count": 21,
+        "text": "bexagliflozin (21)",
+        "value": "PUBCHEM.COMPOUND:25195624"
+    },
+    {
+        "drugKey": "PUBCHEM.COMPOUND:4829",
+        "count": 21,
+        "text": "Pioglitazone (21)",
+        "value": "PUBCHEM.COMPOUND:4829"
+    }
+]

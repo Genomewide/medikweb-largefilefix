@@ -29,12 +29,12 @@
                       v-on:click="getAllEdges"
                       >getAllEdges</b-button
                     >              
-                    <!-- <b-button 
+                    <b-button 
                       style="margin-left: 10px"
                       variant="success"
-                      v-on:click="testGroupBy"
-                      >testGroupBy</b-button
-                    >    -->
+                      v-on:click="testMedik"
+                      >testMedik</b-button
+                    >   
 
                     <div
                       style="padding-left: 10px"
@@ -314,7 +314,33 @@
               </div>
           </b-tab>
           <b-tab title="Diagram">
-<conceptExploreComponent :conceptData="tree" />
+            <div class="border border-primary rounded" >
+        <!-- <cytoscape ref="cyRef" :config="config" v-on:mousedown="addNode" v-on:cxttapstart="updateNode"> -->
+        <!-- <cytoscape :key="keyCounter" ref="cyto" :config="config" :preConfig="preConfig" :afterCreated="updateGraph"> -->
+        <cytoscape
+          :key="keyCounter"
+          ref="cyto"
+          :config="config"
+          :preConfig="preConfig"
+        >
+          <!-- <cytoscape :key="keyCounter" ref="cyto" :config="config"  > -->
+          <cy-element
+            ref="cy"
+            v-for="def in elements"
+            :key="`${def.data.id}`"
+            :definition="def"
+            v-on:mousedown="deleteNode($event, def, def.data, def.data.id)"
+          />
+          <!-- <cy-element
+          ref="cy"
+          v-for="def in elements"
+          :key="`${def.data.id}`"
+          :definition="def"
+          v-on:mousedown="deleteNode($event, def.data.id)"
+        /> -->
+        </cytoscape>
+      </div>
+<!-- <conceptExploreComponent :conceptData="tree" /> -->
  <!-- {{testjson}} -->
           </b-tab>
         </b-tabs>
@@ -334,28 +360,46 @@ import TrapiResultClean from "../TrapiResultClean";
 var parser = require("fast-xml-parser");
 import axios from "axios";
 // conceptExploreComponent
-import conceptExploreComponent from "./conceptExploreComponent";
+// import conceptExploreComponent from "./conceptExploreComponent";
 
 // import * as d3 from "d3";
 
 import testjson from "./testjson.json"
 
-// import got from 'got';
-// const EventEmitter = require("events");
+import config3 from "./cytoscapeData/CytoConfig";
+// import config2 from "./cytoscapeData/CytoConfig2";
+// import cytoData from "../assets/diabetesTreatsCleaned.json";
+import cytoscape from "cytoscape";
+import klay from "cytoscape-klay";
 
-// class MyEmitter extends EventEmitter {}
-// const eventEmitter = new MyEmitter();
+// console.log("config");
+// console.log(config);
+// const elements = [config.elements];
+// delete config.elements;
+console.log("config3");
+console.log(config3);
+const elements = [...config3.elements];
+// const modalElements = [...config2.elements];
+delete config3.elements;
+// delete config2.elements;
+// console.log("cytoData");
+// console.log(cytoData);
 
 export default {
   name: "ConceptExplorerPlus",
-     components: {
- conceptExploreComponent
-  },
+//      components: {
+//  conceptExploreComponent
+//   },
   // mounted: function () {
 
   // },
   data() {
     return {
+      cytoscape,
+      config3,
+      elements,
+      klay: klay,
+      keyCounter: 0,
       testjson: testjson,
       error: "",
       text: "",
@@ -506,6 +550,204 @@ export default {
     };
   },
   methods: {
+
+    async testMedik(){
+      console.log("testMedik")
+      // let nodes = []
+      let queryForward = {"message": {"query_graph": {"nodes": {"n1": {},"n2": {"id": "HGNC:6884"}},"edges": {"e1": {"subject": "n1","object": "n2"}}}}}
+      let queryBackward = {"message": {"query_graph": {"nodes": {"n1": {},"n2": {"id": "HGNC:6884"}},"edges": {"e1": {"subject": "n2","object": "n1"}}}}}
+      let queryResultsForward = await PostService.query_raw(queryForward)
+      let queryResultsBackward = await PostService.query_raw(queryBackward)
+      console.log(queryResultsForward)
+      console.log(queryResultsBackward)
+      console.log("elements")
+      console.log(elements)
+
+      // let cleanedResultsForward = await this.cleanMedikResults(queryResultsForward)
+      // console.log("cleanedResultsForward")
+      // console.log(cleanedResultsForward)
+
+      // let cleanedResultsBackward = await this.cleanMedikResults(queryResultsBackward)
+      // console.log("cleanedResultsBackward")
+      // console.log(cleanedResultsBackward)
+    
+    let forwardNodes = queryResultsForward.message.knowledge_graph.nodes
+    console.log("forwardNodes")
+    console.log(forwardNodes)
+
+    let forwardCytoNodes = this.getNodesFromTrapi(forwardNodes)
+    console.log("forwardCytoNodes")
+    console.log(forwardCytoNodes)
+
+    let forwardEdges = queryResultsForward.message.knowledge_graph.edges
+    console.log("forwardEdges")
+    console.log(forwardEdges)
+
+    let forwardCytoEdges = this.getEdgesFromTrapi(forwardEdges)
+    console.log("forwardCytoEdges")
+    console.log(forwardCytoEdges)
+
+    let backwardNodes = queryResultsBackward.message.knowledge_graph.nodes
+    console.log("backwardNodes")
+    console.log(backwardNodes)
+
+    let backwardCytoNodes = this.getNodesFromTrapi(backwardNodes)
+    console.log("backwardCytoNodes")
+    console.log(backwardCytoNodes)
+
+    let backwardEdges = queryResultsBackward.message.knowledge_graph.edges
+    console.log("backwardEdges")
+    console.log(backwardEdges)
+
+    let backwardCytoEdges = this.getEdgesFromTrapi(backwardEdges)
+    console.log("backwardCytoEdges")
+    console.log(backwardCytoEdges)
+
+    // let uniqueNodes = []
+    // let uniqueEdges = []
+
+    console.log("GOT THEM ALL")
+    this.elements = [elements, ...forwardCytoNodes, ...backwardCytoNodes, ...forwardCytoEdges, ...backwardCytoEdges]
+
+
+
+    },
+    getNodesFromTrapi(nodes){
+      let nodesKeys = Object.keys(nodes)
+      let nodesList = []
+      for (let i = 0; i < nodesKeys.length; i++){
+        const node = nodesKeys[i];
+        let nodeInfo = nodes[node]
+        // console.log("nodeInfo")
+        // console.log(nodeInfo)
+        // console.log(nodeInfo.name)
+        // console.log(node)
+        let cytoNode = {}
+        cytoNode.data = {}
+        cytoNode.data.id = ""
+        cytoNode.data.name = ""
+        let fixNodeName = ""
+
+        if(nodeInfo.name == false){
+          // console.log("getting name")
+          // console.log(nodeInfo.name)
+          fixNodeName = node.split(":").join("_")
+        } else {
+          // console.log("else getting name")
+          fixNodeName = nodeInfo.name.split(" ").join("_")
+        }
+
+        // let fixNodeName = nodeInfo.name.split(" ").join("_");
+        let fixNodeId = node.split(":").join("_");
+        let fixNodeGroup = nodeInfo.category.split(":")[1]
+
+        cytoNode.data.name = fixNodeName
+        cytoNode.data.id = fixNodeId
+        cytoNode.data.category = nodeInfo.category
+        cytoNode.group = fixNodeGroup
+
+        nodesList.push(cytoNode)
+      }
+      return nodesList
+    },
+
+    getEdgesFromTrapi(edges){
+      let edgesKeys = Object.keys(edges)
+      let edgesList = []
+    //  {
+    //     data: { id: "ca", source: "c", target: "a" },
+    //     group: "edges"
+    //   }
+      for (let i = 0; i < edgesKeys.length; i++){
+        const edge = edgesKeys[i];
+        let edgeInfo = edges[edge]
+        let cytoEdge = {}
+        cytoEdge.data = {}
+        cytoEdge.data.id = ""
+        cytoEdge.data.source = ""
+        cytoEdge.data.target = ""
+        cytoEdge.data.edgeId = edge
+        cytoEdge.group = "edges"
+
+        let source = edgeInfo.subject.split(":").join("_");
+        let target = edgeInfo.object.split(":").join("_");
+        let edgeId = source & "_" & target
+
+
+        cytoEdge.data.id = edgeId
+        cytoEdge.data.source = source
+        cytoEdge.data.target = target
+
+        edgesList.push(cytoEdge)
+
+      }
+      return edgesList
+    },
+    cleanMedikResults(resultsToClean){
+      return new Promise(async (resolve, reject) => { // eslint-disable-line
+
+      // GET THE EDGE AND THEN USE THE NODE DATA TO ADD IN THE NODE INFORMATION
+      console.log("cleanMedikResults")
+      console.log(resultsToClean)
+      console.log(resultsToClean.message)
+      console.log(resultsToClean.message.knowledge_graph)
+      // get edges
+      let edges = resultsToClean.message.knowledge_graph.edges
+      let edgesKeys = Object.keys(edges)
+      
+      let nodes = resultsToClean.message.knowledge_graph.nodes
+      let results = []
+
+      for (let i = 0; i < edgesKeys.length; i++){
+        const edge = edgesKeys[i];
+
+        let fullEdge = edges[edge]
+
+        // fullEdge.subjectName = nodes[fullEdge.subject].name
+        // get the subject and object
+        let subjectInfo = nodes[fullEdge.subject]
+        let objectInfo = nodes[fullEdge.object]
+        // get the subject and object name
+        
+        fullEdge.subjectName = subjectInfo.name
+        fullEdge.objectName = objectInfo.name
+        // get the subject category
+        fullEdge.subjectCategory = subjectInfo.category
+        fullEdge.objectCategory = objectInfo.category
+        // get the subject and object attributes
+        fullEdge.subjectAttributes = subjectInfo.attributes
+        fullEdge.objectAttributes = objectInfo.attributes
+
+        results.push(fullEdge)
+      }
+
+      resolve(results) 
+
+      });
+      
+    },
+
+    loadCytosccapeDataFromCleanedResults(cleanedResults){
+      console.log("loadCytosccapeDataFromCleanedResults")
+      console.log(cleanedResults)
+
+    },
+    preConfig(cytoscape) {
+      console.log("preConfig");
+      console.log("cytoscape")
+      console.log(cytoscape)
+      // console.log('this.$refs["cy-element"]')
+      // console.log(this.$refs["cy-element"])
+      // console.log("this.$refs.cy")
+      // console.log(this.$refs.cy)
+      // console.log("document.getElementById('cytoscape-div')")
+      // console.log(document.getElementById('cytoscape-div').clientHeight)
+      // console.log(document.getElementById('cytoscape-div').clientWidth)
+      // // cy-element
+      // console.log("this.$refs.cy.instance")
+      // console.log(this.$refs.cy.instance)
+      cytoscape.use(this.klay);
+    },
     onSubmit(event) {
       event.preventDefault();
       // alert(JSON.stringify(this.form))
@@ -644,7 +886,7 @@ export default {
           {group: "sequen", tag: "seqFeature"},
           {group: "all", tag: "all"},
           {group: "public", tag: "publication"}
-       
+      
         ]        
         
         // "thing", "process" ,"phenotyp" , "anatomic"  , "cell", "organism",  "molecularactivity", "molecularentity", "biological,", "chem", "information", "path"]
