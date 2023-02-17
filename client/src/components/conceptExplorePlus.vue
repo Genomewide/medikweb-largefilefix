@@ -4,7 +4,7 @@
     <div>
       <b-card no-body style="padding-bottom: 20px">
         <b-tabs card>
-          <b-tab title="Find Objects related to genes" active>
+          <b-tab title="Find Objects related to genes" >
             <b-card-text>
               <div class="create-post">
                 <div>
@@ -313,24 +313,37 @@
                 <!-- </b-collapse> -->
               </div>
           </b-tab>
-          <b-tab title="Diagram">
+          <b-tab title="Diagram" active>
+                                <b-button 
+                      style="margin-left: 10px"
+                      variant="success"
+                      v-on:click="testMedik"
+                      >testMedik</b-button
+                    >  
             <div class="border border-primary rounded" >
         <!-- <cytoscape ref="cyRef" :config="config" v-on:mousedown="addNode" v-on:cxttapstart="updateNode"> -->
         <!-- <cytoscape :key="keyCounter" ref="cyto" :config="config" :preConfig="preConfig" :afterCreated="updateGraph"> -->
         <cytoscape
           :key="keyCounter"
           ref="cyto"
-          :config="config"
+          :config="config3"
           :preConfig="preConfig"
         >
           <!-- <cytoscape :key="keyCounter" ref="cyto" :config="config"  > -->
           <cy-element
             ref="cy"
-            v-for="def in elements"
-            :key="`${def.data.id}`"
+            v-for="(def, index) in elements"
+            :key="`${index}`"
             :definition="def"
             v-on:mousedown="deleteNode($event, def, def.data, def.data.id)"
           />
+          <!-- <cy-element
+            ref="cy"
+            v-for="(def, index) in elements"
+            :key="`${def.data.id}`"
+            :definition="def"
+            v-on:mousedown="deleteNode($event, def, def.data, def.data.id)"
+          /> -->
           <!-- <cy-element
           ref="cy"
           v-for="def in elements"
@@ -546,7 +559,8 @@ export default {
       preCountTable: [],
       catCountTable: [],
       tree: {test: "test tree"},
-      componentKey: 0
+      componentKey: 0,
+      allNodes: [],
     };
   },
   methods: {
@@ -607,13 +621,28 @@ export default {
     // let uniqueEdges = []
 
     console.log("GOT THEM ALL")
-    this.elements = [elements, ...forwardCytoNodes, ...backwardCytoNodes, ...forwardCytoEdges, ...backwardCytoEdges]
+    console.log("this.elements")
+    console.log(this.elements)
+
+    // this.elements = [elements, ...forwardCytoNodes, ...backwardCytoNodes]
+    let elements = [...forwardCytoNodes, ...backwardCytoNodes, ...forwardCytoEdges, ...backwardCytoEdges]
+    console.log("elements")
+    console.log(elements)
+    this.elements = elements
+
 
 
 
     },
     getNodesFromTrapi(nodes){
       let nodesKeys = Object.keys(nodes)
+      // GET UNIQUE NODES
+      // this.allNodes = [...new Set(nodesKeys)]
+      // USE FILTER TO GET UNIQUE NODES
+      this.allNodes = nodesKeys.filter((v, i, a) => a.indexOf(v) === i);
+      console.log("this.allNodes")
+      console.log(this.allNodes)
+
       let nodesList = []
       for (let i = 0; i < nodesKeys.length; i++){
         const node = nodesKeys[i];
@@ -643,10 +672,19 @@ export default {
 
         cytoNode.data.name = fixNodeName
         cytoNode.data.id = fixNodeId
-        cytoNode.data.category = nodeInfo.category
-        cytoNode.group = fixNodeGroup
+        cytoNode.data.category = fixNodeGroup
+        cytoNode.group = "nodes"
 
-        nodesList.push(cytoNode)
+        if(!this.allNodes.includes(fixNodeId)){
+          this.allNodes.push(fixNodeId)
+          nodesList.push(cytoNode)
+        }        
+        
+        // nodesList.push(cytoNode)
+        // this.allNodes.push(cytoNode)
+        // this.cyInstance.add(addElements);
+        // this.cyInstance.add(cytoNode)
+        
       }
       return nodesList
     },
@@ -670,15 +708,27 @@ export default {
         cytoEdge.group = "edges"
 
         let source = edgeInfo.subject.split(":").join("_");
+        console.log("source")
+        console.log(source)
         let target = edgeInfo.object.split(":").join("_");
-        let edgeId = source & "_" & target
+        console.log("target")
+        console.log(target)
+
+        let edgeId = source + "_" + target
+        console.log("edgeId")
+        console.log(edgeId)
 
 
         cytoEdge.data.id = edgeId
         cytoEdge.data.source = source
         cytoEdge.data.target = target
 
-        edgesList.push(cytoEdge)
+        // push edge if subject and object are in this.allNodes
+        if(this.allNodes.includes(source) && this.allNodes.includes(target)){
+          edgesList.push(cytoEdge)
+        }
+        // edgesList.push(cytoEdge)
+        this.cytoscape.add(cytoEdge)
 
       }
       return edgesList
@@ -1337,7 +1387,16 @@ export default {
       }
       return dbTable;
     },
+    
   },
+
+    cyInstance() {
+      return this.$refs.cyto.instance;
+    },
+    // modalCyInstance() {
+    //   return this.$refs.modalCyto.instance;
+    // },
+  
   // created() {
   //   this.fetchUserData;
   // },
