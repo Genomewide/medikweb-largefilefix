@@ -12,6 +12,35 @@ class NodeService {
   // }
 
 
+  static getHGNCMouseOrtho = (symbol) => {
+
+    let headers = "Accept:application/json"
+    let url = "https://rest.genenames.org/fetch/symbol/ZNF3"
+    console.log(url + ' ' + symbol + ' ' + headers)
+
+
+    return new Promise(async (resolve, reject) => { // eslint-disable-line
+      // let symbol = this.concept_search
+      // symbol = "mapk8ip3"
+      // console.log(symbol)
+
+    // GET ENSEMBL IDS FOR ORTHOLOGS
+      // let symbolEnsemblURL = "https://rest.ensembl.org/homology/symbol/human/" + symbol +"?content-type=application/json;format=condensed;type=orthologues;target_species=caenorhabditis_elegans;target_species=mus_musculus;target_species=danio_rerio;target_species=rattus_norvegicus;targe_species=human;"
+      // console.log(symbolEnsemblURL)
+      try {
+        const res = await axios.get(url);
+        const data = res.data;
+        // });
+  
+        console.log("getHGNCMouseOrtho RAN")
+        console.log(data)
+        resolve(data);
+      } catch (err) {
+        reject(err);
+      }
+    });
+  }
+
   static getAllSynOrtho = (symbol) => {
 
     return new Promise(async (resolve, reject) => { // eslint-disable-line

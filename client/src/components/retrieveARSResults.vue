@@ -1094,7 +1094,7 @@ export default {
     let cleanedFlatResults = await TrapiResultClean.flattenGetPublications(this.ARSResults)
     // let cleanedFlatResults = await TrapiResultClean.flattenGetPublications(cleanedDiabetesResults)
     console.log("cleanedFlatResults")
-    // console.log(cleanedFlatResults)
+    console.log(cleanedFlatResults)
     let flatTitle_flat = "Flatened - ALL - " + date + " " + this.ARSrequestID 
     this.saveFile_ArrayJSONtoTable(cleanedFlatResults.flatResults, flatTitle_flat)
     // 

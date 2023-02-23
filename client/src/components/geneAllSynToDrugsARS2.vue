@@ -30,7 +30,6 @@
                     id="concept_search"
                     class="mb-2 mr-sm-2 mb-sm-0"
                     placeholder="Object"
-                    :state="validation"
                   ></b-form-input>
                 
                   <b-button
@@ -38,8 +37,14 @@
                     variant="primary"
                     v-on:click="tryARS2"
                     >tryARS2
-                  </b-button>                  
-
+                  </b-button>  
+                  <b-button
+                    style="margin-left: 20px"
+                    variant="primary"
+                    v-on:click="getOrtholog"
+                    >getOrtholog
+                  </b-button>                
+getOrtholog
                   <b-icon
                     v-if="show_waiting_card"
                     style="margin-left: 5px"
@@ -298,7 +303,7 @@
         </b-row>
         </transition>
         
-        <b-row style="margin-top: 20px" v-if="geneResults.length > 0">
+        <!-- <b-row style="margin-top: 20px" v-if="geneResults.length > 0">
             <b-card :key="componentKey + 1000">
               <template #header>
                 <h6 class="mb-0">
@@ -363,20 +368,9 @@
                   :filter-include-fields="[]"
                   @filtered="onFiltered"
                 ></b-table>
-              <!-- <b-table
-                bordered
-                striped
-                hover
-                ref="timepersteptable"
-                table-layout:
-                fixed
-                :items="geneResults"
-                :fields="resultFields"
-              >
-              </b-table> -->
+            
             </b-card>
-          <!-- </b-col> -->
-        </b-row>
+        </b-row> -->
 
         <!-- <b-row style="margin-top: 20px">
           <b-col>
@@ -453,6 +447,7 @@
 import PubCleanService from "../PubCleanService";
 import TrapiResultClean from "../TrapiResultClean";
 import ARSService from "../ARSService";
+import NodeService from "../NodeService";
 // import excel from 'vue-excel-export'
 // import ARAXService from "../ARAXService";
 // import NodeService from "../NodeService";
@@ -962,6 +957,10 @@ export default {
     };
   },
   methods: {
+    async getOrtholog(){
+      let x = await NodeService.getHGNCMouseOrtho("cdk8")
+      console.log(x)
+    },
     openInNewTab(url) {
       window.open(url, '_blank', 'noreferrer');
     },
@@ -1089,6 +1088,9 @@ export default {
     },
 
     async tryARS2() {
+      
+
+
       // #######################
       // RESET THE TABLES TO CLEAR FOR NEW RUN
       // #######################
@@ -1177,7 +1179,7 @@ export default {
         // LOOP i < 10 times TO GET FULL ARS STATUS TABLE BUILT this.ARSrequestID
         // IF NOT DONE IN THAT MANY TIMES THEN MOVE ON
         // #######################
-        for (let i = 0; i < 10; i++) {
+        for (let i = 0; i < 50; i++) {
         // for (let i = 0; i < 5; i++) {
           let ARSStatusCheck = await this.ARSStatusTable()
           // ################
@@ -1197,11 +1199,15 @@ export default {
           console.log("I LOOP NUMBER = ", i)
           console.log("ARSStatusCheck")
           console.log(ARSStatusCheck)
+          console.log("sorted.length")
+          console.log(sorted)
+          console.log(Object.keys(sorted).length)
           // ################
-          // CHECK STATUS OF RESULTS
+          // CHECK STATUS OF RESULTS 
           // ################          
-          if(ARSStatusCheck.agentFinished == 0 && ARSStatusCheck.agentCount >15){
-            i = 10
+          // if(ARSStatusCheck.agentFinished == 0 && ARSStatusCheck.agentCount >15){
+          if(ARSStatusCheck.agentFinished == 0 && ARSStatusCheck.agentCount == Object.keys(sorted).length){
+            i = 50
             // console.log("finish before looping to 10!")
             // console.log("this.ARSResultStatus")
             // console.log(this.ARSResultStatus)

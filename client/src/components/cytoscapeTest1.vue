@@ -6,6 +6,9 @@
     <b-row>
       <b-col cols="3">
         <div class="border border-secondary rounded" style="height: 100%">
+          <b-button class="mt-3" variant="success" block @click="testMedik"
+            >testMedik</b-button
+          >    
           <b-button class="mt-3" variant="primary" block @click="selectResult2"
             >selectResult2</b-button
           >
@@ -104,10 +107,26 @@
               v-for="def in elements"
               :key="`${def.data.id}`"
               :definition="def"
+              v-on:mousedown="showNodeInfo($event, def, def.data, def.data.id)"
+            />
+          </cytoscape>
+          <!-- <cytoscape
+            
+            :key="keyCounter"
+            ref="cyto"
+            :config="config"
+            :preConfig="preConfig"
+          >
+            <cy-element
+              id="cytoscape1"
+              ref="cy"
+              v-for="def in elements"
+              :key="`${def.data.id}`"
+              :definition="def"
               v-on:mouseover="hoverGraph($event, def, def.data, def.data.id)"
               v-on:mousedown="moveToModal($event, def, def.data, def.data.id)"
             />
-          </cytoscape>
+          </cytoscape> -->
         </div>
       </b-col>
     </b-row>
@@ -325,6 +344,10 @@
 </template>
 
 <script>
+import PostService from "../PostService";
+// import TrapiResultClean from "../TrapiResultClean";
+
+
 import klay from "cytoscape-klay";
 import config from "./cytoscapeData/CytoConfig";
 import config2 from "./cytoscapeData/CytoConfig2";
@@ -467,11 +490,235 @@ export default {
         "objectName": "GLICLAZIDE"
     }
       ],
-      radioDrug: "CHEMBL.COMPOUND:CHEMBL408"
+      radioDrug: "CHEMBL.COMPOUND:CHEMBL408",
+      allNodes: [],
       
     };
   },
   methods: {
+    async testMedik(){
+      console.log("testMedik")
+      // let nodes = []
+      let queryForward = {"message": {"query_graph": {"nodes": {"n1": {},"n2": {"id": "HGNC:6884"}},"edges": {"e1": {"subject": "n1","object": "n2"}}}}}
+      let queryBackward = {"message": {"query_graph": {"nodes": {"n1": {},"n2": {"id": "HGNC:6884"}},"edges": {"e1": {"subject": "n2","object": "n1"}}}}}
+      let queryResultsForward = await PostService.query_raw(queryForward)
+      let queryResultsBackward = await PostService.query_raw(queryBackward)
+      console.log("queryResultsForward")
+      console.log(queryResultsForward)
+      console.log("queryResultsBackward")
+      console.log(queryResultsBackward)
+      console.log("elements")
+      console.log(elements)
+
+      // let cleanedResults = await TrapiResultClean.TrapiResultClean(queryResultsForward, "testkp")
+      // console.log("cleanedResults")
+      // console.log(cleanedResults)
+
+
+
+      // let cleanedResultsForward = await this.cleanMedikResults(queryResultsForward)
+      // console.log("cleanedResultsForward")
+      // console.log(cleanedResultsForward)
+
+      // let cleanedResultsBackward = await this.cleanMedikResults(queryResultsBackward)
+      // console.log("cleanedResultsBackward")
+      // console.log(cleanedResultsBackward)
+    
+    // GET NODES
+    let forwardNodes = queryResultsForward.message.knowledge_graph.nodes
+    console.log("forwardNodes")
+    console.log(forwardNodes)
+
+    let forwardCytoNodes = this.getNodesFromMedikTrapi(forwardNodes)
+    console.log("forwardCytoNodes")
+    console.log(forwardCytoNodes)
+
+    let backwardNodes = queryResultsBackward.message.knowledge_graph.nodes
+    console.log("backwardNodes")
+    console.log(backwardNodes)
+
+    let backwardCytoNodes = this.getNodesFromMedikTrapi(backwardNodes)
+    console.log("backwardCytoNodes")
+    console.log(backwardCytoNodes)
+
+    let nodes = [...forwardCytoNodes, ...backwardCytoNodes]
+    // GET UNIQUE NODES BASED ON ID
+    let uniqueNodes = [...new Map(nodes.map(item => [item.data.id, item])).values()]
+
+    // GET EDGES
+    let backwardEdges = queryResultsBackward.message.knowledge_graph.edges
+    console.log("backwardEdges")
+    console.log(backwardEdges)
+
+    let backwardCytoEdges = this.getEdgesFromMedikTrapi(backwardEdges)
+    console.log("backwardCytoEdges")
+    console.log(backwardCytoEdges)
+
+    let forwardEdges = queryResultsForward.message.knowledge_graph.edges
+    console.log("forwardEdges")
+    console.log(forwardEdges)
+
+    let forwardCytoEdges = this.getEdgesFromMedikTrapi(forwardEdges)
+    console.log("forwardCytoEdges")
+    console.log(forwardCytoEdges)
+
+    let edges = [...forwardCytoEdges, ...backwardCytoEdges]
+    // GET UNIQUE EDGES BASED ON ID
+    let uniqueEdges = [...new Map(edges.map(item => [item.data.id, item])).values()]
+    // let uniqueNodes = []
+    // let uniqueEdges = []
+
+    console.log("GOT THEM ALL")
+    console.log("this.elements")
+    console.log(this.elements)
+    console.log("nodes")
+    console.log(nodes)
+    console.log("edges")
+    console.log(edges)
+
+    this.elements = [...uniqueNodes, ...uniqueEdges]
+    console.log("this.elements")
+    console.log(this.elements)
+
+    //get unique catergoies from nodes
+    let categories = this.elements.map(x => x.data.category)
+    categories = [...new Set(categories)]
+    console.log("categories")
+    console.log(categories)
+
+
+    // this.elements = [...forwardCytoNodes, ...forwardCytoEdges]
+    // let elements = [...forwardCytoNodes, ...backwardCytoNodes, ...forwardCytoEdges, ...backwardCytoEdges]
+    // console.log("elements")
+    // console.log(elements)
+    // this.elements = elements
+
+    // this.cyInstance.add(addElements)
+
+    this.cyInstance.makeLayout({ name: "klay", animate: true }).run();
+    // this.keyCounter++
+
+    },
+    showNodeInfo(event, def, data, id){
+      console.log("showNodeInfo")
+      // console.log(event)
+      // console.log(def)
+      console.log(data.category)
+      console.log(id)
+      // this.nodeInfo = node
+    },
+    getNodesFromMedikTrapi(nodes){
+      let nodesKeys = Object.keys(nodes)
+      // GET UNIQUE NODES
+      // this.allNodes = [...new Set(nodesKeys)]
+      // USE FILTER TO GET UNIQUE NODES
+      // this.allNodes = nodesKeys.filter((v, i, a) => a.indexOf(v) === i);
+      // console.log("this.allNodes")
+      // console.log(this.allNodes)
+
+      let nodesList = []
+      for (let i = 0; i < nodesKeys.length; i++){
+        const node = nodesKeys[i];
+        let nodeInfo = nodes[node]
+        // console.log("nodeInfo")
+        // console.log(nodeInfo)
+        // console.log(nodeInfo.name)
+        // console.log(node)
+        let cytoNode = {}
+        cytoNode.data = {}
+        cytoNode.data.id = ""
+        cytoNode.data.name = ""
+        let fixNodeName = ""
+
+        if(nodeInfo.name == false){
+          // console.log("getting name")
+          // console.log(nodeInfo.name)
+          fixNodeName = node.split(":").join("_")
+        } else {
+          // console.log("else getting name")
+          fixNodeName = nodeInfo.name.split(" ").join("_")
+        }
+
+        // let fixNodeName = nodeInfo.name.split(" ").join("_"); // "NamedThing|biolink"
+        let fixNodeId = node.split(":").join("_");
+        let fixNodeGroup = nodeInfo.category.split(":")[1]
+        fixNodeGroup = fixNodeGroup.replace(/\|biolink/gi, "");
+        // console.log("fixNodeName")
+        // console.log(fixNodeName)
+        // console.log("fixNodeId")
+        // console.log(fixNodeId)
+        // console.log("fixNodeGroup")
+        // console.log(fixNodeGroup)
+
+        
+
+        cytoNode.data.name = fixNodeName
+        cytoNode.data.id = fixNodeId
+        cytoNode.data.category = fixNodeGroup
+        cytoNode.group = "nodes"
+        cytoNode.classes = [fixNodeGroup]
+
+        if(this.allNodes.indexOf(fixNodeId) == -1){
+          this.allNodes.push(fixNodeId)
+          nodesList.push(cytoNode)
+        }        
+        
+        // nodesList.push(cytoNode)
+        // this.allNodes.push(cytoNode)
+        // this.cyInstance.add(addElements);
+        // this.cyInstance.add(cytoNode)
+        
+      }
+      return nodesList
+    },
+
+    getEdgesFromMedikTrapi(edges){
+      let edgesKeys = Object.keys(edges)
+      let edgesList = []
+    //  {
+    //     data: { id: "ca", source: "c", target: "a" },
+    //     group: "edges"
+    //   }
+      for (let i = 0; i < edgesKeys.length; i++){
+        const edge = edgesKeys[i];
+        let edgeInfo = edges[edge]
+        let cytoEdge = {}
+        cytoEdge.data = {}
+        cytoEdge.data.id = ""
+        cytoEdge.data.source = ""
+        cytoEdge.data.target = ""
+        cytoEdge.data.edgeId = edge
+        cytoEdge.data.predicate = edgeInfo.predicate.split(":")[1]
+        cytoEdge.group = "edges"
+
+        let source = edgeInfo.subject.split(":").join("_");
+        // console.log("source")
+        // console.log(source)
+        let target = edgeInfo.object.split(":").join("_");
+        // console.log("target")
+        // console.log(target)
+
+        let edgeId = source + "_" + target
+        // console.log("edgeId")
+        // console.log(edgeId)
+
+
+        cytoEdge.data.id = edgeId
+        cytoEdge.data.source = source
+        cytoEdge.data.target = target
+
+        // push edge if subject and object are in this.allNodes
+        if(this.allNodes.includes(source) && this.allNodes.includes(target)){
+          edgesList.push(cytoEdge)
+        }
+        // edgesList.push(cytoEdge)
+        // this.cytoscape.add(cytoEdge)
+        
+
+      }
+      return edgesList
+    },
+
     getNodesPerResult(){
       // console.log("getNodesPerResult")
       //GET ARRAY OF NODES PER RESULT IN pathData
@@ -645,6 +892,7 @@ export default {
       
 
     },
+
     paths(){
       console.log(pathData)
       let pathsData = pathData
@@ -682,6 +930,7 @@ export default {
 
 
     },
+
     countPaths(){
       console.log(pathData)
       let pathsData = pathData
@@ -701,6 +950,7 @@ export default {
 
 
     },
+
     testModal(){
 
       console.log("this.$refs.modalCyto")
@@ -789,6 +1039,7 @@ export default {
       this. dataMenu = menuItems
       
     },
+
     selectResult2() {
       this.cyInstance.selectionType("additive");
       // Set the selection type.

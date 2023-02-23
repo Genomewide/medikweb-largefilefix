@@ -17,7 +17,7 @@ const CytoConfig = {
         group: "nodes"
       },
       {
-        data: { id: "ab", source: "a", target: "b" },
+        data: { id: "ab", source: "a", target: "b", predicate: "test" },
         group: "edges"
       }
     ],
@@ -82,6 +82,14 @@ const CytoConfig = {
         style: { "background-color": "#ff7d00"}
       },
       {
+        selector: ".Gene",
+        style: { "background-color": "#ff612d"}
+      },
+      {
+        selector: ".SequenceVariant",
+        style: { "background-color": "#ffb670"}
+      },
+      {
         selector: ".test",
         style: { "background-color": "#8cd164"}
       },
@@ -89,7 +97,10 @@ const CytoConfig = {
         selector: ".SmallMolecule",
         style: { "background-color": "#5daadc"}
       },
-
+      {
+        selector: ".NamedThing",
+        style: { "background-color": "#E1C699"}
+      },
       {
         selector: ".hidden",
         style: { display: 'none'}
@@ -98,6 +109,7 @@ const CytoConfig = {
       {
         selector: "edge",
         style: {
+          label: "data(predicate)",
           width: 3,
           "curve-style": "bezier",
           "line-color": "#cccccc",
@@ -169,7 +181,7 @@ const CytoConfig = {
         }
       }
     ],
-    // layout: { name: "grid", rows: 1 } 
+    // layout: { name: "grid", rows: 1 } SequenceVariant
     // layout: { name: "klay" }
     // green #62942d #008c95 #008c94
     // blues #223077 #5daadc #00b7d5 #5ec6dd #b6dee6  #004f73
@@ -185,6 +197,7 @@ const CytoConfig = {
     // biolink:Pathway #ff7d00
     // phenotype #62942d
     // disease #008c95
+    // named thing #620226
   };
   
   export default CytoConfig;

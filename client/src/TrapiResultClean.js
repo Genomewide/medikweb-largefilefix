@@ -23,7 +23,7 @@ class TrapiResultClean {
         nodesCheck = nodes
         // let nodeKeys = Object.keys(nodes)
         console.log("edges")
-        // console.log(edges)
+        console.log(edges)
 
         // console.log("length = ", edgeKeys.length)
 
