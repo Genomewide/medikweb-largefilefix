@@ -104,6 +104,97 @@ class synonymService {
     });
   }
 
+  static nodeLargeListNormalizationPost = (idArray) => {
+
+    return new Promise(async (resolve, reject) => { // eslint-disable-line
+      // let symbol = this.concept_search
+      // symbol = "mapk8ip3"
+      let length = idArray.length
+      console.log("length")
+      console.log(length)
+      // GET 1000 AT A TIME
+      let start = 0
+      let end = 1000
+      let count = 0
+      let results = []
+
+      let quotient = Math.floor(length/1000);
+      let remainder = length % 1000;
+      let loop = 1
+      if (quotient > 0) {
+        loop = quotient
+      }
+
+      if (remainder > 0) {
+        loop = loop + 1
+      }
+      console.log("length")
+      console.log(length)
+      console.log("loop")
+      console.log(loop)
+
+      for (let i = 0; i < loop; i++) {
+        let tempArray = idArray.slice(start, end)
+        console.log("tempArray")
+        console.log(tempArray)
+        let tempResults = await this.nodeNormalizationPost(tempArray)
+        console.log("tempResults")
+        console.log(tempResults)
+        // results = results.concat(tempResults)
+        results = {...results, ...tempResults}
+        console.log("results")
+        console.log(results)
+        start = start + 1000
+        end = end + 1000
+        count = count + 1000        
+      }
+      // while (count < length) {
+      //   let tempArray = idArray.slice(start, end)
+      //   console.log("tempArray")
+      //   console.log(tempArray)
+      //   let tempResults = await this.nodeNormalizationPost(tempArray)
+      //   console.log("tempResults")
+      //   console.log(tempResults)
+      //   // results = results.concat(tempResults)
+      //   results = {...results, ...tempResults}
+      //   console.log("results")
+      //   console.log(results)
+      //   start = start + 1000
+      //   end = end + 1000
+      //   count = count + 1000
+      // }
+
+      resolve(results)
+    //   console.log(idArray)
+    //   let postPacket = {
+    //     "curies": [
+    //       "ENSEMBL:ENSG00000132153"
+    //     ],
+    //     "conflate": true
+    //   }
+      
+    //   postPacket.curies = idArray
+    //   console.log("postPacket")
+    //   console.log(postPacket)
+  
+    // // POST TO NODENORMALIZER
+    // // "https://rest.ensembl.org/xrefs/id/" + ensemblid + "?content-type=application/json" 
+    // // let normalURL = "https://nodenorm.transltr.io/nodenormalization-sri.renci.org/1.3"
+    // let normalURL = "https://nodenorm.transltr.io/1.3/get_normalized_nodes"
+  
+    //   console.log(normalURL)
+    //   try {
+    //     const res = await axios.post(normalURL, postPacket);
+    //       const data = res.data;
+    //       console.log("nodeNormalizationPost RAN")
+    //       console.log(data)
+    //       resolve(data);
+    //   } catch (err) {
+    //     reject(err);
+    //   }
+    });
+  }
+
   static chemSynonyms = (searchterm) => {
     console.log("started chemSynonyms - seatrchterm ");
     return new Promise(async (resolve, reject) => { // eslint-disable-line

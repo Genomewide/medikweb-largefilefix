@@ -6,6 +6,9 @@
     <b-row>
       <b-col cols="3">
         <div class="border border-secondary rounded" style="height: 100%">
+          <b-button class="mt-3" variant="success" block @click="getMeta"
+            >getMeta</b-button
+          > 
           <b-button class="mt-3" variant="success" block @click="testMedik"
             >testMedik</b-button
           >    
@@ -108,6 +111,7 @@
               :key="`${def.data.id}`"
               :definition="def"
               v-on:mousedown="showNodeInfo($event, def, def.data, def.data.id)"
+              v-on:mouseover="hoverGraph($event, def, def.data, def.data.id)"
             />
           </cytoscape>
           <!-- <cytoscape
@@ -286,6 +290,7 @@
       <!-- <b-collapse :id="'table-collapse' + index + result.name"> -->
       <b-card-text>
         <b-form style="margin-top: 20px; margin-bottom: 20px">
+          Rows = {{ filterCytoData.length }}
           <b-form-group
             label="Filter"
             label-for="filter-input"
@@ -313,7 +318,7 @@
         <b-pagination
           style="padding-bottom: 20px"
           v-model="currentPage"
-          :total-rows="cytoData.length"
+          :total-rows="filterCytoData.length"
           :per-page="10"
           align="fill"
           size="sm"
@@ -331,7 +336,7 @@
           :current-page="currentPage"
           :per-page="10"
           :fields="resultFields"
-          :items="cytoData"
+          :items="filterCytoData"
           :filter="filter"
           :filter-include-fields="[]"
           @filtered="onFiltered"
@@ -347,11 +352,12 @@
 import PostService from "../PostService";
 // import TrapiResultClean from "../TrapiResultClean";
 
-
+// bte_metagraph
 import klay from "cytoscape-klay";
 import config from "./cytoscapeData/CytoConfig";
 import config2 from "./cytoscapeData/CytoConfig2";
 import dataMenu from "./cytoscapeData/cytoscapeExampleResults.json";
+import metagraph from "../assets/bte_metagraph.json";
 import pathData from "./cytoscapeData/pathsData.json";
 import cytoData from "../assets/diabetesTreatsCleaned.json";
 // import dataMenu from "../assets/cytoscapeExampleResults.json";
@@ -369,6 +375,8 @@ delete config.elements;
 delete config2.elements;
 console.log("cytoData");
 console.log(cytoData);
+console.log("metagraph");
+console.log(metagraph);
 
 
 
@@ -388,43 +396,51 @@ export default {
       currentPage: 1,
       keyCounter: 1,
       cytoData: cytoData,
+      filterCytoData: cytoData,
       filter: null,
       resultFields: [
         {
           key: "resNodeCount",
           label: "#Nodes",
           sortable: true,
+          class: "text-wrap"
         },
         {
           key: "drugKey",
           label: "Drug",
           sortable: true,
+          class: "text-wrap"
         },
         {
           key: "objectName",
           label: "Object",
           sortable: true,
           tdClass: "colwidth",
+          class: ".text-break"
         },
 
         {
           key: "object",
           label: "object ID",
+          class: ".text-break"
         },
         {
           key: "predicate",
           label: "Predicate",
+          class: ".text-break"
         },
         {
           key: "subjectName",
           label: "Subject",
           sortable: true,
+          class: ".text-break"
         },
         {
           key: "subject",
           label: "Subject ID",
           sortable: true,
           tdClass: "colwidth",
+          class: ".text-wrap"
         },
       ],
       gotNodes: [],
@@ -496,6 +512,63 @@ export default {
     };
   },
   methods: {
+    getMeta(){
+      // get node keys from metagraph
+      let nodeKeys = Object.keys(metagraph.nodes)
+      console.log("nodeKeys")
+      console.log(nodeKeys)
+      // get unique subjects from edges
+      let subjects = []
+      for (let i = 0; i < metagraph.edges.length; i++){
+        let subj = metagraph.edges[i].subject
+        if (!subjects.includes(subj)){
+          subjects.push(subj)
+        }
+      }
+      console.log("subjects")
+      console.log(subjects)
+      // get unique objects from edges
+      let objects = []
+      for (let i = 0; i < metagraph.edges.length; i++){
+        let obj = metagraph.edges[i].object
+        if (!objects.includes(obj)){
+          objects.push(obj)
+        }
+      }
+      console.log("objects")
+      console.log(objects)
+
+
+
+      // // get all predicates for each node key
+      // let nodePredicates = []
+      // for (let i = 0; i < nodeKeys.length; i++){
+      //   let nodeKey = nodeKeys[i]
+      //   let nodePreds = metagraph.nodes[nodeKey].predicates
+      //   console.log("nodePreds")
+      //   console.log(nodePreds)
+      //   nodePredicates.push(nodePreds)
+      // }
+      // get unique predicates
+      let uniquePredicates = []
+      for (let i = 0; i < nodePredicates.length; i++){
+        let nodePreds = nodePredicates[i]
+        for (let j = 0; j < nodePreds.length; j++){
+          let nodePred = nodePreds[j]
+          if (!uniquePredicates.includes(nodePred)){
+            uniquePredicates.push(nodePred)
+          }
+        }
+      }
+      console.log("uniquePredicates")
+      console.log(uniquePredicates)
+      
+
+
+
+      
+
+    },
     async testMedik(){
       console.log("testMedik")
       // let nodes = []
@@ -702,7 +775,10 @@ export default {
         // console.log("edgeId")
         // console.log(edgeId)
 
-
+        if(edgeId == ""){
+          console.log("cytoEdge - blank ID")
+          console.log(cytoEdge)
+        }
         cytoEdge.data.id = edgeId
         cytoEdge.data.source = source
         cytoEdge.data.target = target
@@ -965,7 +1041,7 @@ export default {
       console.log(this.modalElements);
       this.$refs.modal.show();
     },
-    // @remind selectResult2
+    // @remind getComplexResults
     getComplexResults(){
       console.log("starting getComplexResults")
       // GET UNIQUE VALUES OF DRUG KEY FROM CYTODATA
@@ -1040,10 +1116,23 @@ export default {
       
     },
 
-    selectResult2() {
+    selectResult3  () {
       this.cyInstance.selectionType("additive");
       // Set the selection type.
       // type The selection type string; one of 'single' (default) or 'additive'.
+
+      let aras = cytoData.map((x) => x.agent);
+      console.log("aras");
+      console.log(aras);
+
+      let uniqueARAs = [...new Set(aras)];
+      console.log("uniqueARAs");
+      console.log(uniqueARAs);
+      
+      // let uniqueARAs = [...new Map(cytoData.map((x) => x.agent))]
+      // console.log("uniqueARAs")
+      // console.log(uniqueARAs)
+
 
       console.log("this.keyCounter");
       console.log(this.keyCounter);
@@ -1054,12 +1143,100 @@ export default {
         (x) => x.drugKey == this.radioDrug
       );
 
+      this.filterCytoData = filterCytoData
       console.log("filterCytoData");
       console.log(filterCytoData);
       // let newElements = []
+      console.log("genNodes")
       let nodes = this.genNodes(filterCytoData);
+
+      console.log("genEdges")
       let edges = this.genEdges(filterCytoData);
       let addElements = [...nodes, ...edges];
+      // FIND THE ELEMENTS THAT HAVE '' AS THE NAME
+      let emptyNames = addElements.filter((x) => x.data.id == "");
+      console.log("emptyNames");
+      console.log(emptyNames);
+      
+
+      // FILTER OUT THOSE WITHOUT ID
+      addElements = addElements.filter((x) => x.data.id != "");
+      console.log("addElements = ", addElements);
+      this.cyInstance.add(addElements);
+
+      console.log("this.elements");
+      console.log(this.elements);
+      this.cyInstance.remove(this.cyInstance.$("#a"));
+      this.cyInstance.remove(this.cyInstance.$("#b"));
+      this.cyInstance.remove(this.cyInstance.$("#c"));
+
+      // ###############################################################
+      // ###############################################################
+      // USE THIS TO ADD SO THAT CLICKING ON NODES WORKS - WILL SHOW ERROR IN CONSOLE BUT WORKS
+      // ###############################################################
+      // ###############################################################
+      this.elements = [...nodes, ...edges];
+
+      console.log("after adding elements");
+      console.log(this.elements);
+      this.updateGraph();
+      // console.log(this.cyInstance.$('#a'))
+      this.cyInstance.makeLayout({ name: "klay", animate: true }).run();
+
+      // #####################################################################
+      // GET PARENT AND GRANPARENT DATA AND TAG NODES WITH IT
+      // #####################################################################
+      this.getNodeParentGrandparentData();
+
+      this.allPaths()
+    },
+
+    // @remind selectResult2
+    selectResult2() {
+      this.cyInstance.selectionType("additive");
+      // Set the selection type.
+      // type The selection type string; one of 'single' (default) or 'additive'.
+
+      let aras = cytoData.map((x) => x.agent);
+      console.log("aras");
+      console.log(aras);
+
+      let uniqueARAs = [...new Set(aras)];
+      console.log("uniqueARAs");
+      console.log(uniqueARAs);
+
+      // let uniqueARAs = [...new Map(cytoData.map((x) => x.agent))]
+      // console.log("uniqueARAs")
+      // console.log(uniqueARAs)
+
+
+      console.log("this.keyCounter");
+      console.log(this.keyCounter);
+      // console.log("config2")
+      // console.log(config2)
+      // CHEMBL.COMPOUND:CHEMBL408
+      let filterCytoData = cytoData.filter(
+        (x) => x.drugKey == this.radioDrug
+      );
+
+      this.filterCytoData = filterCytoData
+      console.log("filterCytoData");
+      console.log(filterCytoData);
+      // let newElements = []
+      console.log("genNodes")
+      let nodes = this.genNodes(filterCytoData);
+
+      console.log("genEdges")
+      let edges = this.genEdges(filterCytoData);
+      let addElements = [...nodes, ...edges];
+      // FIND THE ELEMENTS THAT HAVE '' AS THE NAME
+      let emptyNames = addElements.filter((x) => x.data.id == "");
+      console.log("emptyNames");
+      console.log(emptyNames);
+      
+
+      // FILTER OUT THOSE WITHOUT ID
+      addElements = addElements.filter((x) => x.data.id != "");
       console.log("addElements = ", addElements);
       this.cyInstance.add(addElements);
 
@@ -1135,7 +1312,7 @@ export default {
         // #################################################
         // GET SUBJECT NODES
         // #################################################
-        if (nodeCheck.indexOf(fixSubjectName) == -1) {
+        if (nodeCheck.indexOf(fixSubjectName) == -1 ) {
           x = x + 50;
           if (x % 500 == 0) {
             y = y + 100;
@@ -1152,6 +1329,10 @@ export default {
           el.data.id = fixSubjectName;
           el.data.sriCat = res.subjectSRICat.split(":")[1];
           el.data.classDefault = res.subjectSRICat.split(":")[1];
+          if(res.subjectName == ""){
+            console.log("res.objectName == ''")
+            console.log(res)
+          }
 
           el.position = { x: x, y: y };
           el.group = "nodes";
@@ -1160,6 +1341,8 @@ export default {
           console.log(res.subjectCats);
 
           if (res.diseaseKey == res.subject) {
+            console.log("res.diseaseKey == res.subject")
+            console.log(res)
             this.theDisease = fixSubjectName;
             el.classes = ["thedisease"];
             el.position = { x: 900, y: 300 };
@@ -1195,7 +1378,7 @@ export default {
           nodeCheck.push(fixSubjectName);
         }
 
-        if (nodeCheck.indexOf(fixObjectName) == -1) {
+        if (nodeCheck.indexOf(fixObjectName) == -1 ) {
           x = x + 50;
           if (x % 500 == 0) {
             y = y + 100;
@@ -1213,7 +1396,10 @@ export default {
           el.data.sriCat = res.objectSRICat.split(":")[1];
           el.data.classDefault = res.objectSRICat.split(":")[1];
           el.data.name = res.objectName;
-
+          if(res.objectName == ""){
+            console.log("res.objectName == ''")
+            console.log(res)
+          }
           el.position = { x: x, y: y };
           el.group = "nodes";
 
@@ -2447,9 +2633,8 @@ export default {
       // console.log("config2")
       // console.log(config2)
       // CHEMBL.COMPOUND:CHEMBL408
-      let filterCytoData = cytoData.filter(
-        (x) => x.drugKey == "CHEMBL.COMPOUND:CHEMBL408"
-      );
+      let filterCytoData = cytoData.map((x) => x.agent)
+
       console.log("filterCytoData");
       console.log(filterCytoData);
       // let newElements = []
@@ -2480,3 +2665,17 @@ export default {
   },
 };
 </script>
+<style scoped>
+table td{ 
+  vertical-align: top; 
+  padding: 5px;
+  word-break: break-all;  /* MUST ADD THIS */
+}
+#cy {
+  height: 100%;
+  width: 100%;
+  position: absolute;
+  left: 0;
+  top: 0;
+}
+</style>

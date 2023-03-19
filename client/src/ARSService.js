@@ -20,6 +20,7 @@ class ARSService {
         console.log(data)
         resolve(data);
       } catch (err) {
+        console.error(err)
         reject(err);
       }
     });
@@ -32,7 +33,8 @@ class ARSService {
     // console.log("started getSynonyms");
     return new Promise(async (resolve, reject) => { // eslint-disable-line
       // ARAXquery_gg.message.query_graph.nodes.n00.ids = [searchterm]
-      // console.log(ARAXquery_gg)
+      console.log("queryID")
+      console.log(queryID)
       // let url = "https://ars.test.transltr.io/ars/api/messages/" + queryID + "?trace=y"
       let url = "https://ars-prod.transltr.io/ars/api/messages/" + queryID + "?trace=y"
       // let url = 'https://arax.ncats.io/api/arax/v1.2/query'
@@ -42,10 +44,11 @@ class ARSService {
         const data = res.data;
         // });
   
-        // console.log("ARSStatus ran")
-        // console.log(data)
+        console.log("ARSStatus ran")
+        console.log(data)
         resolve(data);
       } catch (err) {
+        console.error(err)
         reject(err);
       }
     });

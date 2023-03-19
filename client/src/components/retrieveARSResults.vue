@@ -1025,14 +1025,9 @@ export default {
         }
         
       }
-
       console.log("cleanedResults")
       console.log(cleanedResults)
       this.saveFile_ArrayJSONtoTable(cleanedResults, "cleanedResults")
-
-
-
-
       
     },
 
@@ -1112,14 +1107,11 @@ export default {
       usedPubEdges = [usedPubEdges, ...textMineEdgeIds]
       console.log("usedPubEdges - textmine")
       // console.log(usedPubEdges)
-
       let flatTitleTM = "Flatened - text mine Pubs - " + date + " " + this.ARSrequestID 
       this.saveFile_ArrayJSONtoTable(cleanedFlatResults_textminer, flatTitleTM)      
     } else {
       console.log("0 flatResults_textminer RESULTS")
     }
-
-
 
     console.log("start cleanedFlatResults_semmeddb")
     // console.log(cleanedFlatResults.flatResults_semmeddb)
@@ -2060,7 +2052,8 @@ async araxCategoryGroup(){
           // let checkForAnyResults = ARSStatusCheckArray.filter(x => x.resultCount > 0)
           console.log("ARSStatusCheck")
           console.log(ARSStatusCheck)
-          if(ARSStatusCheck.agentFinished < 3 && ARSStatusCheck.agentCount >10){
+          if(ARSStatusCheck.agentFinished == 0 && ARSStatusCheck.agentCount >10){
+          // if(ARSStatusCheck.agentFinished < 2 && ARSStatusCheck.agentCount >10){
           // if(ARSStatusCheck.agentFinished < 3){
           // if(checkForAnyResults.length != 0){
             i = loopCount
@@ -2075,6 +2068,7 @@ async araxCategoryGroup(){
             await new Promise(resolve => setTimeout(resolve, 3000));
           }
         }
+        resolve()
       })// PROMISE
 
     },

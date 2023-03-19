@@ -14,10 +14,10 @@ class NodeService {
 
   static getHGNCMouseOrtho = (symbol) => {
 
-    let headers = "Accept:application/json"
-    let url = "https://rest.genenames.org/fetch/symbol/ZNF3"
-    console.log(url + ' ' + symbol + ' ' + headers)
-
+    // let headers = "Accept:application/json"
+    let url = "https://rest.genenames.org/fetch/symbol/" + symbol 
+    console.log("url")
+    console.log(url)
 
     return new Promise(async (resolve, reject) => { // eslint-disable-line
       // let symbol = this.concept_search

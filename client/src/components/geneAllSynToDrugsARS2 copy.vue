@@ -1034,8 +1034,7 @@ query_gg: {
       orthoInfo: [],
       orthosIDs: [],
       synsIDForTest: [],
-      allowARAFail: false,
-      geneCuriesToAddForOneHop: [],
+      allowARAFail: false
 
     };
   },
@@ -1078,12 +1077,7 @@ query_gg: {
         // this.orthosIDs.push(x.response.docs[0].mgd_id[0])
         // this.orthosIDs.push(x.response.docs[0].rgd_id[0])
         this.orthoInfo.push({"Name": "Symbol", "Value": x.response.docs[0].symbol })
-        try{
-          this.orthoInfo.push({"Name": "Gene Group", "Value": x.response.docs[0].gene_group[0] })
-        } catch {
-          this.orthoInfo.push({"Name": "Gene Group", "Value": "None found from HGNC" })
-        }
-        
+        this.orthoInfo.push({"Name": "Gene Group", "Value": x.response.docs[0].gene_group[0] })
         this.orthoInfo.push({"Name": "Name", "Value" : x.response.docs[0].name })
         this.orthoInfo.push({"Name": "Human", "Value" : x.response.docs[0].agr })
         // this.orthoInfo.push({"Name": "Mouse", "Value": x.response.docs[0].mgd_id[0] })
@@ -1226,6 +1220,29 @@ query_gg: {
       console.log("this.ARSResults")
       console.log(this.ARSResults)
 
+      // if(this.resultGroup == "gene"){
+      //   this.resultGroup = "drug"
+      //   console.log("DONE! - gene")
+      //   console.log("this.geneResults")
+      //   console.log(this.geneResults)
+      //   let genesForDrug = this.ARSResults.map(x => x.object)
+      //   genesForDrug.push(this.concept_search)
+      //   this.queryTerms = genesForDrug
+      //   // console.log("this.queryTerms")
+      //   // console.log(this.queryTerms)
+      //   this.geneGeneFileName = this.concept_search + "_gene_gene"
+      //   // let fileName = this.concept_search + "_gene_gene"
+      //   this.saveExcel(this.geneResults)
+      //   this.saveThisFile2(this.geneResults, this.geneGeneFileName)
+      //   // this.tryARS2()
+
+      // } else{
+      //   this.drugGeneFileName = this.concept_search + "_drug_gene"
+      //   this.saveExcel(this.geneResults)
+      //   this.saveThisFile2(this.drugResults, this.geneDrugFileName)
+      //   // this.saveExcel(this.drugResults)
+      //   console.log("THIS IS THE END")
+      // }
     },
 
     async tryARS3() {
@@ -1270,8 +1287,8 @@ query_gg: {
         for (let i = 0; i < normalKeys.length; i++) {
           const key = normalKeys[i];
           let termData = normalizedTerms[key]
-          // console.log("normalizedTerms[key]")
-          // console.log(normalizedTerms[key])
+          console.log("normalizedTerms[key]")
+          console.log(normalizedTerms[key])
           try{
             let normTerms = termData.equivalent_identifiers.map(x => x.identifier)
             this.synonyms = this.synonyms.concat(normTerms)
@@ -1280,29 +1297,14 @@ query_gg: {
           }
 
 
-          // this.geneSynonyms = this.synonyms
-          // this.targetGeneSynonyms = termData.equivalent_identifiers
+          this.geneSynonyms = this.synonyms
+          this.targetGeneSynonyms = termData.equivalent_identifiers
 
           if(i == normalKeys.length - 1){
             console.log("this.synonyms")
             console.log(this.synonyms)
             console.log("this.queryTerms")
             console.log(this.queryTerms)
-            // FILTER QUERYTERMS TO ONLY INCLUDE NCBI, HGNC, MGI, RGD, UniprotKB
-            this.queryTerms = this.queryTerms.filter(x => x.includes("NCBIGene") || x.includes("HGNC") || x.includes("MGI") || x.includes("RGD") || x.includes("UniProtKB"))
-            console.log("filtered this.queryTerms")
-            console.log(this.queryTerms)
-            // get curies if == gene
-            if(this.resultGroup == "gene"){
-              this.geneCuriesToAddForOneHop = this.queryTerms
-            } else if(this.resultGroup == "drug"){
-              console.log("This is the drug turn")
-              console.log("there are the curies from genes = ", this.geneCuriesToAddForOneHop)
-              this.queryTerms = [...this.geneCuriesToAddForOneHop, ...this.queryTerms]
-              console.log("this.queryTerms")
-              console.log(this.queryTerms)
-              // this.drugCuriesToAddForOneHop = this.queryTerms
-            }
             return
           }
 
@@ -1314,33 +1316,22 @@ query_gg: {
         // console.log("step 2 started")
           if(this.resultGroup == "gene"){
             this.query_gg.message.query_graph.nodes.targetGene.ids = this.queryTerms
-            // SHOW QUERY TO CHECK ON THE TERMS AND SEE THE FORMAT
-            console.log("CHECK GENE QUERY => this.query_gg")
-            console.log(this.query_gg)
-
             // this.query_gg.nodes.targetGene.ids = this.queryTerms
 
             // #######################
-            // SEND TO LOOP THE QUERY TO ARS 
+            // SEND TO LOOP THE QUERY TO ARS - USE EVENT LOOPING
             // #######################
             let query = this.query_gg
             // this.ARSResultsLoop(query)
             return query
         }   
           else if(this.resultGroup == "drug"){
-            // #######################
-            // RESET THE STATE SO THAT IT WILL SEARCH USING ALL ARAS AGAIN IF IT WAS TURNED OFF FOR GENE
-            this.allowARAFail = "false"
             // this.query_dg.nodes.genes.ids = this.queryTerms
             this.query_dg.message.query_graph.nodes.genes.ids = this.queryTerms
-            // ####################### 
-            // SEND TO LOOP THE QUERY TO ARS
-            // CHECK THE QUERY TO SEE THE FORMAT
+            // ####################### message.query_graph.
+            // SEND TO LOOP THE QUERY TO ARS - USE EVENT LOOPING
             // #######################
-
             let query = this.query_dg
-            console.log("CHECK DRUG QUERY => this.query_dg")
-            console.log(this.query_dg)
             // this.ARSResultsLoop(query)
             return query
         }         
@@ -1427,7 +1418,7 @@ query_gg: {
           console.log("cleanedResults")
           console.log(cleanedResults)
           // @remind uncomment for two hop
-          this.tryARS3()
+          this.tryARS2()
           // this.saveExcel(this.geneResults)
           this.saveThisFile2(this.geneResults, fileName)
 
@@ -1445,7 +1436,206 @@ query_gg: {
 
     },
 
- 
+    async tryARS2() {
+      // #######################
+      // GET ORTHOLOGS FROM SYMBOL
+      // #######################      
+      console.log("before this.orthosIDs")
+      console.log(this.orthosIDs)
+      await this.getOrtholog()
+      console.log("after this.orthosIDs")
+      console.log(this.orthosIDs)
+      // #######################
+      // RESET THE TABLES TO CLEAR FOR NEW RUN
+      // #######################
+      if(this.resultGroup == "gene"){
+        this.geneResults = []
+        this.drugResults = []
+        this.queryTerms = this.orthosIDs
+        this.queryTerms = [this.concept_search]
+      }
+      this.ARSResults = []
+      this.ARSResultsSPO = []
+      this.synonyms = []
+      
+      // #######################
+      // PREPARE TO REMOVE NODES THAT DON'T HAVE TARGET GENE AS OBJECT - GET SYNONYMS
+      // CAN SEARCH WITH SINGLE TERM THOUGH - ARAS ARE NORMALISZING
+      // #######################
+
+
+      // #######################
+      // LOOP THROUGH ALL TERMS TO GET ALL SYNONYMS
+      // #######################
+      // @remind get synonyms
+      synonymService.nodeNormalizationPost(this.queryTerms)
+      .then(async (normalizedTerms) => {
+        this.gettingAliasColor = "primary"
+        let normalKeys = Object.keys(normalizedTerms)
+        console.log("normalizedTerms")
+        console.log(normalizedTerms)
+        // PROCESS NODENORMALIZER DATA
+        for (let i = 0; i < normalKeys.length; i++) {
+          const key = normalKeys[i];
+          let termData = normalizedTerms[key]
+          // console.log("normalizedTerms[key]")
+          // console.log(normalizedTerms[key])
+          // if(termData != null){
+          //   this.synonyms.push(termData.id)
+          // }
+          try {
+          let normTerms = termData.equivalent_identifiers.map(x => x.identifier)
+          this.synonyms = this.synonyms.concat(normTerms)
+
+          this.geneSynonyms = this.synonyms
+          this.targetGeneSynonyms = termData.equivalent_identifiers
+          } catch (error) {
+            console.log("error")
+            console.log(error)
+          }
+
+
+          if(i == normalKeys.length - 1){
+            console.log("this.synonyms")
+            console.log(this.synonyms)
+            // GET ALL IDS THAT START WITH NCBIGENE, HGNC, MGI, RGD, ZFIN, WORMBASE, UNIPROTKB
+            let geneSynonyms = this.synonyms.filter(x => x.startsWith("NCBIGENE") || x.startsWith("HGNC") || x.startsWith("MGI") || x.startsWith("RGD") || x.startsWith("ZFIN") || x.startsWith("WORMBASE") || x.startsWith("UniProtKB"))
+            console.log("geneSynonyms")
+            console.log(geneSynonyms)
+            
+            if(this.resultGroup == "gene"){
+              this.queryTerms = geneSynonyms
+            } else {
+              this.queryTerms = this.synonyms
+            }
+            return
+          }
+
+        }
+
+      })
+      .then(async () => {
+        // @remind set query
+        // console.log("step 2 started")
+          if(this.resultGroup == "gene"){
+            // this.query_gg.nodes.targetGene.ids = this.queryTerms
+            this.query_gg.message.query_graph.nodes.targetGene.ids = this.queryTerms
+
+            // ####################### message.query_graph.
+            // SEND TO LOOP THE QUERY TO ARS - USE EVENT LOOPING
+            // #######################
+            let query = this.query_gg
+            // this.ARSResultsLoop(query)
+            return query
+        }   
+          else if(this.resultGroup == "drug"){
+            // this.query_dg.nodes.genes.ids = this.queryTerms
+            this.query_dg.message.query_graph.nodes.genes.ids = this.queryTerms
+            // ####################### 
+            // SEND TO LOOP THE QUERY TO ARS - USE EVENT LOOPING
+            // #######################
+            let query = this.query_dg
+            // this.ARSResultsLoop(query)
+            return query
+        }         
+      })
+      // .then(async (test) => {test.filter(x=> x==1)})
+      .then(async (query) => {
+        // #######################
+        // GET PK FOR QUERY
+        // #######################
+        let pk = await this.setPK(query)
+        return pk
+      })
+      .then(async () => {
+        // @remind loop ARS
+        // #######################
+        // LOOP i < 10 times TO GET FULL ARS STATUS TABLE BUILT this.ARSrequestID
+        // IF NOT DONE IN THAT MANY TIMES THEN MOVE ON
+        // #######################
+        for (let i = 0; i < 50; i++) {
+        // for (let i = 0; i < 5; i++) {
+          let ARSStatusCheck = await this.ARSStatusTable()
+          // ################
+          // SORT THE STATUS TABLE ALPHABETICALLY
+          // ################
+          let obj = this.ARSResultStatus
+          let sorted = Object.keys(obj)
+            .sort()
+            .reduce((accumulator, key) => {
+              accumulator[key] = obj[key];
+              return accumulator;
+            }, {});
+          this.ARSResultStatus = sorted
+              
+          console.log("SORTED THE STATUS TABLE")
+          this.componentKey++
+          console.log("I LOOP NUMBER = ", i)
+          console.log("ARSStatusCheck")
+          console.log(ARSStatusCheck)
+          console.log("sorted.length")
+          console.log(sorted)
+          console.log(Object.keys(sorted).length)
+          // ################
+          // CHECK STATUS OF RESULTS 
+          // ################          
+          // if(ARSStatusCheck.agentFinished == 0 && ARSStatusCheck.agentCount >15){
+          if(ARSStatusCheck.agentFinished == 0 && ARSStatusCheck.agentCount == Object.keys(sorted).length){
+            i = 50
+            // console.log("finish before looping to 10!")
+            // console.log("this.ARSResultStatus")
+            // console.log(this.ARSResultStatus)
+
+            this.componentKey++
+            return
+          } else {
+            await new Promise(resolve => setTimeout(resolve, 5000));
+          }
+        }
+
+      }) //ARSCleanResults
+      .then(async () => {
+        await this.ARSCleanResults()
+        return
+      })
+      .then(async () => {
+        if(this.resultGroup == "gene"){
+          this.resultGroup = "drug"
+          console.log("DONE!")
+          let genesForDrug = this.ARSResults.map(x => x.object)
+          genesForDrug.push(this.concept_search)
+          this.queryTerms = genesForDrug
+          // console.log("this.queryTerms")
+          // console.log(this.queryTerms)
+          this.geneGeneFileName = this.concept_search + "_gene_gene"
+          let fileName = this.concept_search + "_gene_gene"
+
+          // NEW FLATTENING CLEAN
+          
+          let cleanedResults = await TrapiResultClean.flattenGetPublications(this.geneResults)
+          this.ggTotalRows = this.geneResults.length
+          this.saveThisFile(cleanedResults, fileName)
+          console.log("cleanedResults")
+          console.log(cleanedResults)
+          // @remind uncomment for two hop
+          this.tryARS2()
+          // this.saveExcel(this.geneResults)
+          this.saveThisFile2(this.geneResults, fileName)
+
+        } else{
+          this.resultGroup == "gene"
+          let fileName = this.concept_search + "_drug_gene"
+          this.saveThisFile2(this.drugResults, fileName)
+          this.saveExcel(this.drugResults)
+          // this.saveExcel(this.drugResults)
+          console.log("THIS IS THE END")
+        }
+
+        // if()
+      })
+
+    },
+
     // @remind nodeNormalize
     async nodeNormalize(queryTarget){
 
@@ -1469,9 +1659,9 @@ query_gg: {
           // console.log(normalizedTerms[key])
           let normTerms = termData.equivalent_identifiers.map(x => x.identifier)
           this.synonyms = this.synonyms.concat(normTerms)
-          if(this.resultGroup == "gene"){
+           if(this.resultGroup == "gene"){
             this.geneSynonyms = this.resultGroup
-          }
+           }
           if(i == normalKeys.length - 1){
             console.log("synonyms")
             console.log(synonyms)

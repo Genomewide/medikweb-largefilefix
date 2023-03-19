@@ -18,7 +18,8 @@ import geneAllSynToDrugsARS from './components/geneAllSynToDrugsARS.vue';
 import retrieveARSResults from './components/retrieveARSResults.vue';
 import geneAllSynToDrugsARS2 from './components/geneAllSynToDrugsARS2.vue';
 import cytoscapeTest1 from './components/cytoscapeTest1.vue';
-// import conceptExploreTextMatch from './components/cytoscapTest1.vue';
+// import conceptExploreTextMatch from './components/cytoscapTest1.vue'; 
+import geneAllSynToDrugsARSBatch from './components/geneAllSynToDrugsARSBatch.vue'; 
 // import conceptConnect from './components/conceptConnect.vue';
 // import xml from './components/XDM-220618-012821/IHE_XDM/CE001/DOC00001.XML';
 // /Users/andycrouse/Documents/GitHub/medikweb_dev/client/src/components/XDM-220618-012821/IHE_XDM/CE001/DOC00001.XML
@@ -56,6 +57,11 @@ Vue.use(Router)
         path: '/cytoscapeTest1', 
         name: 'cytoscapeTest1', 
         component: cytoscapeTest1 
+      },
+      { 
+        path: '/geneAllSynToDrugsARSBatch', 
+        name: 'geneAllSynToDrugsARSBatch', 
+        component: geneAllSynToDrugsARSBatch 
       },
       // { 
       //   path: '/apiexplorer', 

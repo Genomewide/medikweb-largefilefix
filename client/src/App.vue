@@ -63,8 +63,8 @@
     <b-nav-item ><router-link to="/retrieveARSResults">retrieveARSResults</router-link></b-nav-item>
     <b-nav-item ><router-link to="/geneAllSynToDrugsARS2">geneAllSynToDrugsARS2</router-link></b-nav-item>
     <b-nav-item ><router-link to="/cytoscapeTest1">cytoscapeTest1</router-link></b-nav-item>
-    <!-- <b-nav-item ><router-link to="/conceptExploreTextMatch">conceptExploreTextMatch</router-link></b-nav-item> 
-    <b-nav-item ><router-link to="/conceptConnect">conceptConnect</router-link></b-nav-item>
+    <b-nav-item ><router-link to="/geneAllSynToDrugsARSBatch">geneAllSynToDrugsARSBatch</router-link></b-nav-item> 
+    <!-- <b-nav-item ><router-link to="/conceptConnect">conceptConnect</router-link></b-nav-item>
     <b-nav-item ><router-link to="/xml">xml</router-link></b-nav-item> -->
     <!-- <div>svgtest conceptExplorePlus geneAllSynToDrugs geneAllSynToDrugsARS conceptConnect geneAllSynToDrugsARS2
       <svg width = "100" height = "100">
