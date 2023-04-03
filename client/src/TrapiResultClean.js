@@ -41,17 +41,25 @@ class TrapiResultClean {
               let data = {}
               
               data.diseaseKey = ""
+              data.diseaseKeyName = ""
               data.drugKey = ""
+              data.drugKeyName = ""
               data.resNodeCount = 0
               data.normalizedScore = resultData.normalized_score
               try{
-                data.diseaseKey = resultData.node_bindings.disease[0].id
-                data.drugKey = resultData.node_bindings.drug[0].id
+                // data.diseaseKey = resultData.node_bindings.disease[0].id
+                data.diseaseKey = resultData.node_bindings.on[0].id
+                // data.drugKey = resultData.node_bindings.drug[0].id
+                data.drugKey = resultData.node_bindings.sn[0].id
+                data.diseaseKeyName = nodes[data.diseaseKey].name
+                data.drugKeyName = nodes[data.drugKey].name
                 let nodeBindingKeys = Object.keys(resultData.node_bindings)
                 data.resNodeCount = nodeBindingKeys.length
               } catch {
                 data.diseaseKey = "NA"
                 data.drugKey =  "NA"
+                data.diseaseKeyName = "NA"
+                data.drugKeyName = "NA"
                 resultData.node_bindings = 0
               }
               // if(x <10){

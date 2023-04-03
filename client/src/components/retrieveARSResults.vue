@@ -776,8 +776,6 @@ export default {
       geneTableToSave: [],
       chemTableToSave: [],
       hgncAll: [
-     
-      
         "HGNC:10596",
         "HGNC:15573",
         "HGNC:25566",
@@ -904,7 +902,8 @@ export default {
           }
         },
         queryName: "",
-        routPK: ""
+        routPK: "",
+        jsonData: {},
        
     };
   },
@@ -1661,6 +1660,13 @@ async resultEdgeGroupTable(){
   return new Promise(async (resolve, reject) => { // eslint-disable-line
     // results.fields.data
     // GET EACH DATA SET FROM THE ARAS
+    // come back this.ARSResultStatus
+    // console.log('this.allAnswerGraphArray, "allAnswerGraphArray"')
+    // console.log(this.allAnswerGraphArray)
+    // this.saveJson(this.allAnswerGraphArray, "allAnswerGraphArray")
+    // console.log('this.ARSResultStatus, "ARSResultStatus"')
+    // console.log(this.ARSResultStatus)
+    // this.saveJson(this.ARSResultStatus, "ARSResultStatus")
     for (let i = 0; i < this.allAnswerGraphArray.length; i++) {
     // for (let i = 0; i < 1; i++) {
       const res = this.allAnswerGraphArray[i].results.fields.data;
@@ -1715,6 +1721,8 @@ async resultNodeGroupTable(){
   return new Promise(async (resolve, reject) => { // eslint-disable-line
 // results.fields.data
     // GET EACH DATA SET FROM THE ARAS
+    console.log("this.allAnswerGraphArray resultNodeGroupTable")
+    console.log(this.allAnswerGraphArray)
     for (let i = 0; i < this.allAnswerGraphArray.length; i++) {
     // for (let i = 0; i < 1; i++) {
       const res = {...this.allAnswerGraphArray[i].results.fields.data}
@@ -1730,6 +1738,8 @@ async resultNodeGroupTable(){
         // console.log("----- result")
         // console.log(result)
         let nodeBindings = {...result.node_bindings}
+        // console.log("nodeBindings")
+        // console.log(nodeBindings)
         let nodeKeys = Object.keys(nodeBindings)
         // console.log("nodeBindings")
         // console.log(nodeBindings)
@@ -2052,6 +2062,8 @@ async araxCategoryGroup(){
           // let checkForAnyResults = ARSStatusCheckArray.filter(x => x.resultCount > 0)
           console.log("ARSStatusCheck")
           console.log(ARSStatusCheck)
+          // @remind check to see if loop wanted for ARS
+
           if(ARSStatusCheck.agentFinished == 0 && ARSStatusCheck.agentCount >10){
           // if(ARSStatusCheck.agentFinished < 2 && ARSStatusCheck.agentCount >10){
           // if(ARSStatusCheck.agentFinished < 3){
@@ -2110,6 +2122,9 @@ async araxCategoryGroup(){
                 console.log("agent")
                 console.log(agent)
                 console.log({result})
+
+                // SAVE THE JSON TO THE FILE 3176389f-9e75-4e2e-9beb-bed32055de13
+                this.saveJson(result, agent)
 
                 this.ARSResultStatus[agent] = {}
                 this.ARSResultStatus[agent]["agent"] = agent
@@ -2209,10 +2224,11 @@ async araxCategoryGroup(){
           if(Object.prototype.hasOwnProperty.call(this.ARSResultStatus[id].results.fields.data, "message")){
             if(Object.prototype.hasOwnProperty.call(this.ARSResultStatus[id].results.fields.data.message, "knowledge_graph")){
               if(this.ARSResultStatus[id].results.fields.data.message.results != null){
-
               
               console.log("CLEANING RESULTS")
-
+              console.log("this.ARSResultStatus[id]")
+              console.log(this.ARSResultStatus[id])
+              // this.jsonData
               let resultCount = this.ARSResultStatus[id].results.fields.data.message.results.length
               if(resultCount > 0){
                 console.log("this.ARSResultStatus[id].results.fields.data")
@@ -2924,6 +2940,23 @@ async araxCategoryGroup(){
       element.click();
       document.body.removeChild(element);
 
+    },
+
+    saveJson(json, filename){
+      filename =  filename + ".json";
+      let saveJSON = JSON.stringify(json)
+      let element = document.createElement("a");
+      element.setAttribute(
+        "href",
+        "data:application/json;charset=utf-8," + encodeURIComponent(saveJSON)
+      );
+      element.setAttribute("download", filename);
+
+      element.style.display = "none";
+      document.body.appendChild(element);
+
+      element.click();
+      document.body.removeChild(element);
     },
 
     async getPubmed(item, index) {

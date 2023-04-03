@@ -4,8 +4,14 @@
       <h1 class="text-center">CYTOSCAPE TESTING</h1>
     </b-row>
     <b-row>
-      <b-col cols="3">
+      <b-col cols="3"> 
+          <b-button class="mt-3" variant="success" block @click="getTRAPI"
+            >getTRAPI</b-button
+          > 
         <div class="border border-secondary rounded" style="height: 100%">
+          <b-button class="mt-3" variant="success" block @click="graphMeta"
+            >graphMeta</b-button
+          > 
           <b-button class="mt-3" variant="success" block @click="getMeta"
             >getMeta</b-button
           > 
@@ -111,7 +117,6 @@
               :key="`${def.data.id}`"
               :definition="def"
               v-on:mousedown="showNodeInfo($event, def, def.data, def.data.id)"
-              v-on:mouseover="hoverGraph($event, def, def.data, def.data.id)"
             />
           </cytoscape>
           <!-- <cytoscape
@@ -127,6 +132,7 @@
               v-for="def in elements"
               :key="`${def.data.id}`"
               :definition="def"
+              v-on:mouseover="hoverGraph($event, def, def.data, def.data.id)"
               v-on:mouseover="hoverGraph($event, def, def.data, def.data.id)"
               v-on:mousedown="moveToModal($event, def, def.data, def.data.id)"
             />
@@ -284,6 +290,109 @@
     <!-- ########################################################################
     END --- REVIEW AND INFO WINDOWS 
     ######################################################################## -->
+
+
+    <!-- ########################################################################
+    TESTING BTE QUERY SELECTIONN FROM META GRAPH
+    ######################################################################## -->
+    <b-row>
+      <b-col cols="4">
+        <h3>Select subject</h3>
+        <div class="border border-secondary rounded">
+           <div>
+            <b-form-group
+              label="Form-checkbox-group stacked checkboxes"
+              v-slot="{ ariaDescribedby }"
+            >
+              <b-form-checkbox-group
+                v-model="selected"
+                :options="selectSubject"
+                :aria-describedby="ariaDescribedby"
+                name="flavour-2a"
+                stacked
+              ></b-form-checkbox-group>
+            </b-form-group>
+            </div>
+            <div class="mt-3">Selected: <strong>{{ selected }}</strong></div>
+        </div>
+      </b-col>
+      <!-- ######################################################################## -->
+      <b-col cols="4">
+        <h3>Select predicate</h3>
+        <div class="border border-secondary rounded">
+           <div>
+            <b-form-group
+              label="Form-checkbox-group stacked checkboxes"
+              v-slot="{ ariaDescribedby }"
+            >
+              <b-form-checkbox-group
+                v-model="selected"
+                :options="selectPredicate"
+                :aria-describedby="ariaDescribedby"
+                name="flavour-2a"
+                stacked
+              ></b-form-checkbox-group>
+            </b-form-group>
+            </div>
+            <div class="mt-3">Selected: <strong>{{ selected }}</strong></div>
+       
+        </div>
+      </b-col>
+      <!-- ######################################################################## -->
+      <b-col cols="4">
+          <h3>Select object</h3>
+            <div class="border border-secondary rounded">
+              <div>
+                <b-form-group
+                  label="Form-checkbox-group stacked checkboxes"
+                  v-slot="{ ariaDescribedby }"
+                >
+                  <b-form-checkbox-group
+                    v-model="selected"
+                    :options="selectSubject"
+                    :aria-describedby="ariaDescribedby"
+                    name="flavour-2a"
+                    stacked
+                  ></b-form-checkbox-group>
+                </b-form-group>
+                </div>
+                <div class="mt-3">Selected: <strong>{{ selected }}</strong></div>
+            </div>
+      </b-col>
+    </b-row>
+    <!-- ########################################################################
+    END --- REVIEW AND INFO WINDOWS 
+    ######################################################################## -->
+
+<div>
+          <b-pagination
+          style="padding-bottom: 20px"
+          v-model="currentPage"
+          :total-rows="queryData.length"
+          :per-page="10"
+          align="fill"
+          size="sm"
+          class="my-0"
+        ></b-pagination>
+      <b-table
+          bordered
+          striped
+          hover
+          ref="selectableTable"
+          responsive="true"
+          table-layout:
+          fixed
+          :current-page="currentPage"
+          :per-page="10"
+          :fields="resultFields"
+          :items="queryData"
+          :filter="filter"
+          :filter-include-fields="[]"
+          @filtered="onFiltered"
+        >
+        </b-table>
+</div>
+
     <div>
       <!-- <b-button class="mt-3" variant="primary" block @click="selectResult">CHEMBL.COMPOUND:CHEMBL408 </b-button> -->
 
@@ -318,14 +427,30 @@
         <b-pagination
           style="padding-bottom: 20px"
           v-model="currentPage"
-          :total-rows="filterCytoData.length"
+          :total-rows="queryData.length"
           :per-page="10"
           align="fill"
           size="sm"
           class="my-0"
         ></b-pagination>
-
-        <b-table
+      <b-table
+          bordered
+          striped
+          hover
+          ref="selectableTable"
+          responsive="true"
+          table-layout:
+          fixed
+          :current-page="currentPage"
+          :per-page="10"
+          :fields="resultFields"
+          :items="queryData"
+          :filter="filter"
+          :filter-include-fields="[]"
+          @filtered="onFiltered"
+        >
+        </b-table>
+        <!-- <b-table
           bordered
           striped
           hover
@@ -341,7 +466,7 @@
           :filter-include-fields="[]"
           @filtered="onFiltered"
         >
-        </b-table>
+        </b-table> -->
       </b-card-text>
       <!-- </b-collapse> -->
     </div>
@@ -351,13 +476,19 @@
 <script>
 import PostService from "../PostService";
 // import TrapiResultClean from "../TrapiResultClean";
-
+// adfb2b6f-4512-49ba-bc9d-324c8d783dc1
 // bte_metagraph
 import klay from "cytoscape-klay";
 import config from "./cytoscapeData/CytoConfig";
 import config2 from "./cytoscapeData/CytoConfig2";
 import dataMenu from "./cytoscapeData/cytoscapeExampleResults.json";
 import metagraph from "../assets/bte_metagraph.json";
+import arax from "./cytoscapeData/ara-arax.json";
+import unsecret from "./cytoscapeData/ara-unsecret.json";
+import robokop from "./cytoscapeData/ara-robokop.json";
+import explanatory from "./cytoscapeData/ara-explanatory.json";
+import bte from "./cytoscapeData/ara-bte.json";
+import improving from "./cytoscapeData/ara-improving.json";
 import pathData from "./cytoscapeData/pathsData.json";
 import cytoData from "../assets/diabetesTreatsCleaned.json";
 // import dataMenu from "../assets/cytoscapeExampleResults.json";
@@ -365,6 +496,8 @@ import cytoscape from "cytoscape";
 // cytoscapeExampleResults
 // import cytoscapeAllPaths from 'cytoscape-all-paths';
 // cytoscape.use( cytoscapeAllPaths );
+// allAnswerGraphArray_CF
+import allAnswerGraphArray_CF from "./cytoscapeData/allAnswerGraphArray_CF.json";
 
 // cytoscape.use(klay)
 console.log("config");
@@ -377,6 +510,9 @@ console.log("cytoData");
 console.log(cytoData);
 console.log("metagraph");
 console.log(metagraph);
+
+console.log("allAnswerGraphArray_CF")
+console.log(allAnswerGraphArray_CF)
 
 
 
@@ -507,16 +643,406 @@ export default {
     }
       ],
       radioDrug: "CHEMBL.COMPOUND:CHEMBL408",
+      queryData: [],
       allNodes: [],
-      
+      allEdges: [],
+      allNodeIds: [],
+      allEdgeIds: [],
+      selectSubject: [],
+      selectObject: [],
+      selectPredicate: [],
+      selected: [], // Must be an array reference!
+      jsonData: {},
+      allARAData: {},
+      drugSelected: 'PUBCHEM.COMPOUND:16220172'
+
     };
   },
   methods: {
+    getTRAPI(){
+      console.log("arax")
+      console.log(arax)
+      console.log("unsecret")
+      console.log(unsecret)
+      console.log("robokop")
+      console.log(robokop)
+      console.log("explanatory")
+      console.log(explanatory)
+      console.log("bte")
+      console.log(bte)
+      console.log("improving")
+      console.log(improving)
+
+    // test arax
+    this.makeGraphForEachARA(arax)
+
+
+    },
+    makeGraphForEachARA(ara){
+
+      // GET RESULTS FROM ARAX
+      let araResults = ara.fields.data.message.results
+
+      // GET NODES FROM ARAX
+      let araNodes = ara.fields.data.message.knowledge_graph.nodes
+      console.log("araxNodes")
+      console.log(araNodes)
+
+      // GET EDGES FROM ARAX
+      let araEdges = ara.fields.data.message.knowledge_graph.edges
+      console.log("araEdges")
+      console.log(araEdges)
+
+      // GET SN == PUBCHEM.COMPOUND:16220172
+      let araSnAll = araResults.map(x => x.node_bindings.sn[0].id)
+      let araSnUnique = [...new Set(araSnAll)]
+      console.log("araSnUnique")
+      console.log(araSnUnique)
+
+      // FIND MATCHING RESULT
+      let araResult = araResults.filter(x => x.node_bindings.sn[0].id == this.drugSelected)
+      console.log("araResult")
+      console.log(araResult)
+      let on = araResult[0].node_bindings.on[0].id
+      console.log("on")
+      console.log(on)
+      let sn = araResult[0].node_bindings.sn[0].id
+      console.log("sn")
+      console.log(sn)
+
+      // GET EDGES FROM ARAX RESULT IDS
+      let araResultEdges = araResult[0].edge_bindings
+      let araEdgeKeys = Object.keys(araResultEdges)
+      console.log("araEdgeKeys")
+      console.log(araEdgeKeys)
+
+      // this.allARAData["arax"] = []
+      let araEdgeIds = []
+      for (let i = 0; i < araEdgeKeys.length; i++) {
+        const edgeGroup = araEdgeKeys[i];
+        console.log("edgeGroup")
+        console.log(edgeGroup)
+        let edgeId = araResultEdges[edgeGroup].map(x => x.id)
+        araEdgeIds = [...new Set([...araEdgeIds, ...edgeId])] //[...new Set(araxSnAll)]
+        console.log("araEdgeIds")
+        console.log(araEdgeIds)
+        
+      }
+
+      // GET EDGES FROM ARAX RESULT IDS
+      let araEdgesFiltered = []
+      for (let i = 0; i < araEdgeIds.length; i++) {
+        const edgeId = araEdgeIds[i];
+        araEdgesFiltered.push(araEdges[edgeId])
+        // console.log("araxEdge")
+        // console.log(araxEdge)
+        // araxEdgesFiltered = [...new Set([...araxEdgesFiltered, ...araxEdge])] //[...new Set(araxSnAll)]
+      }
+      console.log("araEdgesFiltered")
+      console.log(araEdgesFiltered)
+
+      // MAKE GRAPH OBJECT WITH EDGES AND NODE COMBINED DATA
+      let araGraph = []
+
+      araEdgesFiltered.map(edge => {
+        let subject = araNodes[edge.subject]
+        let object = araNodes[edge.object]
+        let edgeData = {
+          subject: subject,
+          subjectid: edge.subject,
+          object: object,
+          objectid: edge.object,
+          predicate: edge.predicate,
+          edge: edge,
+          ara: "arax"
+        }
+        araGraph.push(edgeData)
+      })
+      console.log("araGraph")
+      console.log(araGraph)
+      
+      for (let i = 0; i < araGraph.length; i++) {
+        const el = araGraph[i];
+        araGraph[i].objectIdFixed = el.objectid.replace(":", "_")
+        araGraph[i].objectIdFixed = araGraph[i].objectIdFixed.replace(" ", "_")
+        araGraph[i].objectIdFixed = araGraph[i].objectIdFixed.replace(".", "_")
+        araGraph[i].objectIdFixed = araGraph[i].objectIdFixed.replace(" ", "_")
+
+        console.log(el.object)
+        console.log(el.object.name)
+
+        if(el.object.name == undefined){
+          console.log("undefined")
+          araGraph[i].objectNameFixed = araGraph[i].objectIdFixed
+        } 
+        // else {
+        //   console.log("defined")
+        //   araGraph[i].objectNameFixed = el.object.name.replace(":", "_")
+        //   araGraph[i].objectNameFixed = araGraph[i].objectNameFixed.replace(" ", "_")
+        // }
+
+        try{
+          araGraph[i].objectNameFixed = el.object.name.replace(":", "_")
+          araGraph[i].objectNameFixed = araGraph[i].objectNameFixed.replace(" ", "_")
+        } catch(e){
+          console.log("error")
+          console.log(e)
+          araGraph[i].objectNameFixed = araGraph[i].objectIdFixed
+          // araxGraph[i].objectNameFixed = araxGraph[i].objectNameFixed.replace(" ", "_")
+        }
+        // araxGraph[i].objectNameFixed = el.object.name.replace(":", "_")
+        // araxGraph[i].objectNameFixed = araxGraph[i].objectNameFixed.replace(" ", "_")
+
+        araGraph[i].subjectIdFixed = el.subjectid.replace(":", "_")
+        araGraph[i].subjectIdFixed = araGraph[i].subjectIdFixed.replace(" ", "_")
+        araGraph[i].subjectIdFixed = araGraph[i].subjectIdFixed.replace(".", "_")
+        araGraph[i].subjectIdFixed = araGraph[i].subjectIdFixed.replace(" ", "_")
+
+        if(el.subject.name == undefined){
+          console.log("undefined")
+          araGraph[i].subjectNameFixed = araGraph[i].subjectIdFixed
+        }
+
+        try{
+          araGraph[i].subjectNameFixed = el.subject.name.replace(":", "_")
+          araGraph[i].subjectNameFixed = araGraph[i].subjectNameFixed.replace(" ", "_")
+        } catch(e){
+          console.log("error")
+          console.log(e)
+          araGraph[i].subjectNameFixed = araGraph[i].subjectIdFixed
+          // araxGraph[i].subjectNameFixed = araxGraph[i].subjectNameFixed.replace(" ", "_")
+        }
+
+        // araxGraph[i].subjectNameFixed = el.subject.name.replace(":", "_")
+        // araxGraph[i].subjectNameFixed = araxGraph[i].subjectNameFixed.replace(" ", "_")
+
+        araGraph[i].predicateFixed = araGraph[i].objectNameFixed + "_" + araGraph[i].ara  + "_" + araGraph[i].subjectNameFixed
+        araGraph[i].predicateFixed = araGraph[i].predicateFixed.replace(" ", "_")
+        araGraph[i].predicateFixed = araGraph[i].predicateFixed.replace(".", "_")
+        araGraph[i].predicateFixed = araGraph[i].predicateFixed.replace(":", "_")
+        araGraph[i].predicateFixed = araGraph[i].predicateFixed.replace("(", "_")
+        araGraph[i].predicateFixed = araGraph[i].predicateFixed.replace(")", "_")
+        
+      }
+
+      console.log("araGraph fixed 1")
+      console.log(araGraph)
+
+      // MAKE CYTOSCAPE NODES if they don't already exist
+      // {
+      //   data: { id: "b" , name : "b modal node"},
+      //   position: { x: 689, y: 282 },
+      //   group: "nodes"
+      // },
+      for (let i = 0; i < araGraph.length; i++) {
+        const el = araGraph[i];
+        //CHECK IF NODE ID IS IN ALLNODEIDS - MAKE OBJECT NODE IF NOT
+        if(!this.allNodeIds.includes(el.objectIdFixed)){
+          this.allNodeIds.push(el.objectIdFixed)
+          let cytoClassesCheck = ""
+
+          if(el.objectid == on){
+            this.theDisease = el.objectIdFixed
+            cytoClassesCheck = ["thedisease"]
+          } else if (el.objectid == sn){
+            this.theDrug = el.objectIdFixed
+            cytoClassesCheck = ["thedrug"]
+          } else {
+            cytoClassesCheck = ["secondaryNode"]}
+
+          this.allNodes.push({
+            data: {
+              id: el.objectIdFixed,
+              label: el.objectNameFixed,
+              name: el.objectNameFixed,
+              nodeType: "ara"
+            },
+            group: "nodes",
+            classes: cytoClassesCheck
+          })
+        }
+
+        //CHECK IF NODE ID IS IN ALLNODEIDS - MAKE SUBJECT NODE IF NOT
+        if(!this.allNodeIds.includes(el.subjectIdFixed)){
+          this.allNodeIds.push(el.subjectIdFixed)
+          let cytoClassesCheck = ""
+
+          if(el.subjectid == on){
+            this.theDisease = el.subjectIdFixed
+            cytoClassesCheck = ["thedisease"]
+          } else if (el.subjectid == sn){
+            this.theDrug = el.subjectIdFixed
+            cytoClassesCheck = ["thedrug"]
+          } else {
+            cytoClassesCheck = ["secondaryNode"]}
+          
+          this.allNodes.push({
+            data: {
+              id: el.subjectIdFixed,
+              label: el.subject.name,
+              name: el.subject.name,
+              nodeType: "ara"
+            },
+            group: "nodes",
+            classes: cytoClassesCheck
+          })
+        }
+        //CHECK IF edges ID IS IN alledgeIDS - MAKE EDGE IF NOT
+        if(!this.allEdgeIds.includes(el.predicateFixed)){
+          this.allEdgeIds.push(el.predicateFixed)
+          this.allEdges.push({
+            data: {
+              id: el.predicateFixed,
+              source: el.subjectIdFixed,
+              target: el.objectIdFixed,
+              label: el.predicateFixed,
+              edgeType: el.ara,
+              predicate: el.predicate,
+            },
+            group: "edges",
+            classes: [el.ara]
+          })
+        }
+        
+      }
+
+        console.log("allNodes")
+        console.log(this.allNodes)
+        console.log("allEdges")
+        console.log(this.allEdges)
+
+        this.elements = [...this.allNodes];
+        this.elements = [...this.elements, ...this.allEdges]
+        console.log("elements")
+        console.log(this.elements)
+
+
+
+
+    },
+    graphMeta(){
+      console.log("graphMeta")
+      console.log("metagraph")
+      console.log(metagraph)    
+      // GET UNIQUE SUBJECT OBJECT PAIRS
+      let edges = metagraph.edges
+      let uniqueSubjects = [...new Set(edges.map(edge => edge.subject))]
+      let uniqueObjects = [...new Set(edges.map(edge => edge.object))]
+      // COMBINE SUBJECTS AND OBJECTS
+      let allNodes = uniqueSubjects.concat(uniqueObjects)
+      let uniqueAllNodes = [...new Set(allNodes)]
+      console.log("uniqueAllNodes")
+      console.log(uniqueAllNodes)
+
+      // CREATE NODES
+      let nodes = uniqueAllNodes.map(node => {
+        return {
+          data: {
+            id: node.split(":")[1],
+            label: node.split(":")[1],
+            name: node.split(":")[1],
+            nodeType: "meta"
+          },
+          group: "nodes"
+        }
+      })
+      console.log("nodes")
+      console.log(nodes)
+
+      // CREATE EDGES
+      let edges2 = edges.map(edge => {
+        return {
+          data: {
+            id: edge.subject.split(":")[1] + "_" + edge.object.split(":")[1],
+            source: edge.subject.split(":")[1],
+            target: edge.object.split(":")[1],
+            // predicate: edge.predicate,
+            edgeType: "meta"
+          },
+          group: "edges"
+        }
+      })
+      console.log("edges2")
+      console.log(edges2)
+      // GET UNIQUE EDGES2 BASES ON ID
+      let uniqueEdges2 = []
+      let uniqueEdgeCheck = []
+      for (let i = 0; i < edges2.length; i++) {
+        const edge = edges2[i];
+        let id1 = edge.data.source + edge.data.target
+        let id2 = edge.data.target + edge.data.source
+        if (!uniqueEdgeCheck.includes(id1) && !uniqueEdgeCheck.includes(id2)) {
+          uniqueEdges2.push(edge)
+          uniqueEdgeCheck.push(id1)
+          uniqueEdgeCheck.push(id2)
+        }
+        
+      }
+      console.log("uniqueEdges2")
+      console.log(uniqueEdges2)
+
+
+      let uniqueEdges3 = []
+
+      edges2.forEach(edge => {
+        if (!uniqueEdges3.some(e => e.data.id === edge.data.id)) {
+          uniqueEdges3.push(edge)
+        }
+      })
+      console.log("uniqueEdges3")
+      console.log(uniqueEdges3)
+
+    
+    this.elements = [...nodes, ...uniqueEdges2];
+
+
+
+      
+
+
+
+    },
     getMeta(){
+      console.log("getMeta")
+      console.log("metagraph")
+      console.log(metagraph)
+
       // get node keys from metagraph
       let nodeKeys = Object.keys(metagraph.nodes)
       console.log("nodeKeys")
       console.log(nodeKeys)
+
+      let edges = metagraph.edges
+      // GET UNIQUE SUBJECTS AND OBJECTS FROM EDGES
+      let uniqueSubjects = [...new Set(edges.map(edge => edge.subject))]
+      let uniqueObjects = [...new Set(edges.map(edge => edge.object))]
+      let uniquePredicates = [...new Set(edges.map(edge => edge.predicate))]
+      console.log("uniquePredicates")
+      console.log(uniquePredicates)
+      console.log("uniqueSubjects")
+      console.log(uniqueSubjects)
+      console.log("uniqueObjects")
+      console.log(uniqueObjects)
+
+      this.selectSubject = uniqueSubjects.map(subject => {
+        return {
+          text: subject.split(":")[1],
+          value: subject
+        }
+      })
+      this.selectObject = uniqueObjects.map(object => {
+        return {
+          text: object.split(":")[1],
+          value: object
+        }
+      })
+      this.selectPredicate = uniquePredicates.map(predicate => {
+        return {
+          text: predicate.split(":")[1],
+          value: predicate
+        }
+      })
+
       // get unique subjects from edges
       let subjects = []
       for (let i = 0; i < metagraph.edges.length; i++){
@@ -525,8 +1051,9 @@ export default {
           subjects.push(subj)
         }
       }
-      console.log("subjects")
-      console.log(subjects)
+      // console.log("subjects")
+      // console.log(subjects)
+
       // get unique objects from edges
       let objects = []
       for (let i = 0; i < metagraph.edges.length; i++){
@@ -535,8 +1062,45 @@ export default {
           objects.push(obj)
         }
       }
-      console.log("objects")
-      console.log(objects)
+      // console.log("objects")
+      // console.log(objects)
+
+
+      // GET ALL PREDICATES FOR EACH SUBJECT NODE KEY
+      let selectionMap = {}
+      selectionMap.subjectsPredicates = {}
+      selectionMap.objectsPredicates = {}
+      for (let i = 0; i < subjects.length; i++) {
+        const subject = subjects[i];
+        selectionMap.subjectsPredicates[subject] = []
+        metagraph.edges.map(x => {
+          if (x.subject === subject) {
+            selectionMap.subjectsPredicates[subject].push(x.predicate)
+          }
+        })
+        selectionMap.subjectsPredicates[subject] = [...new Set(selectionMap.subjectsPredicates[subject])]
+      }
+      console.log("selectionMap")
+      console.log(selectionMap)
+
+
+      // GET ALL PREDICATES FOR EACH OBJECT NODE KEY
+      for (let i = 0; i < objects.length; i++) {
+        const object = objects[i];
+        selectionMap.objectsPredicates[object] = []
+        metagraph.edges.map(x => {
+          if (x.object === object) {
+            selectionMap.objectsPredicates[object].push(x.predicate)
+          }
+        })
+        selectionMap.objectsPredicates[object] = [...new Set(selectionMap.objectsPredicates[object])]
+      }
+
+
+      // for (let i = 0; i < array.length; i++) {
+      //   const element = array[i];
+        
+      // }
 
 
 
@@ -550,19 +1114,19 @@ export default {
       //   nodePredicates.push(nodePreds)
       // }
       // get unique predicates
-      let uniquePredicates = []
-      for (let i = 0; i < nodePredicates.length; i++){
-        let nodePreds = nodePredicates[i]
-        for (let j = 0; j < nodePreds.length; j++){
-          let nodePred = nodePreds[j]
-          if (!uniquePredicates.includes(nodePred)){
-            uniquePredicates.push(nodePred)
-          }
-        }
-      }
-      console.log("uniquePredicates")
-      console.log(uniquePredicates)
-      
+      // let uniquePredicates = []
+      // for (let i = 0; i < nodePredicates.length; i++){
+      //   let nodePreds = nodePredicates[i]
+      //   for (let j = 0; j < nodePreds.length; j++){
+      //     let nodePred = nodePreds[j]
+      //     if (!uniquePredicates.includes(nodePred)){
+      //       uniquePredicates.push(nodePred)
+      //     }
+      //   }
+      // }
+      // console.log("uniquePredicates")
+      // console.log(uniquePredicates)
+
 
 
 
@@ -1194,6 +1758,35 @@ export default {
     // @remind selectResult2
     selectResult2() {
       this.cyInstance.selectionType("additive");
+      // GET COUNT OF RESULTS WITH MORE THAN ONE AGENT
+      let resultGroupsArray = cytoData.map(x => x.ResultGroup)
+      resultGroupsArray = [...new Set(resultGroupsArray)]
+      console.log("resultGroupsArray")
+      console.log(resultGroupsArray)
+      // resultGroupsArray.map((x) => x.ResultGroup)
+      let resultGroupsArrayData = []
+
+      for (let i = 0; i < resultGroupsArray.length; i++) {
+        const resultGroupCheck = resultGroupsArray[i];
+        // console.log("resultGroupCheck")
+        // console.log(resultGroupCheck)
+        // console.log("cytoData.filter(x => x.ResultGroup == resultGroupCheck ).length")
+        // console.log(cytoData.filter(x => x.ResultGroup == resultGroupCheck ).length)
+        let resultData = {
+          ResultGroup: resultGroupCheck,
+          countEdges: cytoData.filter(x => x.ResultGroup == resultGroupCheck ).length,
+          agents: [...new Set(cytoData.filter(x => x.ResultGroup == resultGroupCheck).map(x => x.agent))]
+          
+          }
+          resultGroupsArrayData.push(resultData)
+      }
+      console.log("resultGroupsArrayData")
+      console.log(resultGroupsArrayData)
+      let multiAgentResults = resultGroupsArrayData.filter(x => x.agents.length > 0)
+      console.log("multiAgentResults")
+      console.log(multiAgentResults)
+
+
       // Set the selection type.
       // type The selection type string; one of 'single' (default) or 'additive'.
 
@@ -1454,6 +2047,48 @@ export default {
       // })
     },
     genEdges(filterCytoData) {
+      // return new Promise(async (resolve, reject) => { // eslint-disable-line
+      let edges = [];
+      let edgesCheck = [];
+      for (let i = 0; i < filterCytoData.length; i++) {
+        const res = filterCytoData[i];
+        let agent = res.agent.split("-")[1]
+
+        let edgeCheck = agent + "_" +res.subjectName + "_" + res.objectName;
+        edgeCheck = edgeCheck.split(" ").join("_");
+        // edgeCheck = edgeCheck.split("-").join("_");
+        let primaryEdge1 = this.theDrug + "_" + this.theDisease;
+        let primaryEdge2 = this.theDisease + "_" + this.theDrug;
+
+        if (
+          edgesCheck.indexOf(edgeCheck) == -1 &&
+          primaryEdge1 != edgeCheck &&
+          primaryEdge2 != edgeCheck
+        ) {
+          let el = {};
+          el.data = {};
+          el.data.id = edgeCheck;
+          el.data.source = res.subjectName.split(" ").join("_");
+          el.data.target = res.objectName.split(" ").join("_");
+          // el.position
+          el.group = "edges";
+          el.classes = [agent]
+          // edges = [edges, ...el]
+          edges.push(el);
+          edgesCheck.push(edgeCheck);
+
+        }
+        if (i == filterCytoData.length - 1) {
+          console.log("edges");
+          console.log(edges);
+          // resolve(edges)
+          return edges;
+        }
+      }
+      // })
+    },
+
+    genEdges_original(filterCytoData) {
       // return new Promise(async (resolve, reject) => { // eslint-disable-line
       let edges = [];
       let edgesCheck = [];
@@ -2462,6 +3097,7 @@ export default {
       return primaryMap;
     },
 
+    // @remind move the primary nodes to the side
     movePrimaryNodestoSide() {
       // ####################################################################
       // MOVE THE DISEASE AND DRUG TO THE OPPOSITE SIDES
@@ -2481,9 +3117,17 @@ export default {
       let x2nDisease = renderedBoundingBox.x2 + renderedBoundingBox.w / 4;
       let x2nDrug = renderedBoundingBox.x1 - renderedBoundingBox.w / 4;
       let y2n = (renderedBoundingBox.y1 + renderedBoundingBox.y2) / 2;
-
+      console.log("this.theDisease")
+      console.log(this.theDisease)
+      console.log("this.theDrug")
+      console.log(this.theDrug)
+      let theDisease = this.theDisease
+      let theDrug = this.theDrug
       this.cyInstance.nodes().forEach(function (ele) {
-        if (ele.id() == "type_2_diabetes_mellitus") {
+        // if (ele.id() == "type_2_diabetes_mellitus") {
+      // console.log("this.theDisease 2 inside")
+      // console.log(theDisease)        
+      if (ele.id() == theDisease) {
           console.log("y2n = ", y2n);
           console.log("x2nDisease = ", x2nDisease);
           console.log(ele.id());
@@ -2496,7 +3140,8 @@ export default {
             }
           );
         }
-        if (ele.id() == "TROGLITAZONE") {
+        // if (ele.id() == "TROGLITAZONE") {
+        if (ele.id() == theDrug) {
           console.log("y2n = ", y2n);
           console.log("x2nDrug = ", x2nDrug);
           console.log(ele.id());
