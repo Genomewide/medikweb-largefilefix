@@ -109,7 +109,7 @@ const CytoConfig = {
       {
         selector: "edge",
         style: {
-          label: "data(predicate)",
+          // label: "data(predicate)",
           width: 3,
           "curve-style": "bezier",
           "line-color": "#cccccc",
@@ -117,11 +117,93 @@ const CytoConfig = {
           // "target-arrow-color": "#FF0000",
           "target-arrow-color": "#a9a9a9",
           // "target-arrow-color": "",
-          "target-arrow-shape": "vee",
+          // "target-arrow-shape": "vee",
           "arrow-scale": 2
           // "curve-style": "taxi"
         }
       },
+      {
+        selector: ".arax",
+        style: {
+          width: 3,
+          "curve-style": "bezier",
+          // "line-color": "#ffb703",
+          "line-color": "#8ecae6",
+
+          // "target-arrow-color": "#379bdb", 
+          // "target-arrow-color": "#FF0000",
+          // "target-arrow-shape": "vee",
+          // "arrow-scale": 2
+          // "curve-style": "taxi"
+        }
+      }, 
+      {
+        selector: ".robokop",
+        style: {
+          width: 3,
+          "curve-style": "bezier",
+          "line-color": "#3d5a80",
+          // "line-color": "#ffb703",
+
+          // "target-arrow-color": "#379bdb", // #8ecae6
+          // "target-arrow-color": "#FF0000",
+          // "target-arrow-shape": "vee",
+          // "arrow-scale": 2
+          // "curve-style": "taxi"
+        }
+      }, 
+      {
+        selector: ".explanatory",
+        style: {
+          width: 3,
+          "curve-style": "bezier",
+          "line-color": "#fb8500",
+          // "target-arrow-color": "#379bdb", // #8ecae6
+          // "target-arrow-color": "#FF0000",
+          // "target-arrow-shape": "vee",
+          // "arrow-scale": 2
+          // "curve-style": "taxi"
+        }
+      }, 
+      {
+        selector: ".bte",
+        style: {
+          width: 3,
+          "curve-style": "bezier",
+          "line-color": "#ee6c4d",
+          // "target-arrow-color": "#379bdb", // #8ecae6
+          // "target-arrow-color": "#FF0000",
+          // "target-arrow-shape": "vee",
+          // "arrow-scale": 2
+          // "curve-style": "taxi"
+        }
+      }, 
+      {
+        selector: ".unsecret",
+        style: {
+          width: 3,
+          "curve-style": "bezier",
+          "line-color": "#fb8500",
+          // "target-arrow-color": "#379bdb", // #8ecae6 
+          // "target-arrow-color": "#FF0000",
+          // "target-arrow-shape": "vee",
+          // "arrow-scale": 2
+          // "curve-style": "taxi"
+        }
+      }, 
+      {
+        selector: ".aragorn",
+        style: {
+          width: 3,
+          "curve-style": "bezier",
+          "line-color": "#ee6c4d",
+          // "target-arrow-color": "#379bdb", // #8ecae6 ee6c4d
+          // "target-arrow-color": "#FF0000",
+          // "target-arrow-shape": "vee",
+          // "arrow-scale": 2
+          // "curve-style": "taxi"
+        }
+      }, 
       {
         selector: ".parentEdge",
         style: {

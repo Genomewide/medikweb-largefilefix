@@ -5,11 +5,18 @@
     </b-row>
     <b-row>
       <b-col cols="3"> 
+
+        <div class="border border-secondary rounded" style="height: 100%">
+          <!-- <b-button class="mt-3" variant="success" block @click="checkOverlap"
+            >checkOverlap</b-button
+          >  -->
           <b-button class="mt-3" variant="success" block @click="getTRAPI"
             >getTRAPI</b-button
-          > 
-        <div class="border border-secondary rounded" style="height: 100%">
-          <b-button class="mt-3" variant="success" block @click="graphMeta"
+          >    
+          <b-button class="mt-3" variant="warning" block @click="removeAll"
+            >removeAll</b-button
+          >       
+          <!-- <b-button class="mt-3" variant="success" block @click="graphMeta"
             >graphMeta</b-button
           > 
           <b-button class="mt-3" variant="success" block @click="getMeta"
@@ -17,10 +24,8 @@
           > 
           <b-button class="mt-3" variant="success" block @click="testMedik"
             >testMedik</b-button
-          >    
-          <b-button class="mt-3" variant="primary" block @click="selectResult2"
-            >selectResult2</b-button
-          >
+          >     -->
+
           <b-button
             class="mt-3"
             variant="primary"
@@ -28,11 +33,9 @@
             @click="movePrimaryNodestoSide"
             >movePrimaryNodestoSide
           </b-button>
-            <!-- countPaths -->
-          <b-button class="mt-3" variant="primary" block @click="allPaths()"
+          <!-- <b-button class="mt-3" variant="primary" block @click="allPaths()"
             >allPaths
           </b-button>
-          <!-- <br> -->
           <b-button class="mt-3" variant="primary" block @click="getComplexResults"
         >getComplexResults 
       </b-button>
@@ -42,7 +45,7 @@
             block
             @click="collapseChildNodes"
             >collapseChildNodes
-          </b-button>
+          </b-button> -->
           <!-- <br>  -->
           <!-- <b-button class="mt-3" variant="primary" block @click="getElbow"
         >getElbow
@@ -50,6 +53,9 @@
           <!-- <br>  -->
 
           <br />
+          <b-button class="mt-3" variant="primary" block @click="selectResult2"
+            >selectResult2</b-button
+          >
           <b-button class="mt-3" variant="primary" block @click="klayLayout"
             >klayLayout
           </b-button>
@@ -116,6 +122,7 @@
               v-for="def in elements"
               :key="`${def.data.id}`"
               :definition="def"
+              v-on:mouseover="hoverGraph($event, def, def.data, def.data.id)"
               v-on:mousedown="showNodeInfo($event, def, def.data, def.data.id)"
             />
           </cytoscape>
@@ -137,8 +144,25 @@
               v-on:mousedown="moveToModal($event, def, def.data, def.data.id)"
             />
           </cytoscape> -->
+          
         </div>
+        arasWithHits: {{ arasWithHits }}
+         <div>
+            <b-form-group label="Radios using options " v-slot="{ ariaDescribedby }">
+              <b-form-radio-group
+                id="radio-group-1"
+                v-model="drugSelected"
+                :options="araCompareDrugSet"
+                :aria-describedby="ariaDescribedby"
+                name="radio-options"
+                stacked
+              > </b-form-radio-group>
+            </b-form-group>
+            <div class="mt-3">Selected: <strong>{{ drugSelected }}</strong></div>
+
+            </div>
       </b-col>
+      
     </b-row>
     <br />
     <!-- ########################################################################
@@ -483,6 +507,7 @@ import config from "./cytoscapeData/CytoConfig";
 import config2 from "./cytoscapeData/CytoConfig2";
 import dataMenu from "./cytoscapeData/cytoscapeExampleResults.json";
 import metagraph from "../assets/bte_metagraph.json";
+import aragorn from "./cytoscapeData/ara-aragorn.json";
 import arax from "./cytoscapeData/ara-arax.json";
 import unsecret from "./cytoscapeData/ara-unsecret.json";
 import robokop from "./cytoscapeData/ara-robokop.json";
@@ -654,12 +679,106 @@ export default {
       selected: [], // Must be an array reference!
       jsonData: {},
       allARAData: {},
-      drugSelected: 'PUBCHEM.COMPOUND:16220172'
+      arasWithHits:[],
+      drugSelected: 'CHEMBL.COMPOUND:CHEMBL1201431',
+      araCompareDrugSet: [
+"UMLS:C0242896",
+"PUBCHEM.COMPOUND:46199646",
+"CHEMBL.COMPOUND:CHEMBL1201431",
+"PUBCHEM.COMPOUND:16220172",
+"PUBCHEM.COMPOUND:5742832",
+"PUBCHEM.COMPOUND:16678941",
+"PUBCHEM.COMPOUND:12035",
+"PUBCHEM.COMPOUND:445580",
+"PUBCHEM.COMPOUND:134587348",
+"PUBCHEM.COMPOUND:43672",
+"MESH:D000900",],
+      // drugSelected: 'PUBCHEM.COMPOUND:16220172', // CHEMBL.COMPOUND:CHEMBL1201431
+      // drugSelected: 'CHEMBL.COMPOUND:CHEMBL1201431', // PUBCHEM.COMPOUND:16220172
+      
 
     };
   },
   methods: {
+    checkOverlap(){
+      // let allARAs = [arax, unsecret, robokop, explanatory, bte, improving, aragorn]
+      // make ara object with each results set
+      // FIX UNSECRET TO HAVE SO AND SN
+      let unsecret2 = unsecret.fields.data.message.results.map((item) => {
+        item.node_bindings.on = item.node_bindings.disease
+        item.node_bindings.sn = item.node_bindings.drug
+        return item
+      })
+      console.log("unsecret2")
+      console.log(unsecret2)
+      unsecret.fields.data.message.results = unsecret2
+
+
+
+      let araResults = [
+        {ara: 'arax', results: arax.fields.data.message.results},
+        {ara: 'unsecret', results: unsecret.fields.data.message.results},
+        {ara: 'robokop', results: robokop.fields.data.message.results},
+        {ara: 'explanatory', results: explanatory.fields.data.message.results},
+        {ara: 'bte', results: bte.fields.data.message.results},
+        {ara: 'improving', results: improving.fields.data.message.results},
+        {ara: 'aragorn', results: aragorn.fields.data.message.results},
+
+      ]
+      console.log("araResults")
+      console.log(araResults)
+      // GET ALL SNs
+      // get keys from araResults
+      // let allKeys = Object.keys(araResults)
+      // get all SNs
+      let allSNs = []
+      for (let i = 0; i < araResults.length; i++) {
+        const araResult = araResults[i];
+        console.log("araResult")
+        console.log(araResult)
+        let results = araResult.results
+        console.log("results")
+        console.log(results)
+        let sn = results.map(x => x.node_bindings.sn[0].id)
+        araResults[i].sn = sn
+        allSNs = [...new Set([...allSNs, ...sn])]
+        console.log(allSNs)
+      }
+
+      // COUNT WHICH SNs ARE IN EACH ARA RESULT
+      // let snCount = []
+      
+      
+
+
+      // let totalSN = []
+      // for (let i = 0; i < allARAs.length; i++) {
+      //   const ara = allARAs[i];
+      //   let results = ara.fields.data.message.results
+      //   // GET SN FROM RESULTS
+      //   let araSnAll = araResults.map(x => x.node_bindings.sn[0].id)
+        
+      // }
+
+    },
+    removeAll(){
+      
+      this.elements = []
+      this.cyInstance.remove(this.cyInstance.$("nodes"))
+      this.cyInstance.remove(this.cyInstance.$("edges"));
+      // this.cyInstance.remove();
+
+    },
     getTRAPI(){
+      this.elements = []
+      // this.cyInstance.remove();
+      // this.cyInstance.remove(this.cyInstance.$("nodes"));
+      // this.cyInstance.remove(this.cyInstance.$("edges"));
+      // this.elements = []
+      // this.cyInstance.remove();
+      // this.elements = []
+      this.arasWithHits = []
+
       console.log("arax")
       console.log(arax)
       console.log("unsecret")
@@ -672,20 +791,80 @@ export default {
       console.log(bte)
       console.log("improving")
       console.log(improving)
+      console.log("aragorn")
+      console.log(aragorn)
+
+      let unsecret2 = unsecret.fields.data.message.results.map((item) => {
+        item.node_bindings.on = item.node_bindings.disease
+        item.node_bindings.sn = item.node_bindings.drug
+        return item
+      })
+      console.log("unsecret2")
+      console.log(unsecret2)
+      unsecret.fields.data.message.results = unsecret2
+
+      // LOOP THROUGH ALL ARAS AND CHECK IF DRUG IS IN RESULTS
+      // IF IT IS, GET THE RESULTS
+      // MAKE ARRAY OF objects for each ARAS with the name and the data
+
+      let araResults = [
+        {ara: 'arax', data: arax, results: arax.fields.data.message.results},
+        {ara: 'unsecret',data: unsecret,  results: unsecret.fields.data.message.results},
+        {ara: 'robokop',data: robokop,  results: robokop.fields.data.message.results},
+        {ara: 'explanatory',data: explanatory,  results: explanatory.fields.data.message.results},
+        {ara: 'bte',data: bte,  results: bte.fields.data.message.results},
+        {ara: 'improving',data: improving,  results: improving.fields.data.message.results},
+        {ara: 'aragorn',data: aragorn,  results: aragorn.fields.data.message.results},
+      ]
+
+      for (let i = 0; i < araResults.length; i++) {
+        const ara = araResults[i];
+        console.log("ara.ara")
+        console.log(ara.ara)
+        let araResult = ara.results.filter(x => x.node_bindings.sn[0].id == this.drugSelected)
+        console.log("araResult")
+        console.log(araResult)
+        if(araResult.length > 0){
+          this.arasWithHits.push(ara.ara)
+          this.makeGraphForEachARA(ara.data, ara.ara)
+        }
+        
+      }
+
+      this.cyInstance.makeLayout({ name: "klay", animate: true }).run();
+
+
+      // let allARAs = [arax, unsecret, robokop, explanatory, bte, improving, aragorn]
+      // for (let i = 0; i < allARAs.length; i++) {
+      //   const ara = allARAs[i];
+      //   let araResult = ara.fields.data.message.results.filter(x => x.node_bindings.sn[0].id == this.drugSelected)
+      //   console.log("araResult")
+      //   console.log(araResult.length)
+
+      // }
 
     // test arax
-    this.makeGraphForEachARA(arax)
-
+    // this.makeGraphForEachARA(arax, "arax")
+    // this.makeGraphForEachARA(unsecret, "unsecret")
+    // this.makeGraphForEachARA(robokop, "robokop")
+    // // this.makeGraphForEachARA(explanatory, "explanatory")
+    // this.makeGraphForEachARA(bte, "bte")
+    // this.makeGraphForEachARA(improving, "improving")
+    // this.makeGraphForEachARA(aragorn, "aragorn")
 
     },
-    makeGraphForEachARA(ara){
+    makeGraphForEachARA(ara, araName){
+      //NOTE THE ARA NAME
+      console.log("######################")
+      console.log("araName")
+      console.log(araName)
 
       // GET RESULTS FROM ARAX
       let araResults = ara.fields.data.message.results
 
       // GET NODES FROM ARAX
       let araNodes = ara.fields.data.message.knowledge_graph.nodes
-      console.log("araxNodes")
+      console.log("araNodes")
       console.log(araNodes)
 
       // GET EDGES FROM ARAX
@@ -724,8 +903,8 @@ export default {
         console.log(edgeGroup)
         let edgeId = araResultEdges[edgeGroup].map(x => x.id)
         araEdgeIds = [...new Set([...araEdgeIds, ...edgeId])] //[...new Set(araxSnAll)]
-        console.log("araEdgeIds")
-        console.log(araEdgeIds)
+        // console.log("araEdgeIds")
+        // console.log(araEdgeIds)
         
       }
 
@@ -754,7 +933,7 @@ export default {
           objectid: edge.object,
           predicate: edge.predicate,
           edge: edge,
-          ara: "arax"
+          ara: araName
         }
         araGraph.push(edgeData)
       })
@@ -763,13 +942,14 @@ export default {
       
       for (let i = 0; i < araGraph.length; i++) {
         const el = araGraph[i];
-        araGraph[i].objectIdFixed = el.objectid.replace(":", "_")
-        araGraph[i].objectIdFixed = araGraph[i].objectIdFixed.replace(" ", "_")
-        araGraph[i].objectIdFixed = araGraph[i].objectIdFixed.replace(".", "_")
-        araGraph[i].objectIdFixed = araGraph[i].objectIdFixed.replace(" ", "_")
+        araGraph[i].objectIdFixed = el.objectid.replaceAll(":", "_")
+        araGraph[i].objectIdFixed = araGraph[i].objectIdFixed.replaceAll(" ", "_")
+        araGraph[i].objectIdFixed = araGraph[i].objectIdFixed.replaceAll(".", "_")
+        araGraph[i].objectIdFixed = araGraph[i].objectIdFixed.replaceAll(")", "_")
+        araGraph[i].objectIdFixed = araGraph[i].objectIdFixed.replaceAll("(", "_")
 
-        console.log(el.object)
-        console.log(el.object.name)
+        // console.log(el.object)
+        // console.log(el.object.name)
 
         if(el.object.name == undefined){
           console.log("undefined")
@@ -793,10 +973,11 @@ export default {
         // araxGraph[i].objectNameFixed = el.object.name.replace(":", "_")
         // araxGraph[i].objectNameFixed = araxGraph[i].objectNameFixed.replace(" ", "_")
 
-        araGraph[i].subjectIdFixed = el.subjectid.replace(":", "_")
-        araGraph[i].subjectIdFixed = araGraph[i].subjectIdFixed.replace(" ", "_")
-        araGraph[i].subjectIdFixed = araGraph[i].subjectIdFixed.replace(".", "_")
-        araGraph[i].subjectIdFixed = araGraph[i].subjectIdFixed.replace(" ", "_")
+        araGraph[i].subjectIdFixed = el.subjectid.replaceAll(":", "_")
+        araGraph[i].subjectIdFixed = araGraph[i].subjectIdFixed.replaceAll(" ", "_")
+        araGraph[i].subjectIdFixed = araGraph[i].subjectIdFixed.replaceAll(".", "_")
+        araGraph[i].subjectIdFixed = araGraph[i].subjectIdFixed.replaceAll(")", "_")
+        araGraph[i].subjectIdFixed = araGraph[i].subjectIdFixed.replaceAll("(", "_")
 
         if(el.subject.name == undefined){
           console.log("undefined")
@@ -817,11 +998,21 @@ export default {
         // araxGraph[i].subjectNameFixed = araxGraph[i].subjectNameFixed.replace(" ", "_")
 
         araGraph[i].predicateFixed = araGraph[i].objectNameFixed + "_" + araGraph[i].ara  + "_" + araGraph[i].subjectNameFixed
-        araGraph[i].predicateFixed = araGraph[i].predicateFixed.replace(" ", "_")
-        araGraph[i].predicateFixed = araGraph[i].predicateFixed.replace(".", "_")
-        araGraph[i].predicateFixed = araGraph[i].predicateFixed.replace(":", "_")
-        araGraph[i].predicateFixed = araGraph[i].predicateFixed.replace("(", "_")
-        araGraph[i].predicateFixed = araGraph[i].predicateFixed.replace(")", "_")
+        araGraph[i].predicateFixed = araGraph[i].predicateFixed.replaceAll(" ", "_")
+        // araGraph[i].predicateFixed = araGraph[i].predicateFixed.replaceAll(".", "_")
+        // araGraph[i].predicateFixed = araGraph[i].predicateFixed.replaceAll(":", "_")
+        araGraph[i].predicateFixed = araGraph[i].predicateFixed.replaceAll("(", "_")
+        araGraph[i].predicateFixed = araGraph[i].predicateFixed.replaceAll(")", "_")
+
+        araGraph[i].predicateRevFixed = araGraph[i].subjectNameFixed + "_" + araGraph[i].ara  + "_" +  araGraph[i].objectNameFixed
+        araGraph[i].predicateRevFixed = araGraph[i].predicateRevFixed.replaceAll(" ", "_")
+        // araGraph[i].predicateRevFixed = araGraph[i].predicateRevFixed.replaceAll(".", "_")
+        // araGraph[i].predicateRevFixed = araGraph[i].predicateRevFixed.replaceAll(":", "_")
+        araGraph[i].predicateRevFixed = araGraph[i].predicateRevFixed.replaceAll("(", "_")
+        araGraph[i].predicateRevFixed = araGraph[i].predicateRevFixed.replaceAll(")", "_")
+
+
+
         
       }
 
@@ -887,9 +1078,14 @@ export default {
             classes: cytoClassesCheck
           })
         }
+
+        // ####################################################
         //CHECK IF edges ID IS IN alledgeIDS - MAKE EDGE IF NOT
-        if(!this.allEdgeIds.includes(el.predicateFixed)){
+        // ####################################################
+
+        if(!this.allEdgeIds.includes(el.predicateFixed) && !this.allEdgeIds.includes(el.predicateRevFixed)){
           this.allEdgeIds.push(el.predicateFixed)
+          this.allEdgeIds.push(el.predicateRevFixed)
           this.allEdges.push({
             data: {
               id: el.predicateFixed,
@@ -906,6 +1102,9 @@ export default {
         
       }
 
+        // ####################################################
+        // CHECK THINGS AND ADD TO ELEMENTS
+        // ####################################################
         console.log("allNodes")
         console.log(this.allNodes)
         console.log("allEdges")
@@ -1238,8 +1437,8 @@ export default {
     },
     showNodeInfo(event, def, data, id){
       console.log("showNodeInfo")
-      // console.log(event)
-      // console.log(def)
+      console.log(event)
+      console.log(def)
       console.log(data.category)
       console.log(id)
       // this.nodeInfo = node

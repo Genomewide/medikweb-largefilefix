@@ -94,6 +94,26 @@ class TrapiResultClean {
                 // console.log(secondaryEdgeKeys)
                 for (let q = 0; q < secondaryEdgeKeys.length; q++) {
                   const secondEdge = secondaryEdgeKeys[q];
+                  // let qualifierIDs = ["biolink:object_aspect_qualifier",
+                  // "biolink:object_context_qualifier",
+                  // "biolink:object_derivative_qualifier",
+                  // "biolink:object_direction_qualifier",
+                  // "biolink:object_form_or_variant_qualifier",
+                  // "biolink:object_part_qualifier",
+                  // "biolink:subject_aspect_qualifier",
+                  // "biolink:subject_context_qualifier",
+                  // "biolink:subject_derivative_qualifier",
+                  // "biolink:subject_direction_qualifier",
+                  // "biolink:subject_form_or_variant_qualifier",
+                  // "biolink:subject_part_qualifier",
+                  // "biolink:sex_qualifier",
+                  // "biolink:statement_qualifier",
+                  // "biolink:temporal_context_qualifier",
+                  // "biolink:frequency_qualifier",
+                  // "biolink:onset_qualifier",
+                  // "biolink:population_context_qualifier",
+                  // "biolink:qualified_predicate",
+                  // "biolink:severity_qualifier"]
                   // if(q < 10){
                     // console.log("secondEdge")
                     // console.log(secondEdge)
@@ -113,6 +133,10 @@ class TrapiResultClean {
                     data.object = ""
                     data.predicate = ""
                     // data.relation = edge.relation
+                    // PREPARE FOR QUALIFIERS
+                    data.qualifier_type_id = []
+                    data.qualifier_value = []
+
                     data.subject = ""
                     nodeCheck = ""
                     data.subjectName = ""
@@ -123,7 +147,28 @@ class TrapiResultClean {
                     data.objectCats = ""
                     data.objectCat = ""
                     data.objectAtt = ""
-                    data.subjectAtt = ""    
+                    data.subjectAtt = ""  
+                    data.object_aspect_qualifier = ""
+                    data.object_context_qualifier = ""
+                    data.object_derivative_qualifier = ""
+                    data.object_direction_qualifier = ""
+                    data.object_form_or_variant_qualifier = ""
+                    data.object_part_qualifier = ""
+                    data.subject_aspect_qualifier = ""  
+                    data.subject_context_qualifier = ""
+                    data.subject_derivative_qualifier = ""
+                    data.subject_direction_qualifier = ""
+                    data.subject_form_or_variant_qualifier = ""
+                    data.subject_part_qualifier = ""
+                    data.statement_qualifier = ""
+                    data.temporal_context_qualifier = ""
+                    data.frequency_qualifier = ""
+                    data.onset_qualifier = ""
+                    data.population_context_qualifier = ""
+                    data.qualified_predicate = ""
+                    data.severity_qualifier = ""
+
+
                     try {
                       data.edgeKey = edgeKey
                       data.ResultGroupID = x
@@ -133,6 +178,80 @@ class TrapiResultClean {
                       data.edgeId = id 
                       data.object = secondEdgeData.object
                       data.predicate = secondEdgeData.predicate
+                      // CHECK TO SEE IF QUALIFIERS EXIST
+                      if(Object.prototype.hasOwnProperty.call(secondEdgeData, "qualifiers")){
+                        //LOOP THROUGH EACH QUALIFIER
+                        for (let i = 0; i < secondEdgeData.qualifiers.length; i++) {
+                          const qualifier = secondEdgeData.qualifiers[i];
+                          // console.log("qualifier")
+                          //USE SWITCH TO DETERMINE WHICH QUALIFIER AND THEN ADD TO DATA
+                          switch (qualifier.qualifier_type_id) {
+                            case "biolink:object_aspect_qualifier":
+                              data.object_aspect_qualifier = qualifier.qualifier_value
+
+                              break;
+                            case "biolink:object_context_qualifier":
+                              data.object_context_qualifier = qualifier.qualifier_value
+                              break;
+                            case "biolink:object_derivative_qualifier":
+                              data.object_derivative_qualifier = qualifier.qualifier_value
+                              break;
+                            case "biolink:object_direction_qualifier":
+                              data.object_direction_qualifier = qualifier.qualifier_value
+                              break;
+                            case "biolink:object_form_or_variant_qualifier":
+                              data.object_form_or_variant_qualifier = qualifier.qualifier_value
+                              break;
+                            case "biolink:object_part_qualifier":
+                              data.object_part_qualifier = qualifier.qualifier_value
+                              break;
+                            case "biolink:subject_aspect_qualifier":
+                              data.subject_aspect_qualifier = qualifier.qualifier_value
+                              break;
+                            case "biolink:subject_context_qualifier":
+                              data.subject_context_qualifier = qualifier.qualifier_value
+                              break;
+                            case "biolink:subject_derivative_qualifier":
+                              data.subject_derivative_qualifier = qualifier.qualifier_value
+                              break;
+                            case "biolink:subject_direction_qualifier":
+                              data.subject_direction_qualifier = qualifier.qualifier_value
+                              break;
+                            case "biolink:subject_form_or_variant_qualifier":
+                              data.subject_form_or_variant_qualifier = qualifier.qualifier_value
+                              break;
+                            case "biolink:subject_part_qualifier":
+                              data.subject_part_qualifier = qualifier.qualifier_value
+                              break;
+                            case "biolink:statement_qualifier":
+                              data.statement_qualifier = qualifier.qualifier_value
+                              break;
+                            case "biolink:temporal_context_qualifier":
+                              data.temporal_context_qualifier = qualifier.qualifier_value
+                              break;
+                            case "biolink:frequency_qualifier":
+                              data.frequency_qualifier = qualifier.qualifier_value
+                              break;
+                            case "biolink:onset_qualifier":
+                              data.onset_qualifier = qualifier.qualifier_value
+                              break;
+                            case "biolink:population_context_qualifier":
+                              data.population_context_qualifier = qualifier.qualifier_value
+                              break;
+                            case "biolink:qualified_predicate":
+                              data.qualified_predicate = qualifier.qualifier_value
+                              break;
+                            case "biolink:severity_qualifier":
+                              data.severity_qualifier = qualifier.qualifier_value
+                              break;
+                            default:  
+                              break;
+                          }
+                        }
+                            
+
+                      }
+
                       // data.relation = edge.relation
                       data.subject = secondEdgeData.subject
                       nodeCheck = nodes[subject]
@@ -940,7 +1059,12 @@ static fixPublicationsCOHD(TrapiResults) {
         let edgeAtts = res.edgeinfo.attributes
         
         let pubArray = edgeAtts.filter(x => x.attribute_type_id == "biolink:publications") // GETS ARRAY WITH PMIDS
-        let pubs = pubArray[0].value
+        let pubs = []
+        if(pubArray.length > 0){
+          console.log("no pubs")
+          // console.log(res)
+          pubs = pubArray[0].value
+        }
         // for (let n = 0; n < pubAttsArray.length; n++) {
         //   const pubAtt = pubAttsArray[n].attributes
 

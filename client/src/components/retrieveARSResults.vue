@@ -38,12 +38,12 @@
                     v-on:click="ARSToTable"
                     >ARSToTable
                   </b-button>
-                  <b-button
+                  <!-- <b-button
                     style="margin-left: 20px"
                     variant="primary"
                     v-on:click="testClean"
                     >testClean
-                  </b-button>
+                  </b-button> -->
                   <br /> 
                   <!-- {{routPK}} -->
                   <!-- <b-button testClean
@@ -2124,7 +2124,7 @@ async araxCategoryGroup(){
                 console.log({result})
 
                 // SAVE THE JSON TO THE FILE 3176389f-9e75-4e2e-9beb-bed32055de13
-                this.saveJson(result, agent)
+                // this.saveJson(result, agent)
 
                 this.ARSResultStatus[agent] = {}
                 this.ARSResultStatus[agent]["agent"] = agent
