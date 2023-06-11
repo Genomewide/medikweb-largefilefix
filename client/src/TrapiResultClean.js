@@ -15,6 +15,7 @@ class TrapiResultClean {
       let nodesCheck = ""
 
       try {
+        console.log("TrapiResults")
         console.log(TrapiResults)
         let results = TrapiResults.message.results
         let nodes = TrapiResults.message.knowledge_graph.nodes
@@ -24,16 +25,29 @@ class TrapiResultClean {
         // let nodeKeys = Object.keys(nodes)
         console.log("edges")
         console.log(edges)
+        // CHECK TO SEE IF TrapiResults.reasoner_id EXISTS
+        let reasoner_id = ""
+        try{
+          reasoner_id = TrapiResults.reasoner_id
+        } catch {
+          reasoner_id = "NA"
+        }
+        console.log("reasoner_id")
+        console.log(reasoner_id)
+
 
         // console.log("length = ", edgeKeys.length)
 
-        if(edgeKeys.length > 0){
+        if(edgeKeys.length > 0 && reasoner_id != "infores:openpredict"){
           
           for (let x = 0; x < results.length; x++) {
             // FOR EACH RESULT
             const resultData = results[x];
+            // console.log("resultData")
+            // console.log(resultData)
             let resultEdges = resultData.edge_bindings
             // GET THE EDGES THAT ARE BOUND AND 
+            // console.log("GET THE EDGES THAT ARE BOUND")
             let boundEdgeKeyArray = Object.keys(resultEdges)
             for (let index = 0; index < boundEdgeKeyArray.length; index++) {
               // LOOP THROUGH ALL EDGES
@@ -287,12 +301,12 @@ class TrapiResultClean {
 
                     } catch (error){
                       console.error(error)
-                      console.log("data")
-                      console.log(data)
-                      console.log("subject")
-                      console.log(subject)
-                      console.log("nodes[subject]")
-                      console.log(nodes[subject])
+                      // console.log("data")
+                      // console.log(data)
+                      // console.log("subject")
+                      // console.log(subject)
+                      // console.log("nodes[subject]")
+                      // console.log(nodes[subject])
 
                     }                
                   // }

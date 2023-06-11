@@ -527,8 +527,8 @@ import allAnswerGraphArray_CF from "./cytoscapeData/allAnswerGraphArray_CF.json"
 // cytoscape.use(klay)
 console.log("config");
 console.log(config);
-const elements = [...config.elements];
-const modalElements = [...config2.elements];
+const elements = config.elements;
+const modalElements = config2.elements;
 delete config.elements;
 delete config2.elements;
 console.log("cytoData");

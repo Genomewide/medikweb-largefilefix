@@ -8,6 +8,7 @@ const synonymQueryurl = "api/posts/synonyms/";
 const Queryurl = "api/posts/query/";
 const Queryurl_raw = "api/posts/query_raw/";
 const mongoumlsurl = "api/posts/mongoumls/";
+const robokopurl = "https://automat.renci.org/robokopkg/"
 
 const formData = 
 {
@@ -52,6 +53,38 @@ const pingmedik = (url, packet) => {
   }
 
 class PostService {
+
+  static robokopGet(subjectID, subjectCat, objectCat) {
+    let url = robokopurl + subjectCat + "/" + objectCat + "/" + subjectID
+    console.log("started robokopGet")
+    console.log(url)
+    // USE AXIOS TO GET FROM A URL LIKE THIS: https://automat.renci.org/robokopkg/biolink:Disease/biolink:ChemicalEntity/MONDO:0001234
+    url = "https://automat.renci.org/robokopkg/biolink:Gene/biolink:PhenotypicFeature/NCBIGene:7157"
+    return new Promise(async (resolve, reject) => {// eslint-disable-line
+      try {
+        const res = await axios.get(url);
+        console.log("robokopGet response")
+        console.log(res)
+        const data = res.data;
+        resolve(data);
+      } catch (err) {
+        reject(err);
+      }
+    });
+
+
+    // return new Promise(async (resolve, reject) => {// eslint-disable-line
+    //   try {
+    //     const res = await axios.get(url);
+
+    //     const data = res.data;
+
+    //     resolve(data);
+    //   } catch (err) {
+    //     reject(err);
+    //   }
+    // });
+  }
     static queryPR() {
       console.log("started queryPR - const formData input")
       return new Promise(async (resolve, reject) => { // eslint-disable-line
@@ -491,6 +524,8 @@ class PostService {
     });
   }
 
+
+  
   static synonymsQuery() {
     return new Promise(async (resolve, reject) => {// eslint-disable-line
       // eslint-disable-line

@@ -6,6 +6,9 @@ yarn-debug.log*
 yarn-error.log*
 lerna-debug.log*
 
+# python testing
+/pythonStuff
+
 # client folder
 /client/node_modules/
 /client/src/assets

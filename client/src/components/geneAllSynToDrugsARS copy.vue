@@ -1083,7 +1083,7 @@ query_gg: {
         if(resultList.length< 14){
           console.log("less than 14")
           
-          await new Promise(resolve => setTimeout(resolve, 3000));
+          await new Promise(resolve => setTimeout(resolve, 10000));
           console.log(new Date())
           eventEmitter.emit("event")
         } else {

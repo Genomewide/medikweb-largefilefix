@@ -4,7 +4,7 @@
     <div>
       <b-card no-body style="padding-bottom: 20px">
         <b-tabs card>
-          <b-tab title="Find Objects related to genes" active>
+          <b-tab title="Find Objects related to genes" >
             <b-card-text>
               <div class="create-post">
                 <div>
@@ -17,25 +17,203 @@
                       placeholder="Object"
                     ></b-form-input>
 
-                    <!-- <b-button variant="primary" v-on:click="getConcept_service"
-                      >TestButton</b-button
-                    > -->
-                    <b-button variant="primary" v-on:click="testRobokop"
-                      >testRobokop</b-button
-                    >                    
+                    <b-button variant="primary" v-on:click="getConcept_service"
+                      >Get Related Concepts</b-button
+                    >
+                    <b-button variant="primary" v-on:click="getSynonyms"
+                      >getSynonyms</b-button
+                    >
+                    <b-button 
+                      style="margin-left: 10px"
+                      variant="success"
+                      v-on:click="getAllEdges"
+                      >getAllEdges</b-button
+                    >              
+                    <b-button 
+                      style="margin-left: 10px"
+                      variant="success"
+                      v-on:click="testMedik"
+                      >testMedik</b-button
+                    >   
 
+                    <div
+                      style="padding-left: 10px"
+                      v-if="concepts_table.length > 0"
+                    >
+                      Results: &nbsp;{{ totalRows }} of
+                      {{ concepts_table.length }}
+                    </div>
+                    <b-button
+                      v-if="concepts_table.length > 0"
+                      style="margin-left: 10px"
+                      variant="success"
+                      v-on:click="selectAllRows"
+                      >Select All</b-button
+                    >
+
+                    <div
+                      style="padding-left: 10px"
+                      v-if="selectedRows.length > 0"
+                    >
+                      Selected: &nbsp;{{ selectedRows.length }}
+                    </div>
+                    <!-- <div>{{ getuserdata }}</div> -->
+                    <b-button
+                      style="margin-left: 10px"
+                      v-if="selectedRows.length > 0"
+                      variant="danger"
+                      v-on:click="clearSelected"
+                      >Clear Selection</b-button
+                    >
                   </b-form>
                   <hr />
-                
+                  <!-- <b-row style="margin-top: 20px"> -->
+                  <!-- <b-col> -->
+                  <b-form style="margin-top: 20px; margin-bottom: 20px">
+                    <b-form-group
+                      label="Filter"
+                      label-for="filter-input"
+                      label-cols-sm="1"
+                      label-align-sm="left"
+                      label-size="sm"
+                      class="mb-0"
+                    >
+                      <b-input-group size="sm">
+                        <b-form-input
+                          id="filter-input"
+                          v-model="filter"
+                          type="search"
+                          placeholder="Type to Search"
+                        ></b-form-input>
+
+                        <b-input-group-append>
+                          <b-button :disabled="!filter" @click="filter = ''"
+                            >Clear</b-button
+                          >
+                        </b-input-group-append>
+                      </b-input-group>
+                    </b-form-group>
+                  </b-form>
+                  <!-- </b-col> -->
+                  <!-- </b-row> -->
                 </div>
               </div>
 
-      
+              <b-pagination
+                style="padding-bottom: 20px"
+                v-model="currentPage"
+                :total-rows="totalRows"
+                :per-page="perPage"
+                align="fill"
+                size="sm"
+                class="my-0"
+              ></b-pagination>
+              <div>
+                <b-table
+                  bordered
+                  striped
+                  hover
+                  selectable
+                  ref="selectableTable"
+                  responsive="true"
+                  table-layout:
+                  fixed
+                  :select-mode="selectMode"
+                  :current-page="currentPage"
+                  :per-page="perPage"
+                  :fields="conceptFields"
+                  :items="concepts_table"
+                  @row-clicked="myRowClickHandler"
+                  :filter="filter"
+                  :filter-include-fields="[]"
+                  @filtered="onFiltered"
+                >
+                  <template #cell(selected)="data">
+                    <template v-if="data.value">
+                      <span aria-hidden="true">&check;</span>
+                      <span class="sr-only">Selected</span>
+                    </template>
+                    <template v-else>
+                      <span aria-hidden="true">&nbsp;</span>
+                      <span class="sr-only">Not selected</span>
+                    </template>
+                  </template>
+                </b-table>
+              </div>
+              <hr />
+              <h2>Synonym node normalizer n = {{synonyms.length}}</h2> 
+
+                 <b-table
+                  bordered
+                  striped
+                  hover
+                  selectable
+                  ref="synonymTable"
+                  responsive="true"
+                  table-layout:
+                  fixed
+         
+                  :items="synonyms"
+            
+                >
+            
+                </b-table>
 
               <hr />
-
+              <h2>araxsynonymTable equivalent identifiers n = {{araxSynonyms_equivalentids.length}}</h2> 
+                 <b-table
+                  bordered
+                  striped
+                  hover
+                  selectable
+                  ref="araxsynonymTableEqIDs"
+                  responsive="true"
+                  table-layout:
+                  fixed
+                  :items="araxSynonyms_equivalentids"
+            
+                >
+            
+                </b-table>
 
               <hr />
+              <h2>araxsynonymTable nodes n = {{araxSynonyms_nodes.length}}</h2> 
+                 <b-table
+                  bordered
+                  striped
+                  hover
+                  selectable
+                  ref="araxsynonymTableNodes"
+                  responsive="true"
+                  table-layout:
+                  fixed
+         
+                  :items="araxSynonyms_nodes"
+            
+                >
+            
+                </b-table>
+                {{tree}}
+              <!-- <div>
+                <b-button v-b-toggle.collapse-1 variant="primary"
+                  >Review Selected</b-button
+                >
+                <b-collapse id="collapse-1" class="mt-2">
+                  <b-card v-if="selectedRows.length > 0">
+               
+                    <b-table
+                      bordered
+                      striped
+                      hover
+                      ref="selectedTable"
+                      :sticky-header="true"
+                      :fields="selectedFields"
+                      :items="selectedRows"
+                    >
+                    </b-table>
+                  </b-card>
+                </b-collapse>
+              </div> -->
             </b-card-text>
           </b-tab>
           <b-tab title="Selected Terms">
@@ -135,7 +313,7 @@
                 <!-- </b-collapse> -->
               </div>
           </b-tab>
-          <b-tab title="Diagram" >
+          <b-tab title="Diagram" active>
                                 <b-button 
                       style="margin-left: 10px"
                       variant="success"
@@ -386,16 +564,6 @@ export default {
     };
   },
   methods: {
-
-    async testRobokop(){
-      console.log("testRobokop")
-      let curie = "MONDO:0001234"
-      // biolink:Disease/biolink:ChemicalEntity/MONDO:0001234
-      let robokopGet = await PostService.robokopGet(curie, "biolink:Disease", "biolink:ChemicalEntity")
-      // let query = {"message": {"query_graph": {"nodes": {"n1": {},"n2": {"id": "HGNC:6884"}},"edges": {"e1": {"subject": "n1","object": "n2"}}}}}
-      // let queryResults = PostService.robokopGet(query)
-      console.log(robokopGet)
-    },
 
     async testMedik(){
       console.log("testMedik")

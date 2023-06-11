@@ -11,7 +11,7 @@ import home from './components/geneToDrug.vue';
 // import TwoHop from './components/geneToGeneToDrug.vue';
 // import starburst from './components/starburst.vue';
 // import svgtest from './components/svgtest.vue';
-// import conceptExplorePlus from './components/conceptExplorePlus.vue';
+import conceptExplorePlus from './components/conceptExplorePlus.vue';
 // import geneAllSynToDrugs from './components/geneAllSynToDrugs.vue';
 // import geneAllSynToDrugsv2 from './components/geneAllSynToDrugsv2.vue'; 
 import geneAllSynToDrugsARS from './components/geneAllSynToDrugsARS.vue';
@@ -98,11 +98,11 @@ Vue.use(Router)
       //   name: 'svgtest', 
       //   component: svgtest 
       // },
-      // { 
-      //   path: '/conceptExplorePlus', 
-      //   name: 'conceptExplorePlus', 
-      //   component: conceptExplorePlus 
-      // },
+      { 
+        path: '/conceptExplorePlus', 
+        name: 'conceptExplorePlus', 
+        component: conceptExplorePlus 
+      },
       // { 
       //   path: '/geneAllSynToDrugs', 
       //   name: 'geneAllSynToDrugs', 

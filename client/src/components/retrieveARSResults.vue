@@ -806,7 +806,9 @@ export default {
       // fbd67d01-ab6b-4107-a592-7f77a765184f to get the cohd
       // 3791007a-33d4-4c00-8609-86c758964eff
       //  ARSrequestID:"fbd67d01-ab6b-4107-a592-7f77a765184f",
-       ARSrequestID:"3791007a-33d4-4c00-8609-86c758964eff",
+      // e1f2d8c2-2b26-4dff-864f-350512d6762f
+      //  ARSrequestID:"2dcfd534-ec60-4d69-983b-2fb973b3a526",
+       ARSrequestID:"e1f2d8c2-2b26-4dff-864f-350512d6762f",
       resultSetIDs: [],
       ARSResultStatus: {},
       ARSJobId: "bc32c185-6a97-4aff-b467-aa2fac22e275",
@@ -1673,37 +1675,53 @@ async resultEdgeGroupTable(){
       let agent = this.allAnswerGraphArray[i].agent
       // console.log("-res")
       // console.log(res)
+        // console.log("edges")
+        // console.log(edges)
+        // CHECK TO SEE IF TrapiResults.reasoner_id EXISTS
+        let reasoner_id = ""
+        try{
+          reasoner_id = res.reasoner_id
+        } catch {
+          reasoner_id = "NA"
+        }
+        console.log("reasoner_id")
+        console.log(reasoner_id)
+
+      if(reasoner_id != "infores:openpredict"){
+      
       let results = res.message.results
       // console.log("--results")
       // console.log(results)
       // GO THROUGH EACH RESULT
-      for (let n = 0; n < results.length; n++) {
-        const result = results[n];
-        // console.log("----- result")
-        // console.log(result)
-        let edgeKeys = Object.keys(result.edge_bindings)
-        for (let x = 0; x < edgeKeys.length; x++) {
-          const edgeKey = edgeKeys[x];
-          let edge_bindingGroup = result.edge_bindings[edgeKey]
-          // console.log(" ---------- node_bindingGroup and key = ", nodeKey)
-          console.log(result.normalizedScore)
-          let tableRow = {"agent": agent, "resultGroup": n, "agentResultGroup": agent + "-" + n  ,"key": edgeKey, "edgeID": "", normalizedScore: result.normalizedScore}
-          //  EACH NODE IN ARRAY FOR EACH KEY
-          for (let t = 0; t < edge_bindingGroup.length; t++) {
-            // const element = array[t];
-            // tableRow.edgeID = edge_bindingGroup[t].id
-            // tableRow.edgeID = edge_bindingGroup[t].id
-            // tableRow.edgeID = edge_bindingGroup[t].id
-            tableRow = {...tableRow, edgeID:edge_bindingGroup[t].id}
-            this.allResultsEdgeTable.push(tableRow)
+        for (let n = 0; n < results.length; n++) {        
+          const result = results[n];
+          // console.log("----- result")
+          // console.log(result)
 
+          let edgeKeys = Object.keys(result.edge_bindings)
+          for (let x = 0; x < edgeKeys.length; x++) {
+            const edgeKey = edgeKeys[x];
+            let edge_bindingGroup = result.edge_bindings[edgeKey]
+            // console.log(" ---------- node_bindingGroup and key = ", nodeKey)
+            console.log(result.normalizedScore)
+            let tableRow = {"agent": agent, "resultGroup": n, "agentResultGroup": agent + "-" + n  ,"key": edgeKey, "edgeID": "", normalizedScore: result.normalizedScore}
+            //  EACH NODE IN ARRAY FOR EACH KEY
+            for (let t = 0; t < edge_bindingGroup.length; t++) {
+              // const element = array[t];
+              // tableRow.edgeID = edge_bindingGroup[t].id
+              // tableRow.edgeID = edge_bindingGroup[t].id
+              // tableRow.edgeID = edge_bindingGroup[t].id
+              tableRow = {...tableRow, edgeID:edge_bindingGroup[t].id}
+              this.allResultsEdgeTable.push(tableRow)
+              
+            }
             
           }
-          
-        }
 
-        
+          
+        }             
       }
+      
 
       if(i == this.allAnswerGraphArray.length -1){
         console.log("this.allResultsEdgeTable")
@@ -2077,7 +2095,7 @@ async araxCategoryGroup(){
             resolve()
             return
           } else {
-            await new Promise(resolve => setTimeout(resolve, 3000));
+            await new Promise(resolve => setTimeout(resolve, 10000));
           }
         }
         resolve()
@@ -2788,8 +2806,198 @@ async araxCategoryGroup(){
       console.log("file saved!!");
     },
 
+
+    // @remind ChatGPT code start
+    convertArrayOfObjectsToCSV(data) {
+      console.log("convertArrayOfObjectsToCSV")
+      console.log(data)
+
+      if (!Array.isArray(data) || data.length === 0) {
+        return null;
+      }
+
+      const headers = Object.keys(data[0]);
+
+      const csvRows = [];
+      csvRows.push(headers.join(','));
+
+      data.forEach((obj) => {
+        const values = headers.map((header) => {
+          // console.log("header")
+          // console.log(header)
+          // check if obj[header] is null or undefined
+          if (obj[header] != null) {
+            try {
+              // const escapedValue = obj[header].toString().replace(/"/g, '\\"');
+              const escapedValue = JSON.stringify(obj[header]).replace(/"/g, '\\"');
+              return `"${escapedValue}"`;
+            } catch (err) {
+              console.error(err);
+              console.log("obj")
+              console.log(obj)
+              console.log("header")
+              console.log(header)
+            }          
+          } else {
+            return "NA" // "null
+          }
+
+
+          // const escapedValue = obj[header].toString().replace(/"/g, '\\"');
+          // return `"${escapedValue}"`;
+        });
+        csvRows.push(values.join(','));
+      });
+
+      return csvRows.join('\n');
+    },
+    downloadCSV(data, filename) {
+      console.log("NEW downloadCSV")
+      const MAX_FILE_SIZE = 5 * 1024 * 1024; // Maximum file size in bytes (e.g., 5 MB)
+      const csvData = this.convertArrayOfObjectsToCSV(data);
+      if (csvData === null) {
+        console.error('No data provided.');
+        return;
+      }
+
+      const blob = new Blob([csvData], { type: 'text/csv' });
+
+      if (blob.size <= MAX_FILE_SIZE) {
+        // Single file is within the size limit, download it
+        this.downloadFile(blob, filename);
+      } else {
+        // Split the data into multiple files
+        const chunks = this.splitDataIntoChunks(csvData, MAX_FILE_SIZE);
+        chunks.forEach((chunk, index) => {
+          const chunkBlob = new Blob([chunk], { type: 'text/csv' });
+          filename = filename + '-' + index;
+          this.downloadFile(chunkBlob, filename);
+        });
+      }
+    },
+    splitDataIntoChunks(data, chunkSize) {
+      const chunks = [];
+      let index = 0;
+
+      while (index < data.length) {
+        chunks.push(data.slice(index, index + chunkSize));
+        index += chunkSize;
+      }
+
+      return chunks;
+    },
+    downloadFile(blob, filename) {
+      filename = filename + '.csv'
+      console.log("NEW downloadFile")
+      if (navigator.msSaveBlob) {
+        // For IE and Edge browsers
+        navigator.msSaveBlob(blob, filename);
+      } else {
+        // For other browsers
+        const link = document.createElement('a');
+        if (link.download !== undefined) {
+          const url = URL.createObjectURL(blob);
+          link.setAttribute('href', url);
+          link.setAttribute('download', filename);
+          link.style.visibility = 'hidden';
+          document.body.appendChild(link);
+          link.click();
+          document.body.removeChild(link);
+        }
+      }
+    },
     // @remind saveFile_ArrayJSONtoTable
     saveFile_ArrayJSONtoTable(data, name) {
+      // e1f2d8c2-2b26-4dff-864f-350512d6762f
+
+      name = name + this.queryName
+      let filename = name + " " + this.ARSrequestID + ".csv";
+      console.log("FILENAME ===== ", filename)
+      this.downloadCSV(data, filename)
+      // let text = "";
+      // console.log("saveFile saveFile_ArrayJSONtoTable result");
+      // // let counter = 0
+      // console.log("saveFile_ArrayJSONtoTable data")
+      // // console.log(data)
+      // for (let index = 0; index < data.length; index++) {
+      //   // const result = this.groupedResultsTable[index];
+      //   const result = {...data[index]}
+      //   // console.log(result);
+
+      //   let headers = Object.keys(result);
+        
+      //   if (index == 0) {
+      //     console.log("headers index == 0");
+      //     // HEADER ROW
+      //     for (let i = 0; i < headers.length; i++) {
+      //       const header = headers[i];
+      //       // if(i == 0){
+      //       //   text = "gene,"
+      //       // }
+      //       if (i != headers.length - 1) {
+      //         text = text + header + ",";
+      //       } else {
+      //         text = text + header + "\r\n";
+      //       }
+      //     }
+      //   } 
+      //     // ADD REMAINING ROWS IN SAME ORDER BASED ON KEYS FROM HEADER ROW
+      //     // if(index < 10 ){
+      //     //   console.log("result")
+      //     //   console.log(result)
+      //     // }
+      //     for (let n = 0; n < headers.length; n++) {
+      //       let header = headers[n];
+
+      //       let cell = ""
+      //       if(Object.prototype.hasOwnProperty.call(result, header)){
+      //         cell = JSON.stringify(result[header]);
+      //       }
+
+      //       try {
+      //         //if cell is not undefined then replace commas with semicolons
+      //         if(cell){
+      //           cell = cell.replace(/,/gi, ";");
+      //         } else {
+      //           cell = ""
+      //         }
+
+      //       } catch (err) {
+      //         console.error(err);
+      //       }
+      //       // if(n == 0){
+      //       //   text = this.geneInfo.prowl_symbol + ','
+
+      //       // }
+      //       if(text.length < 2000000000){
+      //         if (n != headers.length - 1) {
+      //           text = text + cell + ",";
+      //         } else {
+      //           text = text + cell + "\r\n";
+      //         }              
+      //       }
+
+      //     }
+      //   // }
+      // }
+
+      // let filename = name + " " + this.ARSrequestID + ".csv";
+      // let element = document.createElement("a");
+      // element.setAttribute(
+      //   "href",
+      //   "data:application/json;charset=utf-8," + encodeURIComponent(text)
+      // );
+      // element.setAttribute("download", filename);
+
+      // element.style.display = "none";
+      // document.body.appendChild(element);
+
+      // element.click();
+      // document.body.removeChild(element);
+
+    },
+    // @remind saveFile_ArrayJSONtoTable_old
+    saveFile_ArrayJSONtoTable_old(data, name) {
       name = name + this.queryName
       let text = "";
       console.log("saveFile saveFile_ArrayJSONtoTable result");
