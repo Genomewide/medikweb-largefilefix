@@ -12,6 +12,7 @@ import home from './components/geneToDrug.vue';
 // import starburst from './components/starburst.vue';
 // import svgtest from './components/svgtest.vue';
 import conceptExplorePlus from './components/conceptExplorePlus.vue';
+import conceptExploreCytoscape from './components/conceptExploreCytoscape.vue';
 // import geneAllSynToDrugs from './components/geneAllSynToDrugs.vue';
 // import geneAllSynToDrugsv2 from './components/geneAllSynToDrugsv2.vue'; 
 import geneAllSynToDrugsARS from './components/geneAllSynToDrugsARS.vue';
@@ -23,7 +24,7 @@ import geneAllSynToDrugsARSBatch from './components/geneAllSynToDrugsARSBatch.vu
 // import conceptConnect from './components/conceptConnect.vue';
 // import xml from './components/XDM-220618-012821/IHE_XDM/CE001/DOC00001.XML';
 // /Users/andycrouse/Documents/GitHub/medikweb_dev/client/src/components/XDM-220618-012821/IHE_XDM/CE001/DOC00001.XML
-// client/src/components/conceptExplorePlus.vue geneAllSynToDrugs geneAllSynToDrugsv2 conceptExploreTextMatch conceptConnect
+// client/src/components/conceptExplorePlus.vue geneAllSynToDrugs geneAllSynToDrugsv2 conceptExploreTextMatch conceptConnect 
 
 Vue.use(Router)
 // arsexplorer 
@@ -62,6 +63,11 @@ Vue.use(Router)
         path: '/geneAllSynToDrugsARSBatch', 
         name: 'geneAllSynToDrugsARSBatch', 
         component: geneAllSynToDrugsARSBatch 
+      },
+      { 
+        path: '/conceptExploreCytoscape', 
+        name: 'conceptExploreCytoscape', 
+        component: conceptExploreCytoscape 
       },
       // { 
       //   path: '/apiexplorer', 

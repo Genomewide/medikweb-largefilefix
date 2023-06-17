@@ -22,20 +22,44 @@
                     > -->
                     <b-button variant="primary" v-on:click="testRobokop"
                       >testRobokop</b-button
-                    >                    
-
+                    >
                   </b-form>
+                  {{ normID }}
                   <hr />
-                
+
+                  {{ normLabel }}
+                  <hr />
+
+                  {{ normCategory }}
+                  <hr />
                 </div>
               </div>
+              <div class="border border-primary rounded">
+                  <div>
+    <vue-cytoscape :elements="graphElements"></vue-cytoscape>
+  </div>
+              <!-- <cytoscape ref="cyRef" :config="config" v-on:mousedown="addNode" v-on:cxttapstart="updateNode"> -->
+              <!-- <cytoscape :key="keyCounter" ref="cyto" :config="config" :preConfig="preConfig" :afterCreated="updateGraph"> -->
+              <!-- <cytoscape
+                :key="keyCounter"
+                ref="cyto"
+                :config="config3"
+                :preConfig="preConfig"
+              >
+                <cy-element
+                  ref="cy"
+                  v-for="(def, index) in elements"
+                  :key="`${index}`"
+                  :definition="def"
+                  v-on:mousedown="
+                    deleteNode($event, def, def.data, def.data.id)
+                  "
+                /> 
+              
+              </cytoscape> -->
+            </div>
 
-      
 
-              <hr />
-
-
-              <hr />
             </b-card-text>
           </b-tab>
           <b-tab title="Selected Terms">
@@ -86,103 +110,71 @@
               </b-card-group>
             </div>
           </b-tab>
-                    <b-tab title="All edges 2 hop">
-              <hr />
-              <div>
-                <!-- <b-button v-b-toggle.collapse-1 variant="primary"
+          <b-tab title="All edges 2 hop">
+            <hr />
+            <div>
+              <!-- <b-button v-b-toggle.collapse-1 variant="primary"
                   >Review Selected</b-button
                 > -->
-                <!-- <b-collapse id="collapse-1" class="mt-2"> -->
-                <b-card title="catCountTable">
-                  <!-- {{ concepts_table }} -->
-                  <!-- selectable table =  {{$refs.selectableTable}} -->
-                  <b-table
-                    bordered
-                    striped
-                    hover
-                    ref="subCountTable"
-                    table-layout:
-                    fixed
-                    :sticky-header="true"
-                    :items="catCountTable"
-                    :fields="countFields"
-                  >
-                  </b-table>
-                </b-card>
-                <!-- </b-collapse> -->
-              </div>
-              <div>
-                <!-- <b-button v-b-toggle.collapse-1 variant="primary"
+              <!-- <b-collapse id="collapse-1" class="mt-2"> -->
+              <b-card title="catCountTable">
+                <!-- {{ concepts_table }} -->
+                <!-- selectable table =  {{$refs.selectableTable}} -->
+                <b-table
+                  bordered
+                  striped
+                  hover
+                  ref="subCountTable"
+                  table-layout:
+                  fixed
+                  :sticky-header="true"
+                  :items="catCountTable"
+                  :fields="countFields"
+                >
+                </b-table>
+              </b-card>
+              <!-- </b-collapse> -->
+            </div>
+            <div>
+              <!-- <b-button v-b-toggle.collapse-1 variant="primary"
                   >Review Selected</b-button
                 > -->
-                <!-- <b-collapse id="collapse-1" class="mt-2"> -->
-                <b-card title="catCountTable">
-                  <!-- {{ concepts_table }} -->
-                  <!-- selectable table =  {{$refs.selectableTable}} -->
-                  <b-table
-                    bordered
-                    striped
-                    hover
-                    ref="catCountTable"
-                    table-layout:
-                    fixed
-                    :sticky-header="true"
-                    :items="preCountTable"
-                    :fields="countFields"
-                  >
-                  </b-table>
-                </b-card>
-                <!-- </b-collapse> -->
-              </div>
+              <!-- <b-collapse id="collapse-1" class="mt-2"> -->
+              <b-card title="catCountTable">
+                <!-- {{ concepts_table }} -->
+                <!-- selectable table =  {{$refs.selectableTable}} -->
+                <b-table
+                  bordered
+                  striped
+                  hover
+                  ref="catCountTable"
+                  table-layout:
+                  fixed
+                  :sticky-header="true"
+                  :items="preCountTable"
+                  :fields="countFields"
+                >
+                </b-table>
+              </b-card>
+              <!-- </b-collapse> -->
+            </div>
           </b-tab>
-          <b-tab title="Diagram" >
-                                <b-button 
-                      style="margin-left: 10px"
-                      variant="success"
-                      v-on:click="testMedik"
-                      >testMedik</b-button
-                    >  
-            <div class="border border-primary rounded" >
-        <!-- <cytoscape ref="cyRef" :config="config" v-on:mousedown="addNode" v-on:cxttapstart="updateNode"> -->
-        <!-- <cytoscape :key="keyCounter" ref="cyto" :config="config" :preConfig="preConfig" :afterCreated="updateGraph"> -->
-        <cytoscape
-          :key="keyCounter"
-          ref="cyto"
-          :config="config3"
-          :preConfig="preConfig"
-        >
-          <!-- <cytoscape :key="keyCounter" ref="cyto" :config="config"  > -->
-          <cy-element
-            ref="cy"
-            v-for="(def, index) in elements"
-            :key="`${index}`"
-            :definition="def"
-            v-on:mousedown="deleteNode($event, def, def.data, def.data.id)"
-          />
-          <!-- <cy-element
-            ref="cy"
-            v-for="(def, index) in elements"
-            :key="`${def.data.id}`"
-            :definition="def"
-            v-on:mousedown="deleteNode($event, def, def.data, def.data.id)"
-          /> -->
-          <!-- <cy-element
-          ref="cy"
-          v-for="def in elements"
-          :key="`${def.data.id}`"
-          :definition="def"
-          v-on:mousedown="deleteNode($event, def.data.id)"
-        /> -->
-        </cytoscape>
-      </div>
-<!-- <conceptExploreComponent :conceptData="tree" /> -->
- <!-- {{testjson}} -->
+          <b-tab title="Diagram">
+            <b-button
+              style="margin-left: 10px"
+              variant="success"
+              v-on:click="testMedik"
+              >testMedik</b-button
+            >
+            
+            <!-- <conceptExploreComponent :conceptData="tree" /> -->
+            <!-- {{testjson}} -->
           </b-tab>
         </b-tabs>
       </b-card>
-             <div>
-    <!-- <svg id="vizTreeII" class="container-border" /> -->
-  </div>
+      <div>
+        <!-- <svg id="vizTreeII" class="container-border" /> -->
+      </div>
     </div>
   </div>
 </template>
@@ -190,6 +182,8 @@
 <script>
 // import { mapGetters, mapActions } from "vuex";
 import PostService from "../PostService";
+import ARSService from "../ARSService";
+
 import synonymService from "../synonymService";
 import TrapiResultClean from "../TrapiResultClean";
 var parser = require("fast-xml-parser");
@@ -199,13 +193,17 @@ import axios from "axios";
 
 // import * as d3 from "d3";
 
-import testjson from "./testjson.json"
+import testjson from "./testjson.json";
 
 import config3 from "./cytoscapeData/CytoConfig";
 // import config2 from "./cytoscapeData/CytoConfig2";
 // import cytoData from "../assets/diabetesTreatsCleaned.json";
-import cytoscape from "cytoscape";
+import VueCytoscape from 'vue-cytoscape';
+
+// import cytoscape from "cytoscape";
 import klay from "cytoscape-klay";
+
+
 
 // console.log("config");
 // console.log(config);
@@ -216,21 +214,27 @@ console.log(config3);
 const elements = [...config3.elements];
 // const modalElements = [...config2.elements];
 delete config3.elements;
+// var cy = cytoscape({
+//   container: document.getElementById('cy'), // replace 'cy' with the ID or class of your container element
+//   elements: [ elements ],
+//   /* other options */
+// });
+
 // delete config2.elements;
 // console.log("cytoData");
 // console.log(cytoData);
 
 export default {
   name: "ConceptExplorerPlus",
-//      components: {
-//  conceptExploreComponent
-//   },
+  components: {
+    VueCytoscape,
+  },
   // mounted: function () {
 
   // },
   data() {
     return {
-      cytoscape,
+      // cytoscape,
       config3,
       elements,
       klay: klay,
@@ -243,7 +247,7 @@ export default {
       edges: [],
       subject: "chemical",
       predicate: "UMLS:C0004096",
-      concept_search: "HGNC:6884",
+      concept_search: "MONDO:0005148",
       // HGNC:6884"
       // "HGNC:2625"
       object: "HGNC:6884",
@@ -259,7 +263,7 @@ export default {
       shownItems: [],
       select_concepts: [],
       countFields: [
-                {
+        {
           key: "category",
           label: "Category",
           sortable: true,
@@ -324,9 +328,9 @@ export default {
           sortable: true,
         },
       ],
- 
+
       queryResults: [],
-    
+
       query_fields: [
         {
           key: "subject_name",
@@ -380,34 +384,149 @@ export default {
       allSynonyms: [],
       preCountTable: [],
       catCountTable: [],
-      tree: {test: "test tree"},
+      tree: { test: "test tree" },
       componentKey: 0,
       allNodes: [],
+      normID: "",
+      normLabel: "",
+      normCategory: "",
+      graphElements: [
+        // initial graph elements
+        { data: { id: 'node1' } },
+        { data: { id: 'node2' } },
+        // other elements...
+      ]
     };
   },
   methods: {
+    async testRobokop() {
+      let catgories = [
+        "biolink:Disease",
+        "biolink:Protein",
+        "biolink:Gene",
+        "biolink:GeneFamily",
+        "biolink:BiologicalProcessOrActivity",
+        "biolink:SmallMolecule",
+        "biolink:Drug",
+      ];
 
-    async testRobokop(){
-      console.log("testRobokop")
-      let curie = "MONDO:0001234"
-      // biolink:Disease/biolink:ChemicalEntity/MONDO:0001234
-      let robokopGet = await PostService.robokopGet(curie, "biolink:Disease", "biolink:ChemicalEntity")
-      // let query = {"message": {"query_graph": {"nodes": {"n1": {},"n2": {"id": "HGNC:6884"}},"edges": {"e1": {"subject": "n1","object": "n2"}}}}}
-      // let queryResults = PostService.robokopGet(query)
-      console.log(robokopGet)
+      // let curie = "MONDO:0005148" //0005148
+      //this.concept_search = "MONDO:0005148"
+      // this.cytoscape.add(cytoEdge);
+
+      // GET NORMALIZED INFO ABOUT THE CURIE SUBMITTED
+      let normalizedArray = await ARSService.getSynonymsArray([
+        this.concept_search,
+      ]);
+      console.log("normalizedArray");
+      console.log(normalizedArray);
+
+      // GET THE ID, LABEL, AND CATEGORY OF THE CURIE SUBMITTED
+
+       this.normID =
+        normalizedArray[this.concept_search].id.identifier;
+      this.normLabel = normalizedArray[this.concept_search].id.label;
+      this.normCategory = normalizedArray[this.concept_search].type[0];
+      console.log("normID");
+      console.log(this.normID);
+      console.log("normLabel");
+      console.log(this.normLabel);
+      console.log("normCategory");
+      console.log(this.normCategory);
+
+      // MAKE THE CYTOSCAPE NODE FOR THE CURIE SUBMITTED AND ADD IT TO THE GRAPH
+      // show cytoscape version
+      // console.log("cytoscape.version")
+      // console.log(cytoscape.version)
+      
+      let cytoNode = {
+        data: {
+          id: this.normID,
+          name: this.normLabel,
+          category: this.normCategory,
+          db: this.normID.split(":")[0],
+        },
+      };
+      this.cyInstance.add(cytoNode)
+      // this.cytoscape.add(cytoNode);
+
+      // LOOP THROUGH CATEGORIES AND SUBSTITUTE biolink:ChemicalEntity for each loop
+      for (let i = 0; i < catgories.length; i++) {
+        let category = catgories[i];
+
+        console.log("testRobokop");
+        console.log("Current time:", new Date());
+        console.time("robokopGet()");
+
+        let robokopGet = await PostService.robokopGet(
+          this.normID,
+          this.normCategory,
+          category
+        );
+        console.log("##### CATEGORY #####");
+        console.log(category);
+        console.log("robokopGet");
+        console.log(robokopGet);
+
+        console.log("Finish time:", new Date());
+        console.timeEnd("robokopGet()");
+      }
+
+      // console.log("testRobokop")
+      // console.log('Current time:', new Date());
+
+      // console.time('robokopGet()');
+
+      // console.log("testRobokop")
+      // let curie = "MONDO:0001234"
+      // // biolink:Disease/biolink:ChemicalEntity/MONDO:0001234
+
+      // let robokopGet = await PostService.robokopGet(curie, "biolink:Disease", "biolink:ChemicalEntity")
+      // console.log("robokopGet")
+      // console.log(robokopGet)
+
+      // console.log('Finish time:', new Date());
+      // console.timeEnd('robokopGet()');
     },
 
-    async testMedik(){
-      console.log("testMedik")
+    async testBTE() {
+      console.log("testBTE");
+      console.log("Current time:", new Date());
+
+      console.time("testBTE()");
+
+      let BTEPost = await PostService.testBTE();
+      console.log("BTEPost");
+      console.log(BTEPost);
+      console.log("Finish time:", new Date());
+      console.timeEnd("testBTE()");
+    },
+
+    async testMedik() {
+      console.log("testMedik");
       // let nodes = []
-      let queryForward = {"message": {"query_graph": {"nodes": {"n1": {},"n2": {"id": "HGNC:6884"}},"edges": {"e1": {"subject": "n1","object": "n2"}}}}}
-      let queryBackward = {"message": {"query_graph": {"nodes": {"n1": {},"n2": {"id": "HGNC:6884"}},"edges": {"e1": {"subject": "n2","object": "n1"}}}}}
-      let queryResultsForward = await PostService.query_raw(queryForward)
-      let queryResultsBackward = await PostService.query_raw(queryBackward)
-      console.log(queryResultsForward)
-      console.log(queryResultsBackward)
-      console.log("elements")
-      console.log(elements)
+      let queryForward = {
+        message: {
+          query_graph: {
+            nodes: { n1: {}, n2: { id: "HGNC:6884" } },
+            edges: { e1: { subject: "n1", object: "n2" } },
+          },
+        },
+      };
+      let queryBackward = {
+        message: {
+          query_graph: {
+            nodes: { n1: {}, n2: { id: "HGNC:6884" } },
+            edges: { e1: { subject: "n2", object: "n1" } },
+          },
+        },
+      };
+      let queryResultsForward = await PostService.query_raw(queryForward);
+      let queryResultsBackward = await PostService.query_raw(queryBackward);
+      console.log(queryResultsForward);
+      console.log(queryResultsBackward);
+      console.log("elements");
+      console.log(elements);
 
       // let cleanedResultsForward = await this.cleanMedikResults(queryResultsForward)
       // console.log("cleanedResultsForward")
@@ -416,208 +535,204 @@ export default {
       // let cleanedResultsBackward = await this.cleanMedikResults(queryResultsBackward)
       // console.log("cleanedResultsBackward")
       // console.log(cleanedResultsBackward)
-    
-    let forwardNodes = queryResultsForward.message.knowledge_graph.nodes
-    console.log("forwardNodes")
-    console.log(forwardNodes)
 
-    let forwardCytoNodes = this.getNodesFromTrapi(forwardNodes)
-    console.log("forwardCytoNodes")
-    console.log(forwardCytoNodes)
+      let forwardNodes = queryResultsForward.message.knowledge_graph.nodes;
+      console.log("forwardNodes");
+      console.log(forwardNodes);
 
-    let forwardEdges = queryResultsForward.message.knowledge_graph.edges
-    console.log("forwardEdges")
-    console.log(forwardEdges)
+      let forwardCytoNodes = this.getNodesFromTrapi(forwardNodes);
+      console.log("forwardCytoNodes");
+      console.log(forwardCytoNodes);
 
-    let forwardCytoEdges = this.getEdgesFromTrapi(forwardEdges)
-    console.log("forwardCytoEdges")
-    console.log(forwardCytoEdges)
+      let forwardEdges = queryResultsForward.message.knowledge_graph.edges;
+      console.log("forwardEdges");
+      console.log(forwardEdges);
 
-    let backwardNodes = queryResultsBackward.message.knowledge_graph.nodes
-    console.log("backwardNodes")
-    console.log(backwardNodes)
+      let forwardCytoEdges = this.getEdgesFromTrapi(forwardEdges);
+      console.log("forwardCytoEdges");
+      console.log(forwardCytoEdges);
 
-    let backwardCytoNodes = this.getNodesFromTrapi(backwardNodes)
-    console.log("backwardCytoNodes")
-    console.log(backwardCytoNodes)
+      let backwardNodes = queryResultsBackward.message.knowledge_graph.nodes;
+      console.log("backwardNodes");
+      console.log(backwardNodes);
 
-    let backwardEdges = queryResultsBackward.message.knowledge_graph.edges
-    console.log("backwardEdges")
-    console.log(backwardEdges)
+      let backwardCytoNodes = this.getNodesFromTrapi(backwardNodes);
+      console.log("backwardCytoNodes");
+      console.log(backwardCytoNodes);
 
-    let backwardCytoEdges = this.getEdgesFromTrapi(backwardEdges)
-    console.log("backwardCytoEdges")
-    console.log(backwardCytoEdges)
+      let backwardEdges = queryResultsBackward.message.knowledge_graph.edges;
+      console.log("backwardEdges");
+      console.log(backwardEdges);
 
-    // let uniqueNodes = []
-    // let uniqueEdges = []
+      let backwardCytoEdges = this.getEdgesFromTrapi(backwardEdges);
+      console.log("backwardCytoEdges");
+      console.log(backwardCytoEdges);
 
-    console.log("GOT THEM ALL")
-    console.log("this.elements")
-    console.log(this.elements)
+      // let uniqueNodes = []
+      // let uniqueEdges = []
 
-    // this.elements = [elements, ...forwardCytoNodes, ...backwardCytoNodes]
-    let elements = [...forwardCytoNodes, ...backwardCytoNodes, ...forwardCytoEdges, ...backwardCytoEdges]
-    console.log("elements")
-    console.log(elements)
-    this.elements = elements
+      console.log("GOT THEM ALL");
+      console.log("this.elements");
+      console.log(this.elements);
 
-
-
-
+      // this.elements = [elements, ...forwardCytoNodes, ...backwardCytoNodes]
+      let elements = [
+        ...forwardCytoNodes,
+        ...backwardCytoNodes,
+        ...forwardCytoEdges,
+        ...backwardCytoEdges,
+      ];
+      console.log("elements");
+      console.log(elements);
+      this.elements = elements;
     },
-    getNodesFromTrapi(nodes){
-      let nodesKeys = Object.keys(nodes)
+    getNodesFromTrapi(nodes) {
+      let nodesKeys = Object.keys(nodes);
       // GET UNIQUE NODES
       // this.allNodes = [...new Set(nodesKeys)]
       // USE FILTER TO GET UNIQUE NODES
       this.allNodes = nodesKeys.filter((v, i, a) => a.indexOf(v) === i);
-      console.log("this.allNodes")
-      console.log(this.allNodes)
+      console.log("this.allNodes");
+      console.log(this.allNodes);
 
-      let nodesList = []
-      for (let i = 0; i < nodesKeys.length; i++){
+      let nodesList = [];
+      for (let i = 0; i < nodesKeys.length; i++) {
         const node = nodesKeys[i];
-        let nodeInfo = nodes[node]
+        let nodeInfo = nodes[node];
         // console.log("nodeInfo")
         // console.log(nodeInfo)
         // console.log(nodeInfo.name)
         // console.log(node)
-        let cytoNode = {}
-        cytoNode.data = {}
-        cytoNode.data.id = ""
-        cytoNode.data.name = ""
-        let fixNodeName = ""
+        let cytoNode = {};
+        cytoNode.data = {};
+        cytoNode.data.id = "";
+        cytoNode.data.name = "";
+        let fixNodeName = "";
 
-        if(nodeInfo.name == false){
+        if (nodeInfo.name == false) {
           // console.log("getting name")
           // console.log(nodeInfo.name)
-          fixNodeName = node.split(":").join("_")
+          fixNodeName = node.split(":").join("_");
         } else {
           // console.log("else getting name")
-          fixNodeName = nodeInfo.name.split(" ").join("_")
+          fixNodeName = nodeInfo.name.split(" ").join("_");
         }
 
         // let fixNodeName = nodeInfo.name.split(" ").join("_");
         let fixNodeId = node.split(":").join("_");
-        let fixNodeGroup = nodeInfo.category.split(":")[1]
+        let fixNodeGroup = nodeInfo.category.split(":")[1];
 
-        cytoNode.data.name = fixNodeName
-        cytoNode.data.id = fixNodeId
-        cytoNode.data.category = fixNodeGroup
-        cytoNode.group = "nodes"
+        cytoNode.data.name = fixNodeName;
+        cytoNode.data.id = fixNodeId;
+        cytoNode.data.category = fixNodeGroup;
+        cytoNode.group = "nodes";
 
-        if(!this.allNodes.includes(fixNodeId)){
-          this.allNodes.push(fixNodeId)
-          nodesList.push(cytoNode)
-        }        
-        
+        if (!this.allNodes.includes(fixNodeId)) {
+          this.allNodes.push(fixNodeId);
+          nodesList.push(cytoNode);
+        }
+
         // nodesList.push(cytoNode)
         // this.allNodes.push(cytoNode)
         // this.cyInstance.add(addElements);
         // this.cyInstance.add(cytoNode)
-        
       }
-      return nodesList
+      return nodesList;
     },
 
-    getEdgesFromTrapi(edges){
-      let edgesKeys = Object.keys(edges)
-      let edgesList = []
-    //  {
-    //     data: { id: "ca", source: "c", target: "a" },
-    //     group: "edges"
-    //   }
-      for (let i = 0; i < edgesKeys.length; i++){
+    getEdgesFromTrapi(edges) {
+      let edgesKeys = Object.keys(edges);
+      let edgesList = [];
+      //  {
+      //     data: { id: "ca", source: "c", target: "a" },
+      //     group: "edges"
+      //   }
+      for (let i = 0; i < edgesKeys.length; i++) {
         const edge = edgesKeys[i];
-        let edgeInfo = edges[edge]
-        let cytoEdge = {}
-        cytoEdge.data = {}
-        cytoEdge.data.id = ""
-        cytoEdge.data.source = ""
-        cytoEdge.data.target = ""
-        cytoEdge.data.edgeId = edge
-        cytoEdge.group = "edges"
+        let edgeInfo = edges[edge];
+        let cytoEdge = {};
+        cytoEdge.data = {};
+        cytoEdge.data.id = "";
+        cytoEdge.data.source = "";
+        cytoEdge.data.target = "";
+        cytoEdge.data.edgeId = edge;
+        cytoEdge.group = "edges";
 
         let source = edgeInfo.subject.split(":").join("_");
-        console.log("source")
-        console.log(source)
+        console.log("source");
+        console.log(source);
         let target = edgeInfo.object.split(":").join("_");
-        console.log("target")
-        console.log(target)
+        console.log("target");
+        console.log(target);
 
-        let edgeId = source + "_" + target
-        console.log("edgeId")
-        console.log(edgeId)
+        let edgeId = source + "_" + target;
+        console.log("edgeId");
+        console.log(edgeId);
 
-
-        cytoEdge.data.id = edgeId
-        cytoEdge.data.source = source
-        cytoEdge.data.target = target
+        cytoEdge.data.id = edgeId;
+        cytoEdge.data.source = source;
+        cytoEdge.data.target = target;
 
         // push edge if subject and object are in this.allNodes
-        if(this.allNodes.includes(source) && this.allNodes.includes(target)){
-          edgesList.push(cytoEdge)
+        if (this.allNodes.includes(source) && this.allNodes.includes(target)) {
+          edgesList.push(cytoEdge);
         }
         // edgesList.push(cytoEdge)
-        this.cytoscape.add(cytoEdge)
-
+        this.cytoscape.add(cytoEdge);
       }
-      return edgesList
+      return edgesList;
     },
-    cleanMedikResults(resultsToClean){
+    cleanMedikResults(resultsToClean) {
       return new Promise(async (resolve, reject) => { // eslint-disable-line
-
-      // GET THE EDGE AND THEN USE THE NODE DATA TO ADD IN THE NODE INFORMATION
-      console.log("cleanMedikResults")
-      console.log(resultsToClean)
-      console.log(resultsToClean.message)
-      console.log(resultsToClean.message.knowledge_graph)
-      // get edges
-      let edges = resultsToClean.message.knowledge_graph.edges
-      let edgesKeys = Object.keys(edges)
-      
-      let nodes = resultsToClean.message.knowledge_graph.nodes
-      let results = []
-
-      for (let i = 0; i < edgesKeys.length; i++){
-        const edge = edgesKeys[i];
-
-        let fullEdge = edges[edge]
-
-        // fullEdge.subjectName = nodes[fullEdge.subject].name
-        // get the subject and object
-        let subjectInfo = nodes[fullEdge.subject]
-        let objectInfo = nodes[fullEdge.object]
-        // get the subject and object name
         
-        fullEdge.subjectName = subjectInfo.name
-        fullEdge.objectName = objectInfo.name
-        // get the subject category
-        fullEdge.subjectCategory = subjectInfo.category
-        fullEdge.objectCategory = objectInfo.category
-        // get the subject and object attributes
-        fullEdge.subjectAttributes = subjectInfo.attributes
-        fullEdge.objectAttributes = objectInfo.attributes
 
-        results.push(fullEdge)
-      }
+        // GET THE EDGE AND THEN USE THE NODE DATA TO ADD IN THE NODE INFORMATION
+        console.log("cleanMedikResults");
+        console.log(resultsToClean);
+        console.log(resultsToClean.message);
+        console.log(resultsToClean.message.knowledge_graph);
+        // get edges
+        let edges = resultsToClean.message.knowledge_graph.edges;
+        let edgesKeys = Object.keys(edges);
 
-      resolve(results) 
+        let nodes = resultsToClean.message.knowledge_graph.nodes;
+        let results = [];
 
+        for (let i = 0; i < edgesKeys.length; i++) {
+          const edge = edgesKeys[i];
+
+          let fullEdge = edges[edge];
+
+          // fullEdge.subjectName = nodes[fullEdge.subject].name
+          // get the subject and object
+          let subjectInfo = nodes[fullEdge.subject];
+          let objectInfo = nodes[fullEdge.object];
+          // get the subject and object name
+
+          fullEdge.subjectName = subjectInfo.name;
+          fullEdge.objectName = objectInfo.name;
+          // get the subject category
+          fullEdge.subjectCategory = subjectInfo.category;
+          fullEdge.objectCategory = objectInfo.category;
+          // get the subject and object attributes
+          fullEdge.subjectAttributes = subjectInfo.attributes;
+          fullEdge.objectAttributes = objectInfo.attributes;
+
+          results.push(fullEdge);
+        }
+
+        resolve(results);
       });
-      
     },
 
-    loadCytosccapeDataFromCleanedResults(cleanedResults){
-      console.log("loadCytosccapeDataFromCleanedResults")
-      console.log(cleanedResults)
-
+    loadCytosccapeDataFromCleanedResults(cleanedResults) {
+      console.log("loadCytosccapeDataFromCleanedResults");
+      console.log(cleanedResults);
     },
     preConfig(cytoscape) {
       console.log("preConfig");
-      console.log("cytoscape")
-      console.log(cytoscape)
+      console.log("cytoscape");
+      // console.log(cytoscape);
       // console.log('this.$refs["cy-element"]')
       // console.log(this.$refs["cy-element"])
       // console.log("this.$refs.cy")
@@ -634,380 +749,385 @@ export default {
       event.preventDefault();
       // alert(JSON.stringify(this.form))
     },
-    async getAllEdges (){
+    async getAllEdges() {
       // this.tree = testjson
 
-      let queryForward = {"message": {"query_graph": {"nodes": {"n1": {},"n2": {"id": "HGNC:6884"}},"edges": {"e1": {"subject": "n1","object": "n2"}}}}}
-      let queryBackward = {"message": {"query_graph": {"nodes": {"n1": {},"n2": {"id": "HGNC:6884"}},"edges": {"e1": {"subject": "n2","object": "n1"}}}}}
+      let queryForward = {
+        message: {
+          query_graph: {
+            nodes: { n1: {}, n2: { id: "HGNC:6884" } },
+            edges: { e1: { subject: "n1", object: "n2" } },
+          },
+        },
+      };
+      let queryBackward = {
+        message: {
+          query_graph: {
+            nodes: { n1: {}, n2: { id: "HGNC:6884" } },
+            edges: { e1: { subject: "n2", object: "n1" } },
+          },
+        },
+      };
       // let edges = {}
       // let nodes = {}
 
-      synonymService.allSynonyms(this.concept_search)
-      .then(async (synonymData) => {
-        // console.log(synonymData)
-        this.allSynonyms = synonymData.synonymIdArray
-        let allResults = []
-        // let allResultsForward = []
-        // let allResultsBackward = []
-        
-        for (let i = 0; i < this.allSynonyms.length; i++) {
-          const synonym = this.allSynonyms[i];
-          console.log("SYNONYM TO GET DRUG RESULTS = ", synonym)
+      synonymService
+        .allSynonyms(this.concept_search)
+        .then(async (synonymData) => {
+          // console.log(synonymData)
+          this.allSynonyms = synonymData.synonymIdArray;
+          let allResults = [];
+          // let allResultsForward = []
+          // let allResultsBackward = []
 
-          // GET RESULTS - CURRIE AS OBJECT let allResults
+          for (let i = 0; i < this.allSynonyms.length; i++) {
+            const synonym = this.allSynonyms[i];
+            console.log("SYNONYM TO GET DRUG RESULTS = ", synonym);
 
-          queryForward.message.query_graph.nodes.n2.id = synonym
-          let queryResults = await PostService.query_raw(queryForward)
-          // console.log({queryResults})
+            // GET RESULTS - CURRIE AS OBJECT let allResults
 
-          let cleanedResultsForward = await TrapiResultClean.TrapiResultClean(queryResults);
-          // console.log("index for synonym = ", i)
-          // console.log("length = ", cleanedResultsForward.length) // allResults
-          // allResultsForward = allResultsForward.concat(cleanedResultsForward)
-          allResults = allResults.concat(cleanedResultsForward)
+            queryForward.message.query_graph.nodes.n2.id = synonym;
+            let queryResults = await PostService.query_raw(queryForward);
+            // console.log({queryResults})
 
-          // GET RESULTS - CURRIE AS SUBJECT
+            let cleanedResultsForward = await TrapiResultClean.TrapiResultClean(
+              queryResults
+            );
+            // console.log("index for synonym = ", i)
+            // console.log("length = ", cleanedResultsForward.length) // allResults
+            // allResultsForward = allResultsForward.concat(cleanedResultsForward)
+            allResults = allResults.concat(cleanedResultsForward);
 
-          queryBackward.message.query_graph.nodes.n2.id = synonym
-          queryResults = await PostService.query_raw(queryBackward)
-          // console.log({queryResults})
+            // GET RESULTS - CURRIE AS SUBJECT
 
-          let cleanedResultsBackward = await TrapiResultClean.TrapiResultClean(queryResults);
-          // console.log("index for synonym = ", i)
-          // console.log("length = ", cleanedResultsBackward.length)
-          // allResultsBackward = allResultsBackward.concat(cleanedResultsBackward) 
-          allResults = allResults.concat(cleanedResultsBackward) 
-          
-          if(i == this.allSynonyms.length - 1){
-            // let allResults = {"allResultsBackward": allResultsBackward, "allResultsForward": allResultsForward}
-            return allResults
+            queryBackward.message.query_graph.nodes.n2.id = synonym;
+            queryResults = await PostService.query_raw(queryBackward);
+            // console.log({queryResults})
+
+            let cleanedResultsBackward =
+              await TrapiResultClean.TrapiResultClean(queryResults);
+            // console.log("index for synonym = ", i)
+            // console.log("length = ", cleanedResultsBackward.length)
+            // allResultsBackward = allResultsBackward.concat(cleanedResultsBackward)
+            allResults = allResults.concat(cleanedResultsBackward);
+
+            if (i == this.allSynonyms.length - 1) {
+              // let allResults = {"allResultsBackward": allResultsBackward, "allResultsForward": allResultsForward}
+              return allResults;
+            }
           }
+        })
+        .then((allResults) => {
+          console.log("finished! => ", allResults);
+          let uniquePredArray = [];
+          let predCount = {};
+          let uniqueCatArray = [];
+          let catCount = {};
+          // console.log("allResults length = ", allResults.length)
 
-        }
+          for (let i = 0; i < allResults.length; i++) {
+            const result = allResults[i];
+            // console.log(i)
+            // let catFilter = {}
 
-
-      })
-      .then((allResults) => {
-        console.log("finished! => ", allResults)
-        let uniquePredArray = []
-        let predCount = {}
-        let uniqueCatArray = []
-        let catCount = {}
-        // console.log("allResults length = ", allResults.length)
-
-        for (let i = 0; i < allResults.length; i++) {
-          const result = allResults[i];
-          // console.log(i)
-          // let catFilter = {}
-
-          if(this.allSynonyms.indexOf(result.subject) > -1){
-            allResults[i].hitType = "subject"
-            if(uniqueCatArray.indexOf(result.objectCat) == -1){
-              uniqueCatArray.push(result.objectCat)
-              catCount[result.objectCat] = { "category": result.objectCat, "count": 1}
-            } else {
-              catCount[result.objectCat].count ++
-            }
-
-          } else {
-            allResults[i].hitType = "object"
-            let obCat = result.objectCat
-            if(uniqueCatArray.indexOf(result.objectCat) == -1){
-              
-              uniqueCatArray.push(result.subjectCat)
-              catCount[result.subjectCat] = { "category": result.subjectCat, "count": 1}
-            } else {
-              // console.log(catCount)
-              // console.log(uniqueCatArray)
-              // console.log(catCount[obCat])
-              // console.log(catCount[result.subjectCat][count])
-              catCount[obCat].count ++
-            }            
-          }
-          if(uniquePredArray.indexOf(result.predicate) == -1){
-              uniquePredArray.push(result.predicate)
-              predCount[result.predicate] = { "category": result.predicate, "count": 1}
-            } else {
-              predCount[result.predicate].count ++
-            }
-
-          if(i == allResults.length -1){
-            console.log(predCount)
-            console.log(catCount)
-            this.preCountTable = Object.values(predCount)
-            this.catCountTable = Object.values(catCount)
-            console.log(this.preCountTable)
-            return allResults
-
-          }
-          
-        }
-
-      })
-      .then(async (allResults)=> {
-        let groupedRes = await TrapiResultClean.TrapiResultGroup(allResults, "hitType")
-        console.log(groupedRes)
-        let subjectRes = groupedRes.subject
-        // let objectRes = groupedRes.object
-        let catGroupArray = [
-          {group: "gene", tag: "gene"}, 
-          {group: "thing", tag: "thing"},
-          {group: "process", tag: "process"},
-          {group: "phenotyp", tag: "disease"},
-          {group: "anatomic", tag: "anatomic"},
-          {group: "cell", tag: "cell"},
-          {group: "organism", tag: "gene"},
-          {group: "molecularactivity", tag: "molecularactivity"},
-          {group: "molecularentity", tag: "molecularentity"},
-          {group: "biological", tag: "biological"},
-          {group: "information", tag: "information"},
-          {group: "disease", tag: "disease"},
-          {group: "genomic", tag: "gene"},
-          {group: "protein", tag: "gene"},
-          {group: "chem", tag: "chem"},
-          {group: "sequen", tag: "seqFeature"},
-          {group: "all", tag: "all"},
-          {group: "public", tag: "publication"}
-      
-        ]        
-        
-        // "thing", "process" ,"phenotyp" , "anatomic"  , "cell", "organism",  "molecularactivity", "molecularentity", "biological,", "chem", "information", "path"]
-
-        for (let i = 0; i < subjectRes.length; i++) {
-          const res = subjectRes[i]
-          subjectRes[i].objectCatGroup = ""
-          // console.log(res)
-          let foundit = false
-          for (let n = 0; n < catGroupArray.length; n++) {
-            const groupinfo = catGroupArray[n];
-
-            if(res.objectCat.toLowerCase().includes(groupinfo.group)){
-              // console.log("result had gene in object = ", res)
-              subjectRes[i].objectCatGroup = groupinfo.tag
-              // n = catGroupArray.length
-              foundit = true
-            } 
-            if(n == catGroupArray.length - 1 && foundit == false){
-              subjectRes[i].objectCatGroup = res.objectCat
-            }
-
-          }  
-          if(i == subjectRes.length - 1){
-            groupedRes.subject = subjectRes
-            return groupedRes
-          }       
-        }        
-
-      })
-      .then( async(groupedRes)=>{
-        let objectRes = groupedRes.object
-        // let objectRes = groupedRes.object
-        let catGroupArray = [
-          {group: "gene", tag: "gene"}, 
-          {group: "thing", tag: "thing"},
-          {group: "process", tag: "process"},
-          {group: "phenotyp", tag: "disease"},
-          {group: "anatomic", tag: "anatomic"},
-          {group: "cell", tag: "cell"},
-          {group: "organism", tag: "gene"},
-          {group: "molecularactivity", tag: "molecularactivity"},
-          {group: "molecularentity", tag: "molecularentity"},
-          {group: "biological", tag: "biological"},
-          {group: "information", tag: "information"},
-          {group: "disease", tag: "disease"},
-          {group: "genomic", tag: "gene"},
-          {group: "protein", tag: "gene"},
-          {group: "chem", tag: "chem"},
-          {group: "sequen", tag: "seqFeature"},
-          {group: "all", tag: "all"},
-          {group: "public", tag: "publication"}
-       
-        ]        
-        
-        // "thing", "process" ,"phenotyp" , "anatomic"  , "cell", "organism",  "molecularactivity", "molecularentity", "biological,", "chem", "information", "path"]
-
-        for (let i = 0; i < objectRes.length; i++) {
-          const res = objectRes[i]
-          objectRes[i].subjectCatGroup = ""
-          // console.log(res)
-          let foundit = false
-          for (let n = 0; n < catGroupArray.length; n++) {
-            const groupinfo = catGroupArray[n];
-
-            if(res.objectCat.toLowerCase().includes(groupinfo.group)){
-              // console.log("result had gene in object = ", res)
-              objectRes[i].subjectCatGroup = groupinfo.tag
-              // n = catGroupArray.length
-              foundit = true
-            } 
-            if(n == catGroupArray.length - 1 && foundit == false){
-              objectRes[i].subjectCatGroup = res.objectCat
-            }
-
-          }  
-          if(i == objectRes.length - 1){
-            groupedRes.object = objectRes
-            return groupedRes
-          }       
-        }     
-      })
-      .then(async(groupedRes)=> {
-        let tree = {}
-
-
-
-        console.log("start grouping")
-        groupedRes.subject = await TrapiResultClean.TrapiResultGroup(groupedRes.subject, "objectCatGroup")
-        console.log("finished first grouping")
-
-        groupedRes.object = await TrapiResultClean.TrapiResultGroup(groupedRes.object, "subjectCatGroup")
-        console.log("groupedRes")
-        console.log(groupedRes)
-
-        let subjects = groupedRes.subject
-        let objects = groupedRes.object
-
-        let subKeys = Object.keys(subjects)
-        let objKeys = Object.keys(objects)
-
-        tree.name = this.concept_search
-        tree.children = []
-
-        let subject = {}
-        subject.name = "subject"
-        subject.children = []
-
-        let object = {}
-        object.name = "object"
-        object.children = []
-
-        for (let i = 0; i < subKeys.length; i++) {
-          const subKey = subKeys[i];
-          let child = {}
-          child.name = subKey
-          child.children = subjects[subKey]
-          subject.children.push(child)
- 
-          if(i == subKeys.length  -1) {
-
-            for (let n = 0; n < objKeys.length; n++) {
-              const objKey = objKeys[n];
-              let child = {}
-              child.name = objKey
-              child.children = subjects[objKey]
-              object.children.push(child)
-
-              if(n == objKeys.length - 1){
-
-                console.log(subject)
-                console.log(object)
-                tree.children.push(subject)
-                tree.children.push(object)
-                return tree
-
-
+            if (this.allSynonyms.indexOf(result.subject) > -1) {
+              allResults[i].hitType = "subject";
+              if (uniqueCatArray.indexOf(result.objectCat) == -1) {
+                uniqueCatArray.push(result.objectCat);
+                catCount[result.objectCat] = {
+                  category: result.objectCat,
+                  count: 1,
+                };
+              } else {
+                catCount[result.objectCat].count++;
               }
-
+            } else {
+              allResults[i].hitType = "object";
+              let obCat = result.objectCat;
+              if (uniqueCatArray.indexOf(result.objectCat) == -1) {
+                uniqueCatArray.push(result.subjectCat);
+                catCount[result.subjectCat] = {
+                  category: result.subjectCat,
+                  count: 1,
+                };
+              } else {
+                // console.log(catCount)
+                // console.log(uniqueCatArray)
+                // console.log(catCount[obCat])
+                // console.log(catCount[result.subjectCat][count])
+                catCount[obCat].count++;
+              }
+            }
+            if (uniquePredArray.indexOf(result.predicate) == -1) {
+              uniquePredArray.push(result.predicate);
+              predCount[result.predicate] = {
+                category: result.predicate,
+                count: 1,
+              };
+            } else {
+              predCount[result.predicate].count++;
             }
 
+            if (i == allResults.length - 1) {
+              console.log(predCount);
+              console.log(catCount);
+              this.preCountTable = Object.values(predCount);
+              this.catCountTable = Object.values(catCount);
+              console.log(this.preCountTable);
+              return allResults;
+            }
           }
+        })
+        .then(async (allResults) => {
+          let groupedRes = await TrapiResultClean.TrapiResultGroup(
+            allResults,
+            "hitType"
+          );
+          console.log(groupedRes);
+          let subjectRes = groupedRes.subject;
+          // let objectRes = groupedRes.object
+          let catGroupArray = [
+            { group: "gene", tag: "gene" },
+            { group: "thing", tag: "thing" },
+            { group: "process", tag: "process" },
+            { group: "phenotyp", tag: "disease" },
+            { group: "anatomic", tag: "anatomic" },
+            { group: "cell", tag: "cell" },
+            { group: "organism", tag: "gene" },
+            { group: "molecularactivity", tag: "molecularactivity" },
+            { group: "molecularentity", tag: "molecularentity" },
+            { group: "biological", tag: "biological" },
+            { group: "information", tag: "information" },
+            { group: "disease", tag: "disease" },
+            { group: "genomic", tag: "gene" },
+            { group: "protein", tag: "gene" },
+            { group: "chem", tag: "chem" },
+            { group: "sequen", tag: "seqFeature" },
+            { group: "all", tag: "all" },
+            { group: "public", tag: "publication" },
+          ];
 
-        }
-      })
-      .then((tree) => {
-        this.tree = tree
-        this.componentKey = this.componentKey+=1
-        console.log("this.tree")
-        console.log(this.tree)
-      })
+          // "thing", "process" ,"phenotyp" , "anatomic"  , "cell", "organism",  "molecularactivity", "molecularentity", "biological,", "chem", "information", "path"]
 
-  
+          for (let i = 0; i < subjectRes.length; i++) {
+            const res = subjectRes[i];
+            subjectRes[i].objectCatGroup = "";
+            // console.log(res)
+            let foundit = false;
+            for (let n = 0; n < catGroupArray.length; n++) {
+              const groupinfo = catGroupArray[n];
 
+              if (res.objectCat.toLowerCase().includes(groupinfo.group)) {
+                // console.log("result had gene in object = ", res)
+                subjectRes[i].objectCatGroup = groupinfo.tag;
+                // n = catGroupArray.length
+                foundit = true;
+              }
+              if (n == catGroupArray.length - 1 && foundit == false) {
+                subjectRes[i].objectCatGroup = res.objectCat;
+              }
+            }
+            if (i == subjectRes.length - 1) {
+              groupedRes.subject = subjectRes;
+              return groupedRes;
+            }
+          }
+        })
+        .then(async (groupedRes) => {
+          let objectRes = groupedRes.object;
+          // let objectRes = groupedRes.object
+          let catGroupArray = [
+            { group: "gene", tag: "gene" },
+            { group: "thing", tag: "thing" },
+            { group: "process", tag: "process" },
+            { group: "phenotyp", tag: "disease" },
+            { group: "anatomic", tag: "anatomic" },
+            { group: "cell", tag: "cell" },
+            { group: "organism", tag: "gene" },
+            { group: "molecularactivity", tag: "molecularactivity" },
+            { group: "molecularentity", tag: "molecularentity" },
+            { group: "biological", tag: "biological" },
+            { group: "information", tag: "information" },
+            { group: "disease", tag: "disease" },
+            { group: "genomic", tag: "gene" },
+            { group: "protein", tag: "gene" },
+            { group: "chem", tag: "chem" },
+            { group: "sequen", tag: "seqFeature" },
+            { group: "all", tag: "all" },
+            { group: "public", tag: "publication" },
+          ];
 
+          // "thing", "process" ,"phenotyp" , "anatomic"  , "cell", "organism",  "molecularactivity", "molecularentity", "biological,", "chem", "information", "path"]
+
+          for (let i = 0; i < objectRes.length; i++) {
+            const res = objectRes[i];
+            objectRes[i].subjectCatGroup = "";
+            // console.log(res)
+            let foundit = false;
+            for (let n = 0; n < catGroupArray.length; n++) {
+              const groupinfo = catGroupArray[n];
+
+              if (res.objectCat.toLowerCase().includes(groupinfo.group)) {
+                // console.log("result had gene in object = ", res)
+                objectRes[i].subjectCatGroup = groupinfo.tag;
+                // n = catGroupArray.length
+                foundit = true;
+              }
+              if (n == catGroupArray.length - 1 && foundit == false) {
+                objectRes[i].subjectCatGroup = res.objectCat;
+              }
+            }
+            if (i == objectRes.length - 1) {
+              groupedRes.object = objectRes;
+              return groupedRes;
+            }
+          }
+        })
+        .then(async (groupedRes) => {
+          let tree = {};
+
+          console.log("start grouping");
+          groupedRes.subject = await TrapiResultClean.TrapiResultGroup(
+            groupedRes.subject,
+            "objectCatGroup"
+          );
+          console.log("finished first grouping");
+
+          groupedRes.object = await TrapiResultClean.TrapiResultGroup(
+            groupedRes.object,
+            "subjectCatGroup"
+          );
+          console.log("groupedRes");
+          console.log(groupedRes);
+
+          let subjects = groupedRes.subject;
+          let objects = groupedRes.object;
+
+          let subKeys = Object.keys(subjects);
+          let objKeys = Object.keys(objects);
+
+          tree.name = this.concept_search;
+          tree.children = [];
+
+          let subject = {};
+          subject.name = "subject";
+          subject.children = [];
+
+          let object = {};
+          object.name = "object";
+          object.children = [];
+
+          for (let i = 0; i < subKeys.length; i++) {
+            const subKey = subKeys[i];
+            let child = {};
+            child.name = subKey;
+            child.children = subjects[subKey];
+            subject.children.push(child);
+
+            if (i == subKeys.length - 1) {
+              for (let n = 0; n < objKeys.length; n++) {
+                const objKey = objKeys[n];
+                let child = {};
+                child.name = objKey;
+                child.children = subjects[objKey];
+                object.children.push(child);
+
+                if (n == objKeys.length - 1) {
+                  console.log(subject);
+                  console.log(object);
+                  tree.children.push(subject);
+                  tree.children.push(object);
+                  return tree;
+                }
+              }
+            }
+          }
+        })
+        .then((tree) => {
+          this.tree = tree;
+          this.componentKey = this.componentKey += 1;
+          console.log("this.tree");
+          console.log(this.tree);
+        });
     },
 
-//     testGroupBy(list, key){
+    //     testGroupBy(list, key){
 
-// function groupArrayOfObjects(list, key) {
-//   return list.reduce(function(rv, x) {
-//     (rv[x[key]] = rv[x[key]] || []).push(x);
-//     return rv;
-//   }, {});
-// }
+    // function groupArrayOfObjects(list, key) {
+    //   return list.reduce(function(rv, x) {
+    //     (rv[x[key]] = rv[x[key]] || []).push(x);
+    //     return rv;
+    //   }, {});
+    // }
 
-// // var people = [
-// //     {sex:"Male", name:"Jeff"},
-// //     {sex:"Female", name:"Megan"},
-// //     {sex:"Male", name:"Taylor"},
-// //     {sex:"Female", name:"Madison"}
-// // ];
-// var groupedPeople=groupArrayOfObjects(list, key);
-// console.log(groupedPeople);//will be the Males 
-// console.log(groupedPeople)
+    // // var people = [
+    // //     {sex:"Male", name:"Jeff"},
+    // //     {sex:"Female", name:"Megan"},
+    // //     {sex:"Male", name:"Taylor"},
+    // //     {sex:"Female", name:"Madison"}
+    // // ];
+    // var groupedPeople=groupArrayOfObjects(list, key);
+    // console.log(groupedPeople);//will be the Males
+    // console.log(groupedPeople)
 
-//     },
-    async getSynonyms (){
-      this.araxSynonyms = []
-      this.synonyms = []
+    //     },
+    async getSynonyms() {
+      this.araxSynonyms = [];
+      this.synonyms = [];
       // let array = []
       // let test = array.filter(value => value == 2)
       // console.log(test)
-      synonymService.allSynonyms(this.concept_search)
-      .then((results) =>{
-        this.synonyms = results.nodeNormalSyn[this.concept_search].equivalent_identifiers
-        this.araxSynonyms_equivalentids = results.araxSynonyms_equivalentids
-        this.araxSynonyms_nodes = results.araxSynonyms_nodes
+      synonymService
+        .allSynonyms(this.concept_search)
+        .then((results) => {
+          this.synonyms =
+            results.nodeNormalSyn[this.concept_search].equivalent_identifiers;
+          this.araxSynonyms_equivalentids = results.araxSynonyms_equivalentids;
+          this.araxSynonyms_nodes = results.araxSynonyms_nodes;
 
-        return results.synonymIdArray
+          return results.synonymIdArray;
+        })
+        .then(async (synonymIdArray) => {
+          let allDoubleCheckSyn = [];
+          for (let i = 0; i < synonymIdArray.length; i++) {
+            const syn = synonymIdArray[i];
 
-      })
-      .then(async (synonymIdArray)=> {
-        let allDoubleCheckSyn = []
-        for (let i = 0; i < synonymIdArray.length; i++) {
-          const syn = synonymIdArray[i];
-
-          try {
-            let synSynData = await synonymService.allSynonyms(syn)
-            if(synSynData == []){
-                if(i == synonymIdArray.length - 1){
-                  return allDoubleCheckSyn
-                } 
-                  else {
-                    continue
-                  }             
-            }
-              else {
-                let newSyns = synSynData.synonymIdArray
-                allDoubleCheckSyn = allDoubleCheckSyn.concat(newSyns.filter(value => !allDoubleCheckSyn.includes(value)));
-  
-                  if(i == synonymIdArray.length - 1){
-                    return allDoubleCheckSyn
-                  }                
-              }
-
-          } 
-            catch (err) {
-              console.log(err)
-                if(i == synonymIdArray.length - 1){
-                  return allDoubleCheckSyn
+            try {
+              let synSynData = await synonymService.allSynonyms(syn);
+              if (synSynData == []) {
+                if (i == synonymIdArray.length - 1) {
+                  return allDoubleCheckSyn;
+                } else {
+                  continue;
                 }
-          }
-        }
-      })
-      .then((allDoubleCheckSyn) => {
-        console.log({allDoubleCheckSyn})
-      })
-    },
+              } else {
+                let newSyns = synSynData.synonymIdArray;
+                allDoubleCheckSyn = allDoubleCheckSyn.concat(
+                  newSyns.filter((value) => !allDoubleCheckSyn.includes(value))
+                );
 
+                if (i == synonymIdArray.length - 1) {
+                  return allDoubleCheckSyn;
+                }
+              }
+            } catch (err) {
+              console.log(err);
+              if (i == synonymIdArray.length - 1) {
+                return allDoubleCheckSyn;
+              }
+            }
+          }
+        })
+        .then((allDoubleCheckSyn) => {
+          console.log({ allDoubleCheckSyn });
+        });
+    },
 
     // async getSynonyms (){
     //   this.araxSynonyms = []
     //   this.synonyms = []
     //   // let syns = await ARAXService.getSynonyms()
     //   // PostService.query_raw(this.JSONquery)
-     
-
-
 
     // },
     async getConcept_service() {
@@ -1219,16 +1339,15 @@ export default {
       }
       return dbTable;
     },
-    
   },
 
-    cyInstance() {
-      return this.$refs.cyto.instance;
-    },
-    // modalCyInstance() {
-    //   return this.$refs.modalCyto.instance;
-    // },
-  
+  cyInstance() {
+    return this.$refs.cyto.instance;
+  },
+  // modalCyInstance() {
+  //   return this.$refs.modalCyto.instance;
+  // },
+
   // created() {
   //   this.fetchUserData;
   // },
@@ -1236,7 +1355,6 @@ export default {
   //   // Set the initial number of items
   //   this.totalRows = this.concepts_table.length;
   // },
-
 };
 </script>
 

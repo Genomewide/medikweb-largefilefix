@@ -58,7 +58,8 @@
     <b-nav-item ><router-link to="/svgtest">svgtest</router-link></b-nav-item>
     <b-nav-item ><router-link to="/conceptExplorePlus">conceptExplorePlus</router-link></b-nav-item>
     <b-nav-item ><router-link to="/geneAllSynToDrugs">geneAllSynToDrugs</router-link></b-nav-item> -->
-    <!-- <b-nav-item ><router-link to="/conceptExplorePlus">conceptExplorePlus</router-link></b-nav-item> -->
+    <!-- <b-nav-item ><router-link to="/conceptExplorePlus">conceptExplorePlus</router-link></b-nav-item> conceptExploreCytoscape.vue-->
+    <b-nav-item ><router-link to="/conceptExploreCytoscape">conceptExploreCytoscape</router-link></b-nav-item> .
         <b-nav-item ><router-link to="/conceptExplorePlus">conceptExplorePlus</router-link></b-nav-item>
 
     <b-nav-item active><router-link to="/geneAllSynToDrugsARS">geneAllSynToDrugsARS</router-link></b-nav-item>

@@ -9,6 +9,80 @@ const Queryurl = "api/posts/query/";
 const Queryurl_raw = "api/posts/query_raw/";
 const mongoumlsurl = "api/posts/mongoumls/";
 const robokopurl = "https://automat.renci.org/robokopkg/"
+const BTEurl = "http://localhost:3000/v1/query"
+
+const testQueryTwo = {
+    "message": {
+      "query_graph": {
+      "edges": {
+        "e0": {
+          "attribute_constraints": [],
+          "object": "n1",
+          "qualifier_constraints": [],
+          "subject": "n0"
+        }
+      },
+      "nodes": {
+        "n0": {
+          "categories": [
+            "biolink:Protein"
+          ],
+          "constraints": [],
+          "ids": [
+            "NCBIGene:2597"
+          ],
+          "is_set": false,
+          "name": "GAPDH"
+        },
+        "n1": {
+          "categories": [
+            "biolink:Disease",
+            "biolink:Protein",
+            "biolink:Gene",
+            "biolink:GeneFamily",
+            "biolink:BiologicalProcessOrActivity",
+            "biolink:SmallMolecule",
+            "biolink:Drug"
+          ],
+          "constraints": [],
+          "is_set": false
+        }
+      }
+    }
+  }
+}
+
+
+const testQuery = { // eslint-disable-line
+  "message": {
+    "query_graph": {
+      "nodes": {
+        "n0": {
+          "categories": [
+            "biolink:Disease"
+          ],
+          "ids": [
+            "MONDO:0016575"
+          ]
+        },
+        "n1": {
+          "categories": [
+            "biolink:PhenotypicFeature"
+          ]
+        }
+      },
+      "edges": {
+        "e01": {
+          "subject": "n0",
+          "object": "n1",
+          "predicates": [
+            "biolink:has_phenotype"
+          ]
+        }
+      }
+    }
+  }
+}
 
 const formData = 
 {
@@ -55,13 +129,18 @@ const pingmedik = (url, packet) => {
 class PostService {
 
   static robokopGet(subjectID, subjectCat, objectCat) {
+    return new Promise(async (resolve, reject) => {// eslint-disable-line
+
     let url = robokopurl + subjectCat + "/" + objectCat + "/" + subjectID
     console.log("started robokopGet")
     console.log(url)
     // USE AXIOS TO GET FROM A URL LIKE THIS: https://automat.renci.org/robokopkg/biolink:Disease/biolink:ChemicalEntity/MONDO:0001234
-    url = "https://automat.renci.org/robokopkg/biolink:Gene/biolink:PhenotypicFeature/NCBIGene:7157"
-    return new Promise(async (resolve, reject) => {// eslint-disable-line
+    // https://automat.renci.org/robokopkg/biolink:Disease/biolink:ChemicalEntity/MONDO:0001234
+    // https://automat.renci.org/robokopkg/biolink:Gene/biolink:Gene/NCBIGene:11892
+    // url = "https://automat.renci.org/robokopkg/biolink:Gene/biolink:Gene/NCBIGene:11892"
       try {
+        console.log("url right before robokopGet")
+        console.log(url)
         const res = await axios.get(url);
         console.log("robokopGet response")
         console.log(res)
@@ -72,19 +151,25 @@ class PostService {
       }
     });
 
-
-    // return new Promise(async (resolve, reject) => {// eslint-disable-line
-    //   try {
-    //     const res = await axios.get(url);
-
-    //     const data = res.data;
-
-    //     resolve(data);
-    //   } catch (err) {
-    //     reject(err);
-    //   }
-    // });
   }
+
+  static testBTE = () => {
+    console.log("started testBTE");
+    return new Promise(async (resolve, reject) => { // eslint-disable-line
+    
+    axios.post(BTEurl, testQueryTwo)
+    .then(response => {
+      console.log('Response:', response.data);
+      resolve(response.data)
+    })
+    .catch(error => {
+      console.error('Error:', error);
+      reject(error)
+    });
+
+    });
+  }
+
     static queryPR() {
       console.log("started queryPR - const formData input")
       return new Promise(async (resolve, reject) => { // eslint-disable-line

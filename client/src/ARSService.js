@@ -223,6 +223,25 @@ class ARSService {
             }
         });
       }
+
+      static getNodeNormArray = (searchtermArray) => {
+        // console.log("started getSynonyms");
+        return new Promise(async (resolve, reject) => { // eslint-disable-line
+          let url = "https://nodenormalization-sri.renci.org/1.3/get_normalized_nodes"
+          
+            try {
+              const res = await axios.post(url, {"curies": searchtermArray, "conflate" : true});
+              const data = res.data;
+              // });
+        
+              console.log("getNodeNormArray ran")
+              console.log(data)
+              resolve(data);
+            } catch (err) {
+              reject(err);
+            }
+        });
+      }
       
       static getARAXSynonyms = (searchterm) => {
         console.log("started getSynonyms");
