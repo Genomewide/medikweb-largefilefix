@@ -28,7 +28,24 @@
                         <hr />
 
                         {{ normCategory }}
+                        <hr /> breadthFirstLayout
+                        <b-button variant="primary" v-on:click="breadthFirstLayout()"
+                            >breadthFirstLayout</b-button>
                         <hr />
+                        <b-button variant="primary" v-on:click="colaLayout()"
+                            >colaLayout</b-button>
+                        <hr />
+                        <b-button variant="primary" v-on:click="coseLayout()"
+                            >coseLayout</b-button>
+                        <hr />
+                        <b-button variant="primary" v-on:click="dagreLayout()"
+                            >dagreLayout</b-button>
+                        <hr />
+                        <b-button variant="primary" v-on:click="klayLayout()"
+                            >klayLayout</b-button>
+                        <hr />
+                        <b-button variant="primary" v-on:click="setupLayout()"
+                            >setupLayout</b-button>
                     </div>                
                 </b-col>
                 <b-col cols="9">
@@ -56,8 +73,10 @@
                                 v-for="def in elements"
                                 :key="`${def.data.id}`"
                                 :definition="def"
+                                v-on:mousedown="showNodeInfo($event, def, def.data, def.data.id)"
+
                                 />
-                                 <!-- <button @click="layoutCola()">layoutCola</button>
+                        <!-- <button @click="layoutCola()">layoutCola</button>
                         <br>
                         <button @click="changeLayout()">changeLayout</button>
                         <br>
@@ -98,6 +117,9 @@ import cytoscape from "cytoscape";
 import cola from 'cytoscape-cola';
 import klay from "cytoscape-klay";
 import coseBilkent from 'cytoscape-cose-bilkent';
+// import 'cytoscape-layout-breadthfirst';
+import dagre from 'cytoscape-dagre';
+
 
 import config from "../cytoscapeData/cytoStyle.js"
 import exploreStart from "../cytoscapeData/exploreData.json"
@@ -124,6 +146,7 @@ export default {
                 doITonce: true,
                 cola: cola,
                 klay: klay,
+                dagre: dagre,
                 layout: {
                     name: 'grid',
                     // Additional options for cola layout
@@ -173,13 +196,22 @@ export default {
         },
 
 methods: {
+    handleKeyPress(event) {
+        if (event.ctrlKey && event.key === 'd') {
+            const selectedEdges = this.cyInstance.$(':selected');
+            selectedEdges.remove();
+        }
+    },
+
     async getStarted(){
         this.cyInstance.nodes().remove();
+        this.elements = [];
+        // this.cyInstance.remove(this.cyInstance.elements());
+
         console.log("this.exploreStart")
         console.log(this.exploreStart)
-      
+    
         
-        this.cyInstance.remove(this.cyInstance.elements());
         let graphData = this.exploreStart
         // MAKE TARGET NODE
         let targetNodeObject = await this.makeTargetNode(this.concept_search);
@@ -196,19 +228,19 @@ methods: {
         // ##########################################################################################
 
         // ADD ALL NODES AND EDGES TO GRAPH
-        // let allElements = [...this.elements, ...graphData.graphNodes, ...graphData.graphEdges];
-        // console.log("allElements");
-        // console.log(allElements);
+        let allElements = [...this.elements, ...graphData.graphNodes, ...graphData.graphEdges];
+        console.log("allElements");
+        console.log(allElements);
 
-        // // FILTER OUT DUPLICATES BASED ON DATA.ID
-        // this.elements = allElements.filter((thing, index, self) =>
-        //     index === self.findIndex((t) => (
-        //         t.data.id === thing.data.id
-        //     ))
-        // )
-        // console.log("this.elements");
-        // console.log(this.elements);
         // FILTER OUT DUPLICATES BASED ON DATA.ID
+        this.elements = allElements.filter((thing, index, self) =>
+            index === self.findIndex((t) => (
+                t.data.id === thing.data.id
+            ))
+        )
+        // REMOVE THE EDGE THAT I CAN NOT EXPLAIN WHY IT IS THERE - IT IS A DUPLICATE
+        // TRYING TO UNDERSTAND IF THIS AFFECTS THE HIERARCHICAL LAYOUTS?
+        this.elements = this.elements.filter((element) => element.data.id !== "MONDO_0005148_biolink_DiseaseOrPhenotypicFeature");
 
         // ##########################################################################################
         // ##########################################################################################
@@ -216,12 +248,10 @@ methods: {
         // ##########################################################################################
         // ##########################################################################################
 
-
-        console.log("graphData")
-        console.log(graphData)
         // ADD ALL NODES AND EDGES TO GRAPH
         this.cyInstance.add(graphData.graphNodes);
         this.cyInstance.add(graphData.graphEdges);
+        this.cyInstance.remove(`edge[id="MONDO_0005148_biolink_DiseaseOrPhenotypicFeature"]`);
 
         // REMOVE THE NODES THAT HAVE ONLY 1 EDGE AND HAVE A CATEGORY AS THEIR ID
         this.catgories.forEach(async (cat) => {
@@ -229,7 +259,10 @@ methods: {
             let sanCat =  this.sanitizeNodeId(cat)
             let node = this.cyInstance.getElementById(sanCat)
             if(node.degree() == 1){
+                // REMOVE FROM CYTOSCAPE INSTANCE
                 this.cyInstance.remove(node)
+                // REMOVE FROM ELEMENTS
+                this.elements = this.elements.filter((element) => element.data.id !== sanCat);
             }
         })
 
@@ -238,10 +271,92 @@ methods: {
         // UPDATE THE LABELS OF THE CATEGORY NODES
         this.updateCategoryNames()
         // LAYOUT THE GRAPH
-        this.cyInstance.makeLayout({ name: "cose", animate: true , fit: true}).run()
+        this.cyInstance.makeLayout({ name: "breadthfirst", directed: true, animate: true , fit: true}).run()
+        
+        
+        // THE REST ARE FAILS
+        // this.cyInstance.makeLayout({ name: "breadthfirst", animate: true , fit: true}).run()
+        // this.cyInstance.makeLayout({ name: "cola", animate: true , fit: true}).run()
         // this.cyInstance.makeLayout({ name: "cose", nodeRepulsion: 5000, nodeOverlap: 4, gravity: 0,animate: true , fit: true}).run()
         // this.cyInstance.makeLayout({ name: "cola", nodeRepulsion: 5000, nodeOverlap: 4, gravity: 0,animate: true , fit: true}).run()
         console.log("DONE")
+    },
+    showNodeInfo(event, def, data, id){
+        console.log("showNodeInfo")
+        console.log(event)
+        console.log(def)
+        console.log(data.category)
+        console.log(id)
+        // this.nodeInfo = node
+    },
+    setupLayout(){
+        // THE ROOT NODE ID IS MONDO_0005148 - PUT THAT NODE IN THE MIDDLE VERTICALY AT THE LEFT SIDE OF THE CONTAINER
+
+
+        // GET THE DIMENSIONS OF THE CONTAINER
+        let container = this.cyInstance.container();
+        console.log("container")
+        console.log(container)
+        // GET X AND Y COORDINATES OF THE CONTAINER
+        let containerX = container.getBoundingClientRect().x;
+        let containerY = container.getBoundingClientRect().y;
+        console.log("containerX")
+        console.log(containerX)
+        console.log("containerY")
+        console.log(containerY)
+        // GET THE WIDTH AND HEIGHT OF THE CONTAINER
+        let containerWidth = container.getBoundingClientRect().width;
+        let containerHeight = container.getBoundingClientRect().height;
+        console.log("containerWidth")
+        console.log(containerWidth)
+        console.log("containerHeight")
+        console.log(containerHeight)
+        // GET THE CENTER OF THE CONTAINER
+        let containerCenterX = containerX + containerWidth / 2;
+        let containerCenterY = containerY + containerHeight / 2;
+        console.log("containerCenterX")
+        console.log(containerCenterX)
+        console.log("containerCenterY")
+        console.log(containerCenterY)
+        // SET THE POSITION OF THE ROOT NODE VERITCALLY IN THE MIDDLE BUT HORIZONTALLY TO THE LEFT
+        let rootX = containerX + containerWidth / 4;
+        let rootY = containerCenterY;
+        console.log("rootX")
+        console.log(rootX)
+        console.log("rootY")
+        console.log(rootY)
+        // SET THE POSITION OF THE ROOT NODE
+        this.cyInstance.getElementById("MONDO_0005148").position({x: rootX, y: rootY})
+        // MAKE THAT NODE 4X THE SIZE OF THE OTHER NODES
+        this.cyInstance.getElementById("MONDO_0005148").style({width: 200, height: 200})
+        // CONSOLE LOG THE ROOT NODE POSITION
+        console.log("this.cyInstance.getElementById('MONDO_0005148').position()")
+        console.log(this.cyInstance.getElementById("MONDO_0005148").position())
+        // MOVE THE ROOT NODE THE VERTICAL CENTERE AND THE LEFT SIDE HORIZONTALLY - SHOW THIS WITH ANIMATION
+        this.cyInstance.getElementById("MONDO_0005148").animate({position: {x: containerX, y: containerCenterY}}, {duration: 1000})
+        // this.cyInstance.getElementById("MONDO_0005148").position({x: containerX, y: containerCenterY})
+
+        // SHOW THE NODE IN THE NEW POSITION
+        console.log("this.cyInstance.getElementById('MONDO_0005148').position()")
+        console.log(this.cyInstance.getElementById("MONDO_0005148").position())
+
+
+
+    },
+    breadthFirstLayout(){
+        this.cyInstance.makeLayout({ name: "breadthfirst", rankDir: 'UL',align: 'UL',ranker: 'tight-tree', root: 'MONDO_0005148',directed: true, animate: true , fit: true}).run()
+    },
+    colaLayout(){
+        this.cyInstance.makeLayout({ name: "cola", animate: true , fit: true}).run()
+    },
+    coseLayout(){
+        this.cyInstance.makeLayout({ name: "cose", nodeRepulsion: 5000, nodeOverlap: 4, gravity: 0,animate: true , fit: true}).run()
+    },
+    dagreLayout(){
+        this.cyInstance.makeLayout({ name: "dagre", animate: true , fit: true}).run()
+    },
+    klayLayout(){
+        this.cyInstance.makeLayout({ name: "klay", animate: true , fit: true}).run()
     },
 
     async testRobokop2() {
@@ -433,22 +548,6 @@ methods: {
         // this.cyInstance.center();
         this.keyCounter++;
     },
-    layoutCola() {
-        console.log("layoutCola");
-        // this.layout = {
-        //     name: 'klay'
-        //     // Additional options for cola layout
-        // };
-        this.cyInstance.layout({
-            name: "cola",
-            animate: true,
-            fit: true,
-        }).run();
-        // this.cyInstance.center();
-        this.cyInstance.fit();
-        this.keyCounter++;
-
-    },
     addNode() {
         console.log("addNode");
         console.log(this.elements);
@@ -504,6 +603,7 @@ methods: {
         console.log("preConfig");
     
         cytoscape.use(this.cola);
+        cytoscape.use(this.dagre);
         cytoscape.use(this.klay);
     },
 
@@ -663,8 +763,8 @@ methods: {
                 group: "edges",
                 data: {
                     id: parentNodeID + '_' + targetNodeID,
-                    source: targetNodeID,
-                    target: parentNodeID,
+                    source: parentNodeID,
+                    target: targetNodeID,
                 },
             };
             newRenciNodesObject[category].parentEdges.push(categoryParentEdgeData);
@@ -677,8 +777,8 @@ methods: {
                     group: "edges",
                     data: {
                         id: node.data.id + '_' + parentNodeID,
-                        source: node.data.id,
-                        target: parentNodeID,
+                        source: parentNodeID,
+                        target: node.data.id,
                     },
                 };
                 newRenciNodesObject[category].edges.push(edgeData);
@@ -990,14 +1090,20 @@ methods: {
         }
     },
     mounted() { 
-      
+    
         cytoscape.use(cola);
         cytoscape.use(klay);
         cytoscape.use(coseBilkent);
+        cytoscape.use(dagre);
+        document.addEventListener('keydown', this.handleKeyPress);
+
     },          
     beforeDestroy() {
         // Cleanup Cytoscape instance
         this.cyInstance.destroy();
+    },
+    beforeUnmount() {
+        document.removeEventListener('keydown', this.handleKeyPress);
     },
     computed: {
         cyInstance() {
