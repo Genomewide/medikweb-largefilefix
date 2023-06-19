@@ -17,6 +17,9 @@
                         <b-button variant="primary" v-on:click="testRobokop"
                             >testRobokop</b-button
                         >
+                        <b-button variant="primary" v-on:click="getStarted"
+                            >getStarted</b-button
+                        >
                         </b-form>
                         {{ normID }}
                         <hr />
@@ -54,11 +57,13 @@
                                 :key="`${def.data.id}`"
                                 :definition="def"
                                 />
-                                 <button @click="layoutCola()">layoutCola</button>
+                                 <!-- <button @click="layoutCola()">layoutCola</button>
                         <br>
                         <button @click="changeLayout()">changeLayout</button>
                         <br>
-                        <button @click="addNode()">addNode</button>
+                        <button @click="addNode()">addNode</button> 
+                        <br>
+                        <button @click="addParentWithChildren()">addParentWithChildren</button>  -->
                             </cytoscape>
                             <!-- <cytoscape
                                 
@@ -92,6 +97,10 @@
 import cytoscape from "cytoscape";
 import cola from 'cytoscape-cola';
 import klay from "cytoscape-klay";
+import coseBilkent from 'cytoscape-cose-bilkent';
+
+import config from "../cytoscapeData/cytoStyle.js"
+import exploreStart from "../cytoscapeData/exploreData.json"
 
 // import 'vue-cytoscape/dist/vue-cytoscape.css';
 import PostService from "../../PostService";
@@ -100,85 +109,321 @@ import ARSService from "../../ARSService";
 export default {
     data() {
         return {
-            elements: [
-                { data: { id: "node1" } },
-                { data: { id: "node2" } },
-                { data: { id: "edge1", source: "node1", target: "node2" } },
-            ],
-            concept_search: "MONDO:0005148",
-            normID: "",
-            normLabel: "",
-            normCategory: "",
-            targetNormNodeData: {},
-            renciCatIDObject: {},
-            doITonce: true,
-            cola: cola,
-            klay: klay,
-            layout: {
-                name: 'grid',
-                // Additional options for cola layout
-            },
-            keyCounter: 3,
-            config:{
-                style: [
-                    {
-                        selector: "node",
-                        style: {
-                            "background-color": "#666",
-                            label: "data(id)",
-                        },
-                    },
-                    {
-                        selector: "edge",
-                        style: {
-                            width: 3,
-                            "line-color": "#ccc",
-                            "target-arrow-color": "#ccc",
-                            "target-arrow-shape": "triangle",
-                            "curve-style": "bezier",
-                        },
-                    },
+                config: config,
+                elements: [
+                    { data: { id: "node1",label: "node1", name: "node1" } },
+                    { data: { id: "node2",label: "node1", name: "node1" } },
+                    { data: { id: "edge1", source: "node1", target: "node2" } },
                 ],
-                // layout: {
-                //     name: "klay",
-                //     animate: true,
-                //     fit: true,
-                // },
-
-                // elements: [
-                //     { data: { id: "node1" } },
-                //     { data: { id: "node2" } },
-                //     { data: { id: "edge1", source: "node1", target: "node2" } },
-                // ],
-                zoom: 1,
-                pan: { x: 0, y: 0 },
-                minZoom: 1e-50,
-                maxZoom: 1e50,
-                zoomingEnabled: true,
-                userZoomingEnabled: true,
-                panningEnabled: true,
-                userPanningEnabled: true,
-                boxSelectionEnabled: true,
-                selectionType: "single",
-                touchTapThreshold: 8,
-                desktopTapThreshold: 4,
-                autolock: false,
-                autoungrabify: false,
-                autounselectify: false,
-                headless: false,
-                styleEnabled: true,
-                hideEdgesOnViewport: false,
-                hideLabelsOnViewport: false,
-                textureOnViewport: false,
-                motionBlur: false,
-                motionBlurOpacity: 0.2,
-                wheelSensitivity: 1,
-                pixelRatio: "auto",
-            }, 
-            };
+                concept_search: "MONDO:0005148",
+                normID: "",
+                normLabel: "",
+                normCategory: "",
+                targetNormNodeData: {},
+                renciCatIDObject: {},
+                doITonce: true,
+                cola: cola,
+                klay: klay,
+                layout: {
+                    name: 'grid',
+                    // Additional options for cola layout
+                },
+                keyCounter: 3,
+                exploreStart: exploreStart,
+                catgories: [
+                    "biolink:DiseaseOrPhenotypicFeature",
+                    "biolink:Protein",
+                    "biolink:Gene",
+                    "biolink:GeneFamily",
+                    "biolink:BiologicalProcessOrActivity",
+                    "biolink:SmallMolecule",
+                    "biolink:Drug",
+                ],
+                catgoriesData: {
+                    "biolink_DiseaseOrPhenotypicFeature": {
+                        "id": "biolink:DiseaseOrPhenotypicFeature",
+                        "label": "Disease or Phenotypic Feature"
+                    },
+                    "biolink_Protein": {
+                        "id": "biolink:Protein",
+                        "label": "Protein"
+                    },
+                    "biolink_Gene": {
+                        "id": "biolink:Gene",
+                        "label": "Gene"
+                    },
+                    "biolink_GeneFamily": {
+                        "id": "biolink:GeneFamily",
+                        "label": "Gene Family"
+                    },
+                    "biolink_BiologicalProcessOrActivity": {
+                        "id": "biolink:BiologicalProcessOrActivity",
+                        "label": "Biological Process or Activity"
+                    },
+                    "biolink_SmallMolecule": {
+                        "id": "biolink:SmallMolecule",
+                        "label": "Small Molecule"
+                    },
+                    "biolink_Drug": {
+                        "id": "biolink:Drug",
+                        "label": "Drug"
+                    }
+                }
+            }
         },
 
 methods: {
+    async getStarted(){
+        this.cyInstance.nodes().remove();
+        console.log("this.exploreStart")
+        console.log(this.exploreStart)
+      
+        
+        this.cyInstance.remove(this.cyInstance.elements());
+        let graphData = this.exploreStart
+        // MAKE TARGET NODE
+        let targetNodeObject = await this.makeTargetNode(this.concept_search);
+        this.targetNormNodeData = targetNodeObject
+        
+        // ADD TARGET NODE TO GRAPH
+        // this.elements.push(targetNodeObject);
+        this.cyInstance.add(targetNodeObject);
+
+        // ##########################################################################################
+        // ##########################################################################################
+        // START KEEP THE CODE AFTER THIS - ADDS TO ELEMENTS
+        // ##########################################################################################
+        // ##########################################################################################
+
+        // ADD ALL NODES AND EDGES TO GRAPH
+        // let allElements = [...this.elements, ...graphData.graphNodes, ...graphData.graphEdges];
+        // console.log("allElements");
+        // console.log(allElements);
+
+        // // FILTER OUT DUPLICATES BASED ON DATA.ID
+        // this.elements = allElements.filter((thing, index, self) =>
+        //     index === self.findIndex((t) => (
+        //         t.data.id === thing.data.id
+        //     ))
+        // )
+        // console.log("this.elements");
+        // console.log(this.elements);
+        // FILTER OUT DUPLICATES BASED ON DATA.ID
+
+        // ##########################################################################################
+        // ##########################################################################################
+        // END KEEP THE CODE AFTER THIS
+        // ##########################################################################################
+        // ##########################################################################################
+
+
+        console.log("graphData")
+        console.log(graphData)
+        // ADD ALL NODES AND EDGES TO GRAPH
+        this.cyInstance.add(graphData.graphNodes);
+        this.cyInstance.add(graphData.graphEdges);
+
+        // REMOVE THE NODES THAT HAVE ONLY 1 EDGE AND HAVE A CATEGORY AS THEIR ID
+        this.catgories.forEach(async (cat) => {
+            // remove the nodes that have only 1 edge AND have cat as their id
+            let sanCat =  this.sanitizeNodeId(cat)
+            let node = this.cyInstance.getElementById(sanCat)
+            if(node.degree() == 1){
+                this.cyInstance.remove(node)
+            }
+        })
+
+        // CHANGE THE SIZE OF THE CATEGORY NODES
+        this.updateCategorySize()
+        // UPDATE THE LABELS OF THE CATEGORY NODES
+        this.updateCategoryNames()
+        // LAYOUT THE GRAPH
+        this.cyInstance.makeLayout({ name: "cose", animate: true , fit: true}).run()
+        // this.cyInstance.makeLayout({ name: "cose", nodeRepulsion: 5000, nodeOverlap: 4, gravity: 0,animate: true , fit: true}).run()
+        // this.cyInstance.makeLayout({ name: "cola", nodeRepulsion: 5000, nodeOverlap: 4, gravity: 0,animate: true , fit: true}).run()
+        console.log("DONE")
+    },
+
+    async testRobokop2() {
+        let catgories = [
+            "biolink:DiseaseOrPhenotypicFeature",
+            "biolink:Protein",
+            "biolink:Gene",
+            "biolink:GeneFamily",
+            "biolink:BiologicalProcessOrActivity",
+            "biolink:SmallMolecule",
+            "biolink:Drug",
+        ];
+
+        // GET OBJECT READY TO HOLD THE DATA
+        this.renciCatIDObject.nodeIDsCurrent = []
+        this.renciCatIDObject.nodeIDS = []
+        
+
+      // GET NORMALIZED INFO ABOUT THE CURIE SUBMITTED
+        let normalizedArray = await ARSService.getNodeNormArray([
+            this.concept_search,
+        ]);
+        console.log("normalizedArray");
+        console.log(normalizedArray);
+
+      // GET THE ID, LABEL, AND CATEGORY OF THE CURIE SUBMITTED
+
+        this.normID = normalizedArray[this.concept_search].id.identifier;
+        this.normIDSanitized = this.sanitizeNodeId(normalizedArray[this.concept_search].id.identifier);
+        this.normLabel = normalizedArray[this.concept_search].id.label;
+        this.normCategory = normalizedArray[this.concept_search].type[0];
+        console.log("normID");
+        console.log(this.normID);
+        console.log("normLabel");
+        console.log(this.normLabel);
+        console.log("normCategory");
+        console.log(this.normCategory);
+
+      // MAKE THE CYTOSCAPE NODE FOR THE STARTING CURIE SUBMITTED AND ADD IT TO THE GRAPH
+
+        let cytoNode = {
+            data: {
+                id: this.normIDSanitized,
+                name: this.normLabel,
+                category: this.normCategory,
+                db: this.normID.split(":")[0],
+            },
+        };
+        console.log("cytoNode");
+        console.log(cytoNode);
+        // this.elements.push({ data: cytoNode.data });
+        this.cy.add({ data: cytoNode.data });
+        this.cy.fit();
+        // console.log("this.elements")
+        // console.log(this.elements)
+
+      // LOOP THROUGH CATEGORIES AND GET THE NODES AND EDGES DATA FROM ROBOKOP
+        
+        for (let i = 0; i < catgories.length; i++) {
+
+            let category = global.structuredClone(this.sanitizeNodeId(catgories[i])) ;
+            console.log("STARTING category");
+            console.log(category);
+            // let expandedCat =  structuredClone(category)
+            this.renciCatIDObject[category] = {
+                data: [],
+                nodes: [],
+                edges: [],
+            };
+            // this.renciCatIDObject[category].data = []
+            // this.renciCatIDObject[category].nodes = []
+            console.log("this.renciCatIDObject");
+            console.log(this.renciCatIDObject);
+
+            console.log("testRobokop");
+            console.log("Current time:", new Date());
+            console.time("robokopGet()");
+
+            let robokopGet = await PostService.robokopGet(
+                this.normID,
+                this.normCategory,
+                catgories[i]
+            );
+
+            this.renciCatIDObject[category].data = robokopGet;
+            console.log(" ##### this.renciCatIDObject #####")
+            console.log(this.renciCatIDObject)
+
+            console.log("##### CATEGORY #####");
+            console.log(category);
+            console.log("robokopGet");
+            console.log(robokopGet);
+            // CONSOLE THE STRING OF THE FIRST VALUE IN THE RESPONSE ARRAY
+            // console.log("robokopGet[0]");
+            // console.log(JSON.stringify(robokopGet[0]) );
+
+            // ADD EACH OF THE DATA SETS TO renciCatIDObject
+            // THIS WILL BE USED TO GET THE NODES AND EDGES FROM RENCI
+            // AND ADD THEM TO THE GRAPH
+
+
+            console.log("Finish time:", new Date());
+            console.timeEnd("robokopGet()");
+            console.log("----- getAllRenciIdsAndNormalize -----")
+            console.log("this.renciCatIDObject")
+            console.log(this.renciCatIDObject)
+            
+            // this.getAllRenciIdsAndNormalize(robokopGet, category)
+
+        }
+        //#################### END OF FOR LOOP ####################
+        // REMOVE THE NODES THAT HAVE ONLY 1 EDGE AND HAVE A CATEGORY AS THEIR ID
+        this.catgories.forEach(async (cat) => {
+            // remove the nodes that have only 1 edge AND have cat as their id
+            let sanCat =  this.sanitizeNodeId(cat)
+            let node = this.cyInstance.getElementById(sanCat)
+            if(node.degree() == 1){
+                this.cyInstance.remove(node)
+            }
+        })
+
+        // CHANGE THE SIZE OF THE CATEGORY NODES
+        this.updateCategorySize()
+        // UPDATE THE LABELS OF THE CATEGORY NODES
+        this.updateCategoryNames()
+        // LAYOUT THE GRAPH
+        this.cyInstance.makeLayout({ name: "cose", animate: true , fit: true}).run()
+        // this.cyInstance.makeLayout({ name: "cose", nodeRepulsion: 5000, nodeOverlap: 4, gravity: 0,animate: true , fit: true}).run()
+        // this.cyInstance.makeLayout({ name: "cola", nodeRepulsion: 5000, nodeOverlap: 4, gravity: 0,animate: true , fit: true}).run()
+        console.log("DONE")    
+    },
+    updateCategoryNames(){
+        // Get all the nodes in the graph
+        const nodes = this.cyInstance.nodes();
+
+      // Iterate over the nodes and change their style type = "category"
+        nodes.forEach((node) => {
+        // Check some condition to determine the style
+            if (node.data("type") === "category") {
+                console.log("node.data")
+                console.log(node.json().data)
+                let name = node.json().data.name
+                // console.log("name")
+                // console.log(name)
+
+                let rename = this.catgoriesData[name]
+                // let rename = this.catgoriesData[node.data]
+                // console.log("rename")
+                // console.log(rename)
+
+                node.data({ name: rename.label })
+            } 
+        });
+    },
+    updateCategorySize(){
+
+      // GET ALL THE NODES
+        const nodes = this.cyInstance.nodes();
+
+      // Iterate over the nodes and change their style type = "category"
+        nodes.forEach((node) => {
+        // Check some condition to determine the style
+        if (node.data("type") === "category") {
+            let degree = node.degree()
+            console.log("degree")
+            console.log(degree)
+            let resize = 5 * degree
+            if(resize < 50){
+                resize = 50
+            }
+            node.style("width", resize);
+            node.style("height", resize);
+            node.style("text-max-width", resize/2);
+            node.style("font-size", resize/5);
+
+        } 
+        // else {
+        //   node.style("background-color", "red");
+        // }
+        });
+    
+    },
     changeLayout() {
         console.log("changeLayout");
         this.cyInstance
@@ -218,7 +463,43 @@ methods: {
         this.keyCounter++;
         console.log(this.cyInstance.data())
     },
+    addParentWithChildren() {
+        const parentId = 'parent';
+        const childIds = ['child1', 'child2', 'child3'];
 
+        // Add the parent node
+        this.elements.push({ data: { id: parentId } });
+        this.cyInstance.add({ data: { id: parentId } });
+
+        // Add the child nodes with invisible state
+        childIds.forEach((childId) => {
+            this.elements.push({ data: { id: childId }, classes: 'invisible' });
+            this.elements.push({ data: { source: parentId, target: childId } });
+            this.cyInstance.add([
+                { data: { id: childId }, classes: 'invisible' },
+                { data: { source: parentId, target: childId } },
+            ]);
+        });
+        
+        this.cyInstance.makeLayout({ name: "cola", animate: true, fit: true }).run()
+        this.cyInstance.center();
+      // Refresh the Cytoscape graph
+    //   this.cyInstance.refresh();
+        // this.keyCounter++;
+
+    //   // Bind the click event to the parent node
+    //   const cy = this.cyInstance.getCy();
+    //   cy.on('click', `#${parentId}`, (event) => {
+    //     const parent = event.target;
+    //     console.log(parent);
+
+    //     // Toggle the visibility of the child nodes
+    //     childIds.forEach((childId) => {
+    //       const child = cy.$(`#${childId}`);
+    //       child.toggleClass('invisible');
+    //     });
+    //   });
+    },
     preConfig(cytoscape) {
         console.log("preConfig");
     
@@ -227,6 +508,7 @@ methods: {
     },
 
     async testRobokop(){
+        this.cyInstance.remove(this.cyInstance.elements());
         // MAKE TARGET NODE
         let targetNodeObject = await this.makeTargetNode(this.concept_search);
         this.targetNormNodeData = targetNodeObject
@@ -266,18 +548,20 @@ methods: {
         console.log(graphData);
 
         // ADD ALL NODES AND EDGES TO GRAPH
-        let allElements = [...this.elements, ...graphData.graphNodes, ...graphData.graphEdges];
-        console.log("allElements");
-        console.log(allElements);
+        // let allElements = [...this.elements, ...graphData.graphNodes, ...graphData.graphEdges];
+        // console.log("allElements");
+        // console.log(allElements);
+        // // FILTER OUT DUPLICATES BASED ON DATA.ID
+        // this.elements = allElements.filter((thing, index, self) =>
+        //     index === self.findIndex((t) => (
+        //         t.data.id === thing.data.id
+        //     ))
+        // )
+        // console.log("this.elements");
+        // console.log(this.elements);
         // FILTER OUT DUPLICATES BASED ON DATA.ID
-        this.elements = allElements.filter((thing, index, self) =>
-            index === self.findIndex((t) => (
-                t.data.id === thing.data.id
-            ))
-        )
-        console.log("this.elements");
-        console.log(this.elements);
-        // FILTER OUT DUPLICATES BASED ON DATA.ID
+        console.log("graphData")
+        console.log(graphData)
     
         this.cyInstance.add(graphData.graphNodes);
         this.cyInstance.add(graphData.graphEdges);
@@ -285,11 +569,38 @@ methods: {
         this.cyInstance.makeLayout({ name: "cola", animate: true, fit: true }).run()
             // .makeLayout({ name: "cola", fit: true })
             // .run();
-        this.cy.center();
+        // this.cy.center();
         // this.changeLayout();
-        this.keyCounter++
+        // this.keyCounter++
         console.log("DONE")
-        
+
+        console.log("graphData")
+        console.log(graphData)
+
+        // ADD ALL NODES AND EDGES TO GRAPH
+        this.cyInstance.add(graphData.graphNodes);
+        this.cyInstance.add(graphData.graphEdges);
+
+        // REMOVE THE NODES THAT HAVE ONLY 1 EDGE AND HAVE A CATEGORY AS THEIR ID
+        this.catgories.forEach(async (cat) => {
+            // remove the nodes that have only 1 edge AND have cat as their id
+            let sanCat =  this.sanitizeNodeId(cat)
+            let node = this.cyInstance.getElementById(sanCat)
+            if(node.degree() == 1){
+                this.cyInstance.remove(node)
+            }
+        })
+
+        // CHANGE THE SIZE OF THE CATEGORY NODES
+        this.updateCategorySize()
+        // UPDATE THE LABELS OF THE CATEGORY NODES
+        this.updateCategoryNames()
+        // LAYOUT THE GRAPH
+        this.cyInstance.makeLayout({ name: "cola", animate: true , fit: true}).run()
+        // this.cyInstance.makeLayout({ name: "cose", animate: true , fit: true}).run()
+        // this.cyInstance.makeLayout({ name: "cose", nodeRepulsion: 5000, nodeOverlap: 4, gravity: 0,animate: true , fit: true}).run()
+        // this.cyInstance.makeLayout({ name: "cola", nodeRepulsion: 5000, nodeOverlap: 4, gravity: 0,animate: true , fit: true}).run()
+        console.log("DONE")
 
     },
 
@@ -409,6 +720,7 @@ methods: {
                 name: this.normLabel,
                 category: this.normCategory,
                 db: this.normID.split(":")[0],
+                type: "target",
             },
         };
         console.log("cytoNode");
@@ -465,116 +777,7 @@ methods: {
             return newRenciObject;
     },
     
-    async testRobokop2() {
-        let catgories = [
-            "biolink:DiseaseOrPhenotypicFeature",
-            "biolink:Protein",
-            "biolink:Gene",
-            "biolink:GeneFamily",
-            "biolink:BiologicalProcessOrActivity",
-            "biolink:SmallMolecule",
-            "biolink:Drug",
-        ];
 
-        // GET OBJECT READY TO HOLD THE DATA
-        this.renciCatIDObject.nodeIDsCurrent = []
-        this.renciCatIDObject.nodeIDS = []
-        
-
-      // GET NORMALIZED INFO ABOUT THE CURIE SUBMITTED
-        let normalizedArray = await ARSService.getNodeNormArray([
-            this.concept_search,
-        ]);
-        console.log("normalizedArray");
-        console.log(normalizedArray);
-
-      // GET THE ID, LABEL, AND CATEGORY OF THE CURIE SUBMITTED
-
-        this.normID = normalizedArray[this.concept_search].id.identifier;
-        this.normIDSanitized = this.sanitizeNodeId(normalizedArray[this.concept_search].id.identifier);
-        this.normLabel = normalizedArray[this.concept_search].id.label;
-        this.normCategory = normalizedArray[this.concept_search].type[0];
-        console.log("normID");
-        console.log(this.normID);
-        console.log("normLabel");
-        console.log(this.normLabel);
-        console.log("normCategory");
-        console.log(this.normCategory);
-
-      // MAKE THE CYTOSCAPE NODE FOR THE STARTING CURIE SUBMITTED AND ADD IT TO THE GRAPH
-
-        let cytoNode = {
-            data: {
-                id: this.normIDSanitized,
-                name: this.normLabel,
-                category: this.normCategory,
-                db: this.normID.split(":")[0],
-            },
-        };
-        console.log("cytoNode");
-        console.log(cytoNode);
-        this.elements.push({ data: cytoNode.data });
-        this.cy.add({ data: cytoNode.data });
-        this.cy.fit();
-        console.log("this.elements")
-        console.log(this.elements)
-
-      // LOOP THROUGH CATEGORIES AND GET THE NODES AND EDGES DATA FROM ROBOKOP
-        
-        for (let i = 0; i < catgories.length; i++) {
-
-            let category = global.structuredClone(this.sanitizeNodeId(catgories[i])) ;
-            console.log("STARTING category");
-            console.log(category);
-            // let expandedCat =  structuredClone(category)
-            this.renciCatIDObject[category] = {
-                data: [],
-                nodes: [],
-                edges: [],
-            };
-            // this.renciCatIDObject[category].data = []
-            // this.renciCatIDObject[category].nodes = []
-            console.log("this.renciCatIDObject");
-            console.log(this.renciCatIDObject);
-
-            console.log("testRobokop");
-            console.log("Current time:", new Date());
-            console.time("robokopGet()");
-
-            let robokopGet = await PostService.robokopGet(
-                this.normID,
-                this.normCategory,
-                catgories[i]
-            );
-
-            this.renciCatIDObject[category].data = robokopGet;
-            console.log(" ##### this.renciCatIDObject #####")
-            console.log(this.renciCatIDObject)
-
-            console.log("##### CATEGORY #####");
-            console.log(category);
-            console.log("robokopGet");
-            console.log(robokopGet);
-            // CONSOLE THE STRING OF THE FIRST VALUE IN THE RESPONSE ARRAY
-            // console.log("robokopGet[0]");
-            // console.log(JSON.stringify(robokopGet[0]) );
-
-            // ADD EACH OF THE DATA SETS TO renciCatIDObject
-            // THIS WILL BE USED TO GET THE NODES AND EDGES FROM RENCI
-            // AND ADD THEM TO THE GRAPH
-
-
-            console.log("Finish time:", new Date());
-            console.timeEnd("robokopGet()");
-            console.log("----- getAllRenciIdsAndNormalize -----")
-            console.log("this.renciCatIDObject")
-            console.log(this.renciCatIDObject)
-            
-            // this.getAllRenciIdsAndNormalize(robokopGet, category)
-
-        }
-        // this.makeEdges();
-    },
     // USE renciCatIDObject TO GET THE NORMALIZED NODE INFO
     makeEdges2(){
         // LOOP THROUGH THE CATEGORIES IN renciCatIDObject
@@ -715,7 +918,8 @@ methods: {
 
                 // LOOP THROUGH THE NORMALIZED ARRAY WITH EACH RENCIID AND CREATE AND ADD THE NODE TO THE ARRAY
                 // for (let n = 0; n < allCatIds.length; n++) {
-                for (let n = 0; n < allCatIds.length && n < 10; n++) {
+                for (let n = 0; n < allCatIds.length && n < 20; n++) {
+                // for (let n = 0; n < allCatIds.length; n++) {
                     const renciID = allCatIds[n];
                     let normData = normalizedArray[renciID];
                     
@@ -738,9 +942,10 @@ methods: {
                             data: {
                                 id: sanitizedID,
                                 idOG: renciID,
-                                parent: category,
+                                parentid: category,
                                 sourceCat: newRenciIDData[category].category,
                                 normName: normData.id.label,
+                                name: normData.id.label,
                                 normCat: normData.type[0],
                                 x: Math.random() * 1000,
                                 y: Math.random() * 1000,
@@ -785,38 +990,10 @@ methods: {
         }
     },
     mounted() { 
-        // Create Cytoscape instance
-        // this.cy = cytoscape({
-        //     container: this.$refs.graphContainer,
-        //     elements: this.elements,
-        //     style: [
-        //     {
-        //         selector: "node",
-        //         style: {
-        //         "background-color": "#ff0000",
-        //         label: "data(id)",
-        //         },
-        //     },
-        //     {
-        //         selector: "edge",
-        //         style: {
-        //         width: 3,
-        //             "line-color": "#ccc",
-        //             "target-arrow-color": "#ccc",
-        //             "target-arrow-shape": "triangle",
-        //         },
-        //     },
-        //     ]
-        // });
-        // this.cy.on('click', 'node', (event) => {
-        //     const node = event.target;
-        //     const json = node.json();
-        //     console.log('clicked on node', node.data());
-        //     console.log(node.json())
-        //     console.log(JSON.stringify(json, null, 2));
-        // });
+      
         cytoscape.use(cola);
         cytoscape.use(klay);
+        cytoscape.use(coseBilkent);
     },          
     beforeDestroy() {
         // Cleanup Cytoscape instance
